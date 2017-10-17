@@ -1,1 +1,1 @@
-from pyhiveapi import Pyhiveapi
+from .pyhiveapi import Pyhiveapi
