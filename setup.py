@@ -13,7 +13,7 @@ from os import path
 
 setup(
     name='pyhiveapi',
-    version='0.0.10',
+    version='0.0.11',
     description='A Python library to interface with the Hive API',
     long_description="A Python library to interface with the Hive API",
 	#    url='https://github.com/pypa/sampleproject',
@@ -28,12 +28,12 @@ setup(
         'Intended Audience :: Developers',
 #        'Topic :: Software Development :: API',
         'License :: OSI Approved :: MIT License',
-        'Programming Language :: Python :: 2.7',
+        #'Programming Language :: Python :: 2.7',
         'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
-    python_requires='>=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, <4',
+    python_requires='>=3.4.*',
     keywords='Hive API Library',
 #    py_modules = ['pyhiveapi'],
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
