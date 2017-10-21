@@ -400,227 +400,6 @@ class Pyhiveapi:
         return get_nodes_successful
 
 
-    def p_get_heating_min_temp(self, node_id):
-        """Get heating minimum target temperature."""
-        heating_min_temp_default = 5
-        heating_min_temp_return = 0
-        heating_min_temp_tmp = 0
-        heating_min_temp_found = False
-
-        heating_min_temp_tmp = heating_min_temp_default
-
-        current_node_attribute = "Heating_Min_Temperature_" + node_id
-
-        if heating_min_temp_found:
-            NODE_ATTRIBS[current_node_attribute] = heating_min_temp_tmp
-            heating_min_temp_return = heating_min_temp_tmp
-        else:
-            if current_node_attribute in NODE_ATTRIBS:
-                heating_min_temp_return = NODE_ATTRIBS.get(current_node_attribute)
-            else:
-                heating_min_temp_return = heating_min_temp_default
-
-        return heating_min_temp_return
-
-
-    def p_get_heating_max_temp(self, node_id):
-        """Get heating maximum target temperature."""
-        heating_max_temp_default = 32
-        heating_max_temp_return = 0
-        heating_max_temp_tmp = 0
-        heating_max_temp_found = False
-
-        heating_max_temp_tmp = heating_max_temp_default
-
-        current_node_attribute = "Heating_Max_Temperature_" + node_id
-
-        if heating_max_temp_found:
-            NODE_ATTRIBS[current_node_attribute] = heating_max_temp_tmp
-            heating_max_temp_return = heating_max_temp_tmp
-        else:
-            if current_node_attribute in NODE_ATTRIBS:
-                heating_max_temp_return = NODE_ATTRIBS.get(current_node_attribute)
-            else:
-                heating_max_temp_return = heating_max_temp_default
-
-        return heating_max_temp_return
-
-
-    def p_get_heating_current_temp(self, node_id):
-        """Get heating current temperature."""
-        node_index = -1
-
-        current_temp_return = 0
-        current_temp_tmp = 0
-        current_temp_found = False
-
-        current_node_attribute = "Heating_CurrentTemp_" + node_id
-
-        if len(HSC.products.heating) > 0:
-            for current_node_index in range(0, len(HSC.products.heating)):
-                if "id" in HSC.products.heating[current_node_index]:
-                    if HSC.products.heating[current_node_index]["id"] == node_id:
-                        node_index = current_node_index
-                        break
-
-            if node_index != -1:
-                if "props" in HSC.products.heating[node_index]:
-                    if "temperature" in HSC.products.heating[node_index]["props"]:
-                        current_temp_tmp = (HSC.products.heating[node_index]
-                                            ["props"]["temperature"])
-                        current_temp_found = True
-
-        if current_temp_found:
-            NODE_ATTRIBS[current_node_attribute] = current_temp_tmp
-            current_temp_return = current_temp_tmp
-        else:
-            if current_node_attribute in NODE_ATTRIBS:
-                current_temp_return = NODE_ATTRIBS.get(current_node_attribute)
-            else:
-                current_temp_return = -1000
-
-#        if current_temp_return != -1000:
-#            if node_id in HSC.platform_data.min_max_data:
-#                if (HSC.platform_data.min_max_data[node_id]['TodayDate'] !=
-#                        datetime.date(datetime.now())):
-#                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = 1000
-#                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = -1000
-#                    HSC.platform_data.min_max_data[node_id]['TodayDate'] = \
-#                        datetime.date(datetime.now())
-
-#                if (current_temp_return <
-#                        HSC.platform_data.min_max_data[node_id]['TodayMin']):
-#                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = \
-#                        current_temp_return
-
-#                if (current_temp_return >
-#                        HSC.platform_data.min_max_data[node_id]['TodayMax']):
-#                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = \
-#                        current_temp_return
-
-#                if (current_temp_return <
-#                        HSC.platform_data.min_max_data[node_id]['RestartMin']):
-#                    HSC.platform_data.min_max_data[node_id]['RestartMin'] = \
-#                        current_temp_return
-
-#                if current_temp_return > \
-#                        HSC.platform_data.min_max_data[node_id]['RestartMax']:
-#                    HSC.platform_data.min_max_data[node_id]['RestartMax'] = \
-#                        current_temp_return
-#            else:
-#                current_node_max_min_data = {}
-#                current_node_max_min_data['TodayMin'] = current_temp_return
-#                current_node_max_min_data['TodayMax'] = current_temp_return
-#                current_node_max_min_data['TodayDate'] = \
-#                    datetime.date(datetime.now())
-#                current_node_max_min_data['RestartMin'] = current_temp_return
-#                current_node_max_min_data['RestartMax'] = current_temp_return
-#                HSC.platform_data.min_max_data[node_id] = \
-#                    current_node_max_min_data
-
-#        else:
-#            current_temp_return = 0
-
-        return current_temp_return
-
-    def p_get_heating_target_temp(self, node_id):
-        """Get heating target temperature."""
-        node_index = -1
-
-        heating_target_temp_return = 0
-        heating_target_temp_tmp = 0
-        heating_target_temp_found = False
-
-        current_node_attribute = "Heating_TargetTemp_" + node_id
-
-        # pylint: disable=too-many-nested-blocks
-        if len(HSC.products.heating) > 0:
-            for current_node_index in range(0, len(HSC.products.heating)):
-                if "id" in HSC.products.heating[current_node_index]:
-                    if HSC.products.heating[current_node_index]["id"] == node_id:
-                        node_index = current_node_index
-                        break
-
-            if node_index != -1:
-                heating_mode_current = self.p_get_heating_mode(node_id)
-                if heating_mode_current == "SCHEDULE":
-                    if ('props' in HSC.products.heating[node_index] and
-                            'scheduleOverride' in
-                            HSC.products.heating[node_index]["props"]):
-                        if (HSC.products.heating[node_index]
-                                ["props"]["scheduleOverride"]):
-                            if ("state" in HSC.products.heating[node_index] and
-                                    "target" in HSC.products.heating[node_index]
-                                    ["state"]):
-                                heating_target_temp_tmp = (HSC.products.heating
-                                                           [node_index]["state"]
-                                                           ["target"])
-                                heating_target_temp_found = True
-                        else:
-                            snan = (
-                                self.p_get_schedule_now_next_later(
-                                    HSC.products.heating[node_index]
-                                    ["state"]["schedule"]))
-                            if 'now' in snan:
-                                if ('value' in snan["now"] and
-                                        'target' in snan["now"]
-                                        ["value"]):
-                                    heating_target_temp_tmp = (snan["now"]
-                                                               ["value"]
-                                                               ["target"])
-                                    heating_target_temp_found = True
-                else:
-                    if ("state" in HSC.products.heating[node_index] and "target"
-                            in HSC.products.heating[node_index]["state"]):
-                        heating_target_temp_tmp = \
-                            HSC.products.heating[node_index]["state"]["target"]
-                        heating_target_temp_found = True
-
-        if heating_target_temp_found:
-            NODE_ATTRIBS[current_node_attribute] = heating_target_temp_tmp
-            heating_target_temp_return = heating_target_temp_tmp
-        else:
-            if current_node_attribute in NODE_ATTRIBS:
-                heating_target_temp_return = \
-                    NODE_ATTRIBS.get(current_node_attribute)
-            else:
-                heating_target_temp_return = 0
-
-        return heating_target_temp_return
-
-
-    def p_get_heating_mode(self, node_id):
-        """Get heating current mode."""
-        node_index = -1
-
-        mode_return = "UNKNOWN"
-        mode_tmp = "UNKNOWN"
-        mode_found = False
-
-        current_node_attribute = "Heating_Mode_" + node_id
-
-        if len(HSC.products.heating) > 0:
-            for current_node_index in range(0, len(HSC.products.heating)):
-                if "id" in HSC.products.heating[current_node_index]:
-                    if HSC.products.heating[current_node_index]["id"] == node_id:
-                        node_index = current_node_index
-                        break
-
-            if node_index != -1:
-                if ("state" in HSC.products.heating[node_index] and
-                        "mode" in HSC.products.heating[node_index]["state"]):
-                    mode_tmp = HSC.products.heating[node_index]["state"]["mode"]
-                    if mode_tmp == "BOOST":
-                        if ("props" in HSC.products.heating[node_index] and
-                                "previous" in
-                                HSC.products.heating[node_index]["props"] and
-                                "mode" in
-                                HSC.products.heating[node_index]
-                                ["props"]["previous"]):
-                            mode_tmp = (HSC.products.heating[node_index]
-                                        ["props"]["previous"]["mode"])
-                    mode_found = True
-
         if mode_found:
             NODE_ATTRIBS[current_node_attribute] = mode_tmp
             mode_return = mode_tmp
@@ -800,6 +579,254 @@ class Pyhiveapi:
         device_list_all['device_list_plug'] = device_list_plug
 
         return device_list_all
- 
-    def GetSessionID(self):
+
+    def GetSessionID(self): #### DELETE ME #####
         return HSC.session_id
+
+
+    class Climate():
+        """Hive Switches."""
+        def p_get_heating_min_temp(self, node_id):
+            """Get heating minimum target temperature."""
+            heating_min_temp_default = 5
+            heating_min_temp_return = 0
+            heating_min_temp_tmp = 0
+            heating_min_temp_found = False
+
+            heating_min_temp_tmp = heating_min_temp_default
+
+            current_node_attribute = "Heating_Min_Temperature_" + node_id
+
+            if heating_min_temp_found:
+                NODE_ATTRIBS[current_node_attribute] = heating_min_temp_tmp
+                heating_min_temp_return = heating_min_temp_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    heating_min_temp_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    heating_min_temp_return = heating_min_temp_default
+
+            return heating_min_temp_return
+
+
+        def p_get_heating_max_temp(self, node_id):
+            """Get heating maximum target temperature."""
+            heating_max_temp_default = 32
+            heating_max_temp_return = 0
+            heating_max_temp_tmp = 0
+            heating_max_temp_found = False
+
+            heating_max_temp_tmp = heating_max_temp_default
+
+            current_node_attribute = "Heating_Max_Temperature_" + node_id
+
+            if heating_max_temp_found:
+                NODE_ATTRIBS[current_node_attribute] = heating_max_temp_tmp
+                heating_max_temp_return = heating_max_temp_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    heating_max_temp_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    heating_max_temp_return = heating_max_temp_default
+
+            return heating_max_temp_return
+
+
+        def p_get_heating_current_temp(self, node_id):
+            """Get heating current temperature."""
+            node_index = -1
+
+            current_temp_return = 0
+            current_temp_tmp = 0
+            current_temp_found = False
+
+            current_node_attribute = "Heating_CurrentTemp_" + node_id
+
+            if len(HSC.products.heating) > 0:
+                for current_node_index in range(0, len(HSC.products.heating)):
+                    if "id" in HSC.products.heating[current_node_index]:
+                        if HSC.products.heating[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if "props" in HSC.products.heating[node_index]:
+                        if "temperature" in HSC.products.heating[node_index]["props"]:
+                            current_temp_tmp = (HSC.products.heating[node_index]
+                                                ["props"]["temperature"])
+                            current_temp_found = True
+
+            if current_temp_found:
+                NODE_ATTRIBS[current_node_attribute] = current_temp_tmp
+                current_temp_return = current_temp_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    current_temp_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    current_temp_return = -1000
+
+    #        if current_temp_return != -1000:
+    #            if node_id in HSC.platform_data.min_max_data:
+    #                if (HSC.platform_data.min_max_data[node_id]['TodayDate'] !=
+    #                        datetime.date(datetime.now())):
+    #                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = 1000
+    #                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = -1000
+    #                    HSC.platform_data.min_max_data[node_id]['TodayDate'] = \
+    #                        datetime.date(datetime.now())
+
+    #                if (current_temp_return <
+    #                        HSC.platform_data.min_max_data[node_id]['TodayMin']):
+    #                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = \
+    #                        current_temp_return
+
+    #                if (current_temp_return >
+    #                        HSC.platform_data.min_max_data[node_id]['TodayMax']):
+    #                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = \
+    #                        current_temp_return
+
+    #                if (current_temp_return <
+    #                        HSC.platform_data.min_max_data[node_id]['RestartMin']):
+    #                    HSC.platform_data.min_max_data[node_id]['RestartMin'] = \
+    #                        current_temp_return
+
+    #                if current_temp_return > \
+    #                        HSC.platform_data.min_max_data[node_id]['RestartMax']:
+    #                    HSC.platform_data.min_max_data[node_id]['RestartMax'] = \
+    #                        current_temp_return
+    #            else:
+    #                current_node_max_min_data = {}
+    #                current_node_max_min_data['TodayMin'] = current_temp_return
+    #                current_node_max_min_data['TodayMax'] = current_temp_return
+    #                current_node_max_min_data['TodayDate'] = \
+    #                    datetime.date(datetime.now())
+    #                current_node_max_min_data['RestartMin'] = current_temp_return
+    #                current_node_max_min_data['RestartMax'] = current_temp_return
+    #                HSC.platform_data.min_max_data[node_id] = \
+    #                    current_node_max_min_data
+
+    #        else:
+    #            current_temp_return = 0
+
+            return current_temp_return
+
+        def p_get_heating_target_temp(self, node_id):
+            """Get heating target temperature."""
+            node_index = -1
+
+            heating_target_temp_return = 0
+            heating_target_temp_tmp = 0
+            heating_target_temp_found = False
+
+            current_node_attribute = "Heating_TargetTemp_" + node_id
+
+            # pylint: disable=too-many-nested-blocks
+            if len(HSC.products.heating) > 0:
+                for current_node_index in range(0, len(HSC.products.heating)):
+                    if "id" in HSC.products.heating[current_node_index]:
+                        if HSC.products.heating[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    heating_mode_current = self.p_get_heating_mode(node_id)
+                    if heating_mode_current == "SCHEDULE":
+                        if ('props' in HSC.products.heating[node_index] and
+                                'scheduleOverride' in
+                                HSC.products.heating[node_index]["props"]):
+                            if (HSC.products.heating[node_index]
+                                    ["props"]["scheduleOverride"]):
+                                if ("state" in HSC.products.heating[node_index] and
+                                        "target" in HSC.products.heating[node_index]
+                                        ["state"]):
+                                    heating_target_temp_tmp = (HSC.products.heating
+                                                               [node_index]["state"]
+                                                               ["target"])
+                                    heating_target_temp_found = True
+                            else:
+                                snan = (
+                                    self.p_get_schedule_now_next_later(
+                                        HSC.products.heating[node_index]
+                                        ["state"]["schedule"]))
+                                if 'now' in snan:
+                                    if ('value' in snan["now"] and
+                                            'target' in snan["now"]
+                                            ["value"]):
+                                        heating_target_temp_tmp = (snan["now"]
+                                                                   ["value"]
+                                                                   ["target"])
+                                        heating_target_temp_found = True
+                    else:
+                        if ("state" in HSC.products.heating[node_index] and "target"
+                                in HSC.products.heating[node_index]["state"]):
+                            heating_target_temp_tmp = \
+                                HSC.products.heating[node_index]["state"]["target"]
+                            heating_target_temp_found = True
+
+            if heating_target_temp_found:
+                NODE_ATTRIBS[current_node_attribute] = heating_target_temp_tmp
+                heating_target_temp_return = heating_target_temp_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    heating_target_temp_return = \
+                        NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    heating_target_temp_return = 0
+
+            return heating_target_temp_return
+
+
+        def p_get_heating_mode(self, node_id):
+            """Get heating current mode."""
+            node_index = -1
+
+            mode_return = "UNKNOWN"
+            mode_tmp = "UNKNOWN"
+            mode_found = False
+
+            current_node_attribute = "Heating_Mode_" + node_id
+
+            if len(HSC.products.heating) > 0:
+                for current_node_index in range(0, len(HSC.products.heating)):
+                    if "id" in HSC.products.heating[current_node_index]:
+                        if HSC.products.heating[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in HSC.products.heating[node_index] and
+                            "mode" in HSC.products.heating[node_index]["state"]):
+                        mode_tmp = HSC.products.heating[node_index]["state"]["mode"]
+                        if mode_tmp == "BOOST":
+                            if ("props" in HSC.products.heating[node_index] and
+                                    "previous" in
+                                    HSC.products.heating[node_index]["props"] and
+                                    "mode" in
+                                    HSC.products.heating[node_index]
+                                    ["props"]["previous"]):
+                                mode_tmp = (HSC.products.heating[node_index]
+                                            ["props"]["previous"]["mode"])
+                        mode_found = True
+
+
+    class Light():
+        """Hive Switches."""
+        temp_Switch = "Delete Me" #### DELETE ME #####
+
+        def GetSessionID(self): #### DELETE ME #####
+            return HSC.session_id
+
+
+    class Sensor():
+        """Hive Switches."""
+        temp_Switch = "Delete Me" #### DELETE ME #####
+
+        def GetSessionID(self): #### DELETE ME #####
+            return HSC.session_id
+
+
+    class Switch():
+        """Hive Switches."""
+        temp_Switch = "Delete Me" #### DELETE ME #####
+
+        def GetSessionID(self): #### DELETE ME #####
+            return HSC.session_id
