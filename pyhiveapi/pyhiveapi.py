@@ -191,7 +191,7 @@ class Pyhiveapi:
 
             json_string_content = '{"username": "' + HSC.username + '","password": "' + HSC.password + '"}'
 
-            api_resp_d = self.hive_api_json_call("POST", HIVE_API.urls.global_login, json_string_content, True)
+            api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", HIVE_API.urls.global_login, json_string_content, True)
             api_resp_p = api_resp_d['parsed']
 
             if ('token' in api_resp_p and
@@ -257,7 +257,7 @@ class Pyhiveapi:
         l_logon_mins = int(round(l_logon_secs / 60))
 
         if l_logon_mins >= MINUTES_BETWEEN_LOGONS or HSC.session_id is None:
-            self.hive_api_logon()
+            Pyhiveapi.hive_api_logon(self)
 
 
     def hive_api_get_nodes_rl(self, node_id, device_type):
@@ -267,20 +267,20 @@ class Pyhiveapi:
         last_update_secs = (current_time - HSC.last_update).total_seconds()
         if last_update_secs >= HSC.update_interval_seconds:
             HSC.last_update = current_time
-            nodes_updated = self.hive_api_get_nodes(node_id, device_type)
+            nodes_updated = Pyhiveapi.hive_api_get_nodes(self, node_id, device_type)
         return nodes_updated
 
 
     def hive_api_get_nodes_nl(self):
         """Get latest data for Hive nodes - not rate limiting."""
-        self.hive_api_get_nodes("NoID", "NoDeviceType")
+        Pyhiveapi.hive_api_get_nodes(self, "NoID", "NoDeviceType")
 
 
     def hive_api_get_nodes(self, node_id, device_type):
         """Get latest data for Hive nodes."""
         get_nodes_successful = True
 
-        self.check_hive_api_logon()
+        Pyhiveapi.check_hive_api_logon(self)
 
         if HSC.session_id is not None:
             tmp_devices_hub = []
@@ -300,7 +300,7 @@ class Pyhiveapi:
             try:
                 api_resp_d = {}
                 api_resp_p = None
-                api_resp_d = self.hive_api_json_call("GET", HIVE_API.urls.devices, "", False)
+                api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.devices, "", False)
 
                 api_resp_p = api_resp_d['parsed']
 
@@ -333,10 +333,7 @@ class Pyhiveapi:
             try:
                 api_resp_d = {}
                 api_resp_p = None
-                api_resp_d = self.hive_api_json_call("GET",
-                                                HIVE_API.urls.products,
-                                                "",
-                                                False)
+                api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.products, "", False)
 
                 api_resp_p = api_resp_d['parsed']
 
@@ -451,7 +448,7 @@ class Pyhiveapi:
                 current_slot_custom = current_day_schedule_sorted[current_slot]
 
                 slot_date = datetime.now() + timedelta(days=day_index)
-                slot_time = self.p_minutes_to_time(current_slot_custom["start"])
+                slot_time = Pyhiveapi.p_minutes_to_time(self, current_slot_custom["start"])
                 slot_time_date_s = (slot_date.strftime("%d-%m-%Y")
                                     + " "
                                     + slot_time)
@@ -498,10 +495,10 @@ class Pyhiveapi:
         if HSC.username is None or HSC.password is None:
             return None
         else:
-            self.hive_api_logon()
+            Pyhiveapi.hive_api_logon(self)
             if HSC.session_id is not None:
                 HSC.update_interval_seconds = hive_node_update_interval
-                self.hive_api_get_nodes_nl()
+                Pyhiveapi.hive_api_get_nodes_nl(self)
 
 
         device_list_all = {}
@@ -728,7 +725,7 @@ class Pyhiveapi:
                             break
 
                 if node_index != -1:
-                    heating_mode_current = self.p_get_heating_mode(node_id)
+                    heating_mode_current = Pyhiveapi.Climate.p_get_heating_mode(self, node_id)
                     if heating_mode_current == "SCHEDULE":
                         if ('props' in HSC.products.heating[node_index] and
                                 'scheduleOverride' in
@@ -744,9 +741,7 @@ class Pyhiveapi:
                                     heating_target_temp_found = True
                             else:
                                 snan = (
-                                    self.p_get_schedule_now_next_later(
-                                        HSC.products.heating[node_index]
-                                        ["state"]["schedule"]))
+                                    Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.heating[node_index]["state"]["schedule"]))
                                 if 'now' in snan:
                                     if ('value' in snan["now"] and
                                             'target' in snan["now"]
@@ -806,6 +801,96 @@ class Pyhiveapi:
                                 mode_tmp = (HSC.products.heating[node_index]
                                             ["props"]["previous"]["mode"])
                         mode_found = True
+
+            if mode_found:
+                NODE_ATTRIBS[current_node_attribute] = mode_tmp
+                mode_return = mode_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    mode_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    mode_return = "UNKNOWN"
+
+            return mode_return
+
+
+        def p_get_heating_state(self, node_id):
+            """Get heating current state."""
+            heating_state_return = "OFF"
+            heating_state_tmp = "OFF"
+            heating_state_found = False
+
+            current_node_attribute = "Heating_State_" + node_id
+
+            if len(HSC.products.heating) > 0:
+                temperature_current = Pyhiveapi.Climate.p_get_heating_current_temp(self, node_id)
+                temperature_target = Pyhiveapi.Climate.p_get_heating_target_temp(self, node_id)
+                heating_boost = Pyhiveapi.Climate.p_get_heating_boost(self, node_id)
+                heating_mode = Pyhiveapi.Climate.p_get_heating_mode(self, node_id)
+
+                if (heating_mode == "SCHEDULE" or
+                        heating_mode == "MANUAL" or
+                        heating_boost == "ON"):
+                    if temperature_current < temperature_target:
+                        heating_state_tmp = "ON"
+                        heating_state_found = True
+                    else:
+                        heating_state_tmp = "OFF"
+                        heating_state_found = True
+                else:
+                    heating_state_tmp = "OFF"
+                    heating_state_found = True
+
+            if heating_state_found:
+                NODE_ATTRIBS[current_node_attribute] = heating_state_tmp
+                heating_state_return = heating_state_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    heating_state_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    heating_state_return = "UNKNOWN"
+
+            return heating_state_return
+
+
+        def p_get_heating_boost(self, node_id):
+            """Get heating boost current status."""
+            node_index = -1
+
+            heating_boost_return = "UNKNOWN"
+            heating_boost_tmp = "UNKNOWN"
+            heating_boost_found = False
+
+            current_node_attribute = "Heating_Boost_" + node_id
+
+            if len(HSC.products.heating) > 0:
+                for current_node_index in range(0, len(HSC.products.heating)):
+                    if "id" in HSC.products.heating[current_node_index]:
+                        if HSC.products.heating[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in HSC.products.heating[node_index] and
+                            "boost" in HSC.products.heating[node_index]["state"]):
+                        heating_boost_tmp = (HSC.products.heating[node_index]
+                                             ["state"]["boost"])
+                        if heating_boost_tmp is None:
+                            heating_boost_tmp = "OFF"
+                        else:
+                            heating_boost_tmp = "ON"
+                        heating_boost_found = True
+
+            if heating_boost_found:
+                NODE_ATTRIBS[current_node_attribute] = heating_boost_tmp
+                heating_boost_return = heating_boost_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    heating_boost_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    heating_boost_return = "UNKNOWN"
+
+            return heating_boost_return
 
 
     class Light():
