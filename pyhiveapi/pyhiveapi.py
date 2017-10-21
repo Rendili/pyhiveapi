@@ -260,23 +260,23 @@ class Pyhiveapi:
             Pyhiveapi.hive_api_logon(self)
 
 
-    def hive_api_get_nodes_rl(self, node_id, device_type):
+    def hive_api_get_nodes_rl(self, node_id):
         """Get latest data for Hive nodes - rate limiting."""
         nodes_updated = False
         current_time = datetime.now()
         last_update_secs = (current_time - HSC.last_update).total_seconds()
         if last_update_secs >= HSC.update_interval_seconds:
             HSC.last_update = current_time
-            nodes_updated = Pyhiveapi.hive_api_get_nodes(self, node_id, device_type)
+            nodes_updated = Pyhiveapi.hive_api_get_nodes(self, node_id)
         return nodes_updated
 
 
     def hive_api_get_nodes_nl(self):
         """Get latest data for Hive nodes - not rate limiting."""
-        Pyhiveapi.hive_api_get_nodes(self, "NoID", "NoDeviceType")
+        Pyhiveapi.hive_api_get_nodes(self, "NoID")
 
 
-    def hive_api_get_nodes(self, node_id, device_type):
+    def hive_api_get_nodes(self, node_id):
         """Get latest data for Hive nodes."""
         get_nodes_successful = True
 
@@ -891,6 +891,164 @@ class Pyhiveapi:
                     heating_boost_return = "UNKNOWN"
 
             return heating_boost_return
+
+
+        def p_get_heating_operation_modes(self, node_id):
+            """Get heating list of possible modes."""
+            heating_operation_list = ["SCHEDULE", "MANUAL", "OFF"]
+            return heating_operation_list
+
+
+        def p_get_hotwater_mode(self, node_id):
+            """Get hot water current mode."""
+            node_index = -1
+
+            hotwater_mode_return = "UNKNOWN"
+            hotwater_mode_tmp = "UNKNOWN"
+            hotwater_mode_found = False
+
+            current_node_attribute = "HotWater_Mode_" + node_id
+
+            if len(HSC.products.hotwater) > 0:
+                for current_node_index in range(0, len(HSC.products.hotwater)):
+                    if "id" in HSC.products.hotwater[current_node_index]:
+                        if HSC.products.hotwater[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in HSC.products.hotwater[node_index] and
+                            "mode" in HSC.products.hotwater[node_index]["state"]):
+                        hotwater_mode_tmp = (HSC.products.hotwater[node_index]
+                                             ["state"]["mode"])
+                        if hotwater_mode_tmp == "BOOST":
+                            if ("props" in HSC.products.hotwater[node_index] and
+                                    "previous" in
+                                    HSC.products.hotwater[node_index]["props"] and
+                                    "mode" in
+                                    HSC.products.hotwater[node_index]
+                                    ["props"]["previous"]):
+                                hotwater_mode_tmp = (HSC.products.hotwater[node_index]
+                                                     ["props"]["previous"]["mode"])
+                        elif hotwater_mode_tmp == "MANUAL":
+                            hotwater_mode_tmp = "ON"
+                        hotwater_mode_found = True
+
+            if hotwater_mode_found:
+                NODE_ATTRIBS[current_node_attribute] = hotwater_mode_tmp
+                hotwater_mode_return = hotwater_mode_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    hotwater_mode_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    hotwater_mode_return = "UNKNOWN"
+
+            return hotwater_mode_return
+
+
+        def p_get_hotwater_operation_modes(self, node_id):
+            """Get heating list of possible modes."""
+            hotwater_operation_list = ["SCHEDULE", "ON", "OFF"]
+            return hotwater_operation_list
+
+
+        def p_get_hotwater_boost(self, node_id):
+            """Get hot water current boost status."""
+            node_index = -1
+
+            hotwater_boost_return = "UNKNOWN"
+            hotwater_boost_tmp = "UNKNOWN"
+            hotwater_boost_found = False
+
+            current_node_attribute = "HotWater_Boost_" + node_id
+
+            if len(HSC.products.hotwater) > 0:
+                for current_node_index in range(0, len(HSC.products.hotwater)):
+                    if "id" in HSC.products.hotwater[current_node_index]:
+                        if HSC.products.hotwater[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in HSC.products.hotwater[node_index] and
+                            "boost" in HSC.products.hotwater[node_index]["state"]):
+                        hotwater_boost_tmp = (HSC.products.hotwater[node_index]
+                                              ["state"]["boost"])
+                        if hotwater_boost_tmp is None:
+                            hotwater_boost_tmp = "OFF"
+                        else:
+                            hotwater_boost_tmp = "ON"
+                        hotwater_boost_found = True
+
+            if hotwater_boost_found:
+                NODE_ATTRIBS[current_node_attribute] = hotwater_boost_tmp
+                hotwater_boost_return = hotwater_boost_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    hotwater_boost_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    hotwater_boost_return = "UNKNOWN"
+
+            return hotwater_boost_return
+
+
+        def p_get_hotwater_state(self, node_id):
+            """Get hot water current state."""
+            node_index = -1
+
+            state_return = "OFF"
+            state_tmp = "OFF"
+            state_found = False
+            mode_current = Pyhiveapi.Climate.p_get_hotwater_mode(self, node_id)
+
+            current_node_attribute = "HotWater_State_" + node_id
+
+            # pylint: disable=too-many-nested-blocks
+            if len(HSC.products.hotwater) > 0:
+                for current_node_index in range(0, len(HSC.products.hotwater)):
+                    if "id" in HSC.products.hotwater[current_node_index]:
+                        if HSC.products.hotwater[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in HSC.products.hotwater[node_index] and
+                            "status" in HSC.products.hotwater[node_index]["state"]):
+                        state_tmp = (HSC.products.hotwater[node_index]
+                                     ["state"]["status"])
+                        if state_tmp is None:
+                            state_tmp = "OFF"
+                        else:
+                            if mode_current == "SCHEDULE":
+                                if Pyhiveapi.Climate.p_get_hotwater_boost(self, node_id) == "ON":
+                                    state_tmp = "ON"
+                                    state_found = True
+                                else:
+                                    if ("state" in
+                                            HSC.products.hotwater[node_index] and
+                                            "schedule" in
+                                            HSC.products.hotwater[node_index]
+                                            ["state"]):
+                                        snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.hotwater[node_index]["state"]["schedule"])
+                                        if 'now' in snan:
+                                            if ('value' in snan["now"] and
+                                                    'status' in snan["now"]["value"]):
+                                                state_tmp = (snan["now"]["value"]
+                                                             ["status"])
+                                                state_found = True
+                            else:
+                                state_found = True
+
+            if state_found:
+                NODE_ATTRIBS[current_node_attribute] = state_tmp
+                state_return = state_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    state_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    state_return = "UNKNOWN"
+
+            return state_return
 
 
     class Light():
