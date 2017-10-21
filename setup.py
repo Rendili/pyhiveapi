@@ -4,10 +4,10 @@ from os import path
 
 setup(
     name='pyhiveapi',
-    version='0.0.14',
+    version='0.0.17',
     description='A Python library to interface with the Hive API',
     long_description="A Python library to interface with the Hive API",
-	#    url='https://github.com/pypa/sampleproject',
+    url='https://github.com/Rendili/pyhiveapi',
 
     author='Rendili',
     author_email='rendili@outlook.com',

@@ -1,5 +1,7 @@
 #### Check if data needs updating on each get and set
 #### Set private def prefix
+#### Move NODE_ATTRIBS to HSC
+#### Move HSC to self
 
 import operator
 from datetime import datetime
@@ -99,12 +101,10 @@ HSC = HiveSession()
 class Pyhiveapi:
     def __init__(self):
         """Initialise the base variable values."""
-####        print("Initialise instance and base variables")
 
         HIVE_API.platform_name = ""
 
-        HIVE_API.urls.global_login = \
-            "https://beekeeper.hivehome.com/1.0/global/login"
+        HIVE_API.urls.global_login = "https://beekeeper.hivehome.com/1.0/global/login"
         HIVE_API.urls.base = ""
         HIVE_API.urls.weather = "https://weather-prod.bgchprod.info/weather"
         HIVE_API.urls.holiday_mode = "/holiday-mode"
@@ -118,8 +118,6 @@ class Pyhiveapi:
         HIVE_API.headers.content_type_value = "application/json"
         HIVE_API.headers.session_id_key = "authorization"
         HIVE_API.headers.session_id_value = None
-
-####        print("*** Finished setting base variables ***")
 
 
     def hive_api_json_call(self, request_type, request_url, json_string_content, login_request):
@@ -155,7 +153,6 @@ class Pyhiveapi:
                                              headers=api_headers)
             else:
                 json_response = ""
-#                _LOGGER.error("Unknown JSON API call RequestType : %s", request_type)
 
             json_call_try_finished = True
         except (IOError, RuntimeError, ZeroDivisionError):
@@ -184,7 +181,6 @@ class Pyhiveapi:
 
     def hive_api_logon(self):
         """Log in to the Hive API and get the Session ID."""
-####        print("log in to Hive API")
         login_details_found = True
         HSC.session_id = None
 
@@ -193,17 +189,11 @@ class Pyhiveapi:
             api_resp_d = {}
             api_resp_p = None
 
-            json_string_content = '{"username": "' \
-                                  + HSC.username \
-                                  + '","password": "' \
-                                  + HSC.password + '"}'
+            json_string_content = '{"username": "' + HSC.username + '","password": "' + HSC.password + '"}'
 
             api_resp_d = self.hive_api_json_call("POST", HIVE_API.urls.global_login, json_string_content, True)
-####            print ("Login API Response :")
-####            print (api_resp_d)
-
             api_resp_p = api_resp_d['parsed']
-####            print ("api_resp_d parsed to api_resp_p")
+
             if ('token' in api_resp_p and
                     'user' in api_resp_p and
                     'platform' in api_resp_p):
@@ -249,7 +239,7 @@ class Pyhiveapi:
                 login_details_found = False
 
             try_finished = True
-####            print ("SessionID :: " + HSC.session_id)
+
         except (IOError, RuntimeError, ZeroDivisionError):
             try_finished = False
         finally:
@@ -258,7 +248,6 @@ class Pyhiveapi:
 
         if not login_details_found:
             HSC.session_id = None
-#            _LOGGER.error("Hive API login failed with error : %s", api_resp_p)
 
 
     def check_hive_api_logon(self):
@@ -293,7 +282,6 @@ class Pyhiveapi:
 
         self.check_hive_api_logon()
 
-        # pylint: disable=too-many-nested-blocks
         if HSC.session_id is not None:
             tmp_devices_hub = []
             tmp_devices_thermostat = []
@@ -340,7 +328,6 @@ class Pyhiveapi:
             finally:
                 if not try_finished:
                     try_finished = False
- #                   _LOGGER.error("Error parsing Hive Devices")
 
             try_finished = False
             try:
@@ -374,7 +361,6 @@ class Pyhiveapi:
             finally:
                 if not try_finished:
                     try_finished = False
-#                    _LOGGER.error("Error parsing Hive Products")
 
             try_finished = False
             try:
@@ -408,18 +394,13 @@ class Pyhiveapi:
             finally:
                 if not try_finished:
                     get_nodes_successful = False
-#                    _LOGGER.error("Error adding discovered Products / Devices")
         else:
             get_nodes_successful = False
-#            _LOGGER.error("No Session ID")
-
-#        if get_nodes_successful:
-#            fire_bus_event(node_id, device_type)  ##### replace this in HA code ####
 
         return get_nodes_successful
 
 
-    def p_get_heating_min_temp(self, node_id, device_type):
+    def p_get_heating_min_temp(self, node_id):
         """Get heating minimum target temperature."""
         heating_min_temp_default = 5
         heating_min_temp_return = 0
@@ -442,7 +423,7 @@ class Pyhiveapi:
         return heating_min_temp_return
 
 
-    def p_get_heating_max_temp(self, node_id, device_type):
+    def p_get_heating_max_temp(self, node_id):
         """Get heating maximum target temperature."""
         heating_max_temp_default = 32
         heating_max_temp_return = 0
@@ -465,7 +446,7 @@ class Pyhiveapi:
         return heating_max_temp_return
 
 
-    def p_get_heating_current_temp(self, node_id, device_type):
+    def p_get_heating_current_temp(self, node_id):
         """Get heating current temperature."""
         node_index = -1
 
@@ -498,104 +479,251 @@ class Pyhiveapi:
             else:
                 current_temp_return = -1000
 
-        if current_temp_return != -1000:
-            if node_id in HSC.platform_data.min_max_data:
-                if (HSC.platform_data.min_max_data[node_id]['TodayDate'] !=
-                        datetime.date(datetime.now())):
-                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = 1000
-                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = -1000
-                    HSC.platform_data.min_max_data[node_id]['TodayDate'] = \
-                        datetime.date(datetime.now())
+#        if current_temp_return != -1000:
+#            if node_id in HSC.platform_data.min_max_data:
+#                if (HSC.platform_data.min_max_data[node_id]['TodayDate'] !=
+#                        datetime.date(datetime.now())):
+#                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = 1000
+#                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = -1000
+#                    HSC.platform_data.min_max_data[node_id]['TodayDate'] = \
+#                        datetime.date(datetime.now())
 
-                if (current_temp_return <
-                        HSC.platform_data.min_max_data[node_id]['TodayMin']):
-                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = \
-                        current_temp_return
+#                if (current_temp_return <
+#                        HSC.platform_data.min_max_data[node_id]['TodayMin']):
+#                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = \
+#                        current_temp_return
 
-                if (current_temp_return >
-                        HSC.platform_data.min_max_data[node_id]['TodayMax']):
-                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = \
-                        current_temp_return
+#                if (current_temp_return >
+#                        HSC.platform_data.min_max_data[node_id]['TodayMax']):
+#                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = \
+#                        current_temp_return
 
-                if (current_temp_return <
-                        HSC.platform_data.min_max_data[node_id]['RestartMin']):
-                    HSC.platform_data.min_max_data[node_id]['RestartMin'] = \
-                        current_temp_return
+#                if (current_temp_return <
+#                        HSC.platform_data.min_max_data[node_id]['RestartMin']):
+#                    HSC.platform_data.min_max_data[node_id]['RestartMin'] = \
+#                        current_temp_return
 
-                if current_temp_return > \
-                        HSC.platform_data.min_max_data[node_id]['RestartMax']:
-                    HSC.platform_data.min_max_data[node_id]['RestartMax'] = \
-                        current_temp_return
-            else:
-                current_node_max_min_data = {}
-                current_node_max_min_data['TodayMin'] = current_temp_return
-                current_node_max_min_data['TodayMax'] = current_temp_return
-                current_node_max_min_data['TodayDate'] = \
-                    datetime.date(datetime.now())
-                current_node_max_min_data['RestartMin'] = current_temp_return
-                current_node_max_min_data['RestartMax'] = current_temp_return
-                HSC.platform_data.min_max_data[node_id] = \
-                    current_node_max_min_data
+#                if current_temp_return > \
+#                        HSC.platform_data.min_max_data[node_id]['RestartMax']:
+#                    HSC.platform_data.min_max_data[node_id]['RestartMax'] = \
+#                        current_temp_return
+#            else:
+#                current_node_max_min_data = {}
+#                current_node_max_min_data['TodayMin'] = current_temp_return
+#                current_node_max_min_data['TodayMax'] = current_temp_return
+#                current_node_max_min_data['TodayDate'] = \
+#                    datetime.date(datetime.now())
+#                current_node_max_min_data['RestartMin'] = current_temp_return
+#                current_node_max_min_data['RestartMax'] = current_temp_return
+#                HSC.platform_data.min_max_data[node_id] = \
+#                    current_node_max_min_data
 
-        else:
-            current_temp_return = 0
+#        else:
+#            current_temp_return = 0
 
         return current_temp_return
+
+    def p_get_heating_target_temp(self, node_id):
+        """Get heating target temperature."""
+        node_index = -1
+
+        heating_target_temp_return = 0
+        heating_target_temp_tmp = 0
+        heating_target_temp_found = False
+
+        current_node_attribute = "Heating_TargetTemp_" + node_id
+
+        # pylint: disable=too-many-nested-blocks
+        if len(HSC.products.heating) > 0:
+            for current_node_index in range(0, len(HSC.products.heating)):
+                if "id" in HSC.products.heating[current_node_index]:
+                    if HSC.products.heating[current_node_index]["id"] == node_id:
+                        node_index = current_node_index
+                        break
+
+            if node_index != -1:
+                heating_mode_current = self.p_get_heating_mode(node_id)
+                if heating_mode_current == "SCHEDULE":
+                    if ('props' in HSC.products.heating[node_index] and
+                            'scheduleOverride' in
+                            HSC.products.heating[node_index]["props"]):
+                        if (HSC.products.heating[node_index]
+                                ["props"]["scheduleOverride"]):
+                            if ("state" in HSC.products.heating[node_index] and
+                                    "target" in HSC.products.heating[node_index]
+                                    ["state"]):
+                                heating_target_temp_tmp = (HSC.products.heating
+                                                           [node_index]["state"]
+                                                           ["target"])
+                                heating_target_temp_found = True
+                        else:
+                            snan = (
+                                self.p_get_schedule_now_next_later(
+                                    HSC.products.heating[node_index]
+                                    ["state"]["schedule"]))
+                            if 'now' in snan:
+                                if ('value' in snan["now"] and
+                                        'target' in snan["now"]
+                                        ["value"]):
+                                    heating_target_temp_tmp = (snan["now"]
+                                                               ["value"]
+                                                               ["target"])
+                                    heating_target_temp_found = True
+                else:
+                    if ("state" in HSC.products.heating[node_index] and "target"
+                            in HSC.products.heating[node_index]["state"]):
+                        heating_target_temp_tmp = \
+                            HSC.products.heating[node_index]["state"]["target"]
+                        heating_target_temp_found = True
+
+        if heating_target_temp_found:
+            NODE_ATTRIBS[current_node_attribute] = heating_target_temp_tmp
+            heating_target_temp_return = heating_target_temp_tmp
+        else:
+            if current_node_attribute in NODE_ATTRIBS:
+                heating_target_temp_return = \
+                    NODE_ATTRIBS.get(current_node_attribute)
+            else:
+                heating_target_temp_return = 0
+
+        return heating_target_temp_return
+
+
+    def p_get_heating_mode(self, node_id):
+        """Get heating current mode."""
+        node_index = -1
+
+        mode_return = "UNKNOWN"
+        mode_tmp = "UNKNOWN"
+        mode_found = False
+
+        current_node_attribute = "Heating_Mode_" + node_id
+
+        if len(HSC.products.heating) > 0:
+            for current_node_index in range(0, len(HSC.products.heating)):
+                if "id" in HSC.products.heating[current_node_index]:
+                    if HSC.products.heating[current_node_index]["id"] == node_id:
+                        node_index = current_node_index
+                        break
+
+            if node_index != -1:
+                if ("state" in HSC.products.heating[node_index] and
+                        "mode" in HSC.products.heating[node_index]["state"]):
+                    mode_tmp = HSC.products.heating[node_index]["state"]["mode"]
+                    if mode_tmp == "BOOST":
+                        if ("props" in HSC.products.heating[node_index] and
+                                "previous" in
+                                HSC.products.heating[node_index]["props"] and
+                                "mode" in
+                                HSC.products.heating[node_index]
+                                ["props"]["previous"]):
+                            mode_tmp = (HSC.products.heating[node_index]
+                                        ["props"]["previous"]["mode"])
+                    mode_found = True
+
+        if mode_found:
+            NODE_ATTRIBS[current_node_attribute] = mode_tmp
+            mode_return = mode_tmp
+        else:
+            if current_node_attribute in NODE_ATTRIBS:
+                mode_return = NODE_ATTRIBS.get(current_node_attribute)
+            else:
+                mode_return = "UNKNOWN"
+
+        return mode_return
+
+
+    def p_minutes_to_time(self, minutes_to_convert):
+        """Convert minutes string to datetime."""
+        hours_converted, minutes_converted = divmod(minutes_to_convert, 60)
+        converted_time = datetime.strptime(str(hours_converted)
+                                           + ":"
+                                           + str(minutes_converted),
+                                           "%H:%M")
+        converted_time_string = converted_time.strftime("%H:%M")
+        return converted_time_string
+
+
+    def p_get_schedule_now_next_later(self, hive_api_schedule):
+        """Get the schedule now, next and later of a given nodes schedule."""
+        schedule_now_and_next = {}
+        date_time_now = datetime.now()
+        date_time_now_day_int = date_time_now.today().weekday()
+
+        days_t = ('monday',
+                  'tuesday',
+                  'wednesday',
+                  'thursday',
+                  'friday',
+                  'saturday',
+                  'sunday')
+
+        days_rolling_list = list(days_t[date_time_now_day_int:] + days_t)[:7]
+
+        full_schedule_list = []
+
+        for day_index in range(0, len(days_rolling_list)):
+            current_day_schedule = hive_api_schedule[days_rolling_list[day_index]]
+            current_day_schedule_sorted = sorted(current_day_schedule,
+                                                 key=operator.itemgetter('start'),
+                                                 reverse=False)
+
+            for current_slot in range(0, len(current_day_schedule_sorted)):
+                current_slot_custom = current_day_schedule_sorted[current_slot]
+
+                slot_date = datetime.now() + timedelta(days=day_index)
+                slot_time = self.p_minutes_to_time(current_slot_custom["start"])
+                slot_time_date_s = (slot_date.strftime("%d-%m-%Y")
+                                    + " "
+                                    + slot_time)
+                slot_time_date_dt = datetime.strptime(slot_time_date_s,
+                                                      "%d-%m-%Y %H:%M")
+                if slot_time_date_dt <= date_time_now:
+                    slot_time_date_dt = slot_time_date_dt + timedelta(days=7)
+
+                current_slot_custom['Start_DateTime'] = slot_time_date_dt
+                full_schedule_list.append(current_slot_custom)
+
+        fsl_sorted = sorted(full_schedule_list,
+                            key=operator.itemgetter('Start_DateTime'),
+                            reverse=False)
+
+        schedule_now = fsl_sorted[-1]
+        schedule_next = fsl_sorted[0]
+        schedule_later = fsl_sorted[1]
+
+        schedule_now['Start_DateTime'] = (schedule_now['Start_DateTime']
+                                          - timedelta(days=7))
+
+        schedule_now['End_DateTime'] = schedule_next['Start_DateTime']
+        schedule_next['End_DateTime'] = schedule_later['Start_DateTime']
+        schedule_later['End_DateTime'] = fsl_sorted[2]['Start_DateTime']
+
+        schedule_now_and_next['now'] = schedule_now
+        schedule_now_and_next['next'] = schedule_next
+        schedule_now_and_next['later'] = schedule_later
+
+        return schedule_now_and_next
 
 
     def initialise_api(self, username, password, mins_between_updates):
         """Setup the Hive platform."""
-#        initialise_app()
-
-#        HSC.hass = hass
-
         HSC.username = username
         HSC.password = password
 
-#        hive_config = config[DOMAIN]
-
-#        if "username" in hive_config and "password" in hive_config:
-#            HSC.username = config[DOMAIN]['username']
-#            HSC.password = config[DOMAIN]['password']
-#        else:
-#            _LOGGER.error("Missing UserName or Password in config")
-
-#        if "minutes_between_updates" in hive_config:
-#            tmp_mins_between_upds = config[DOMAIN]['minutes_between_updates']
-#        else:
-#            tmp_mins_between_upds = 2
-
-#        hive_node_update_interval = tmp_mins_between_upds * 60
         if mins_between_updates <= 0:
             mins_between_updates = 2
 
         hive_node_update_interval = mins_between_updates * 60
 
-#        if "logging" in hive_config:
-#            if config[DOMAIN]['logging']:
-#                HSC.logging = True
-#                _LOGGER.warning("Logging is Enabled")
-#            else:
-#                HSC.logging = False
-#        else:
-#            HSC.logging = False
-
         if HSC.username is None or HSC.password is None:
             return None
-#            _LOGGER.error("Missing UserName or Password in Hive Session details")
         else:
-####            print ("Logging in : " + username + " :: " + password)
             self.hive_api_logon()
             if HSC.session_id is not None:
                 HSC.update_interval_seconds = hive_node_update_interval
                 self.hive_api_get_nodes_nl()
 
-        config_devices = []
-
-#        if "devices" in hive_config:
-#            config_devices = config[DOMAIN]['devices']
-
-#        device_count = 0
 
         device_list_all = {}
         device_list_sensor = []
@@ -609,30 +737,13 @@ class Pyhiveapi:
                     node_name = product["state"]["name"]
                     if len(HSC.products.heating) == 1:
                         node_name = None
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_heating" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_climate.append({'HA_DeviceType': 'Heating', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_heating_currenttemperature" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_sensor.append({'HA_DeviceType': 'Heating_CurrentTemperature', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_heating_targettemperature" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_sensor.append({'HA_DeviceType': 'Heating_TargetTemperature', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_heating_state" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_sensor.append({'HA_DeviceType': 'Heating_State', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_heating_mode" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_sensor.append({'HA_DeviceType': 'Heating_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_heating_boost" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_sensor.append({'HA_DeviceType': 'Heating_Boost', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
+
 
         if len(HSC.products.hotwater) > 0:
             for product in HSC.products.hotwater:
@@ -640,22 +751,11 @@ class Pyhiveapi:
                     node_name = product["state"]["name"]
                     if len(HSC.products.hotwater) == 1:
                         node_name = None
-
-#                   if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_hotwater" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_climate.append({'HA_DeviceType': 'HotWater', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_hotwater_state" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_sensor.append({'HA_DeviceType': 'HotWater_State', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_hotwater_mode" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_sensor.append({'HA_DeviceType': 'HotWater_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
-
-#                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_hotwater_boost" in config_devices)):
-#                        device_count = device_count + 1
                     device_list_sensor.append({'HA_DeviceType': 'HotWater_Boost', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name})
+
 
         if len(HSC.devices.thermostat) > 0 or len(HSC.devices.sensors) > 0:
             all_devices = HSC.devices.thermostat + HSC.devices.sensors
@@ -664,80 +764,40 @@ class Pyhiveapi:
                     node_name = a_device["state"]["name"]
                     if (a_device["type"] == "thermostatui" and len(HSC.devices.thermostat) == 1):
                         node_name = None
-                    if (len(config_devices) == 0 or len(config_devices) > 0 and "hive_thermostat_batterylevel" or len(config_devices) > 0 and "hive_sensor_batterylevel" in config_devices):
-#                        device_count = device_count + 1
-                        if "type" in a_device:
-                            hive_device_type = a_device["type"]
-                            device_list_sensor.append({'HA_DeviceType': 'Hive_Device_BatteryLevel', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": hive_device_type})
+                    if "type" in a_device:
+                        hive_device_type = a_device["type"]
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_BatteryLevel', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": hive_device_type})
 
-        # pylint: disable=too-many-nested-blocks
+
         if len(HSC.products.light) > 0:
             for product in HSC.products.light:
                 if ("id" in product and "state" in product and "name" in product["state"]):
-                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_active_light" in config_devices)):
-#                        device_count = device_count + 1
-                        if "type" in product:
-                            light_device_type = product["type"]
-#                            if HSC.logging:
-#                                _LOGGER.warning("Adding %s, %s to device list",
-#                                                product["type"],
-#                                                product["state"]["name"])
-                            device_list_light.append({'HA_DeviceType': 'Hive_Device_Light', 'Hive_Light_DeviceType': light_device_type, 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"]})
-                            if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_active_light_sensor" in config_devices)):
-                                device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Light_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": light_device_type})
+                    if "type" in product:
+                        light_device_type = product["type"]
+                        device_list_light.append({'HA_DeviceType': 'Hive_Device_Light', 'Hive_Light_DeviceType': light_device_type, 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"]})
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Light_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": light_device_type})
 
-        # pylint: disable=too-many-nested-blocks
+
         if len(HSC.products.plug) > 0:
             for product in HSC.products.plug:
                 if ("id" in product and "state" in product and "name" in product["state"]):
-                    if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_active_plug" in config_devices)):
-#                        device_count = device_count + 1
-                        if "type" in product:
-                            plug_device_type = product["type"]
-#                            if HSC.logging:
-#                                _LOGGER.warning("Adding %s, %s to device list",
-#                                                product["type"],
-#                                                product["state"]["name"])
-                            device_list_plug.append({'HA_DeviceType': 'Hive_Device_Plug', 'Hive_Plug_DeviceType': plug_device_type, 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"]})
-                            if (len(config_devices) == 0 or (len(config_devices) > 0 and "hive_active_plug_sensor" in config_devices)):
-                                device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": plug_device_type})
+                    if "type" in product:
+                        plug_device_type = product["type"]
+                        device_list_plug.append({'HA_DeviceType': 'Hive_Device_Plug', 'Hive_Plug_DeviceType': plug_device_type, 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"]})
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": plug_device_type})
 
         if len(HSC.products.sensors) > 0:
             for product in HSC.products.sensors:
                 if ("id" in product and "state" in product and "name" in product["state"]):
-                    if (len(config_devices) == 0 or len(config_devices) > 0 and "hive_active_sensor" in config_devices):
-#                        device_count = device_count + 1
-                        if "type" in product:
-                            hive_sensor_device_type = product["type"]
-                            device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Sensor', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": hive_sensor_device_type})
+                    if "type" in product:
+                        hive_sensor_device_type = product["type"]
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Sensor', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": hive_sensor_device_type})
 
-#        global HGO
-
-#        try:
-#            HGO = HiveObjects()
-#        except RuntimeError:
-#            return False
-
-#        if (len(device_list_sensor) > 0 or len(device_list_climate) > 0 or len(device_list_light) > 0 or len(device_list_plug) > 0):
-####            print (device_list_climate)
-#            return device_list_climate
-#        else:
-#            return None
-#            if len(device_list_sensor) > 0:
-#                load_platform(hass, 'sensor', DOMAIN, device_list_sensor)
-#            if len(device_list_climate) > 0:
- #               load_platform(hass, 'climate', DOMAIN, device_list_climate)
- #           if len(device_list_light) > 0:
-#                load_platform(hass, 'light', DOMAIN, device_list_light)
-#            if len(device_list_plug) > 0:
-#                load_platform(hass, 'switch', DOMAIN, device_list_plug)
-#            return True
 
         device_list_all['device_list_sensor'] = device_list_sensor
         device_list_all['device_list_climate'] = device_list_climate
         device_list_all['device_list_light'] = device_list_light
         device_list_all['device_list_plug'] = device_list_plug
-
 
         return device_list_all
  
