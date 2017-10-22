@@ -1051,6 +1051,145 @@ class Pyhiveapi:
             return state_return
 
 
+        def p_hive_set_temperature(self, node_id, new_temperature):
+            """Set heating target temperature."""
+            Pyhiveapi.check_hive_api_logon()
+
+            set_temperature_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                node_index = -1
+                if len(HSC.products.heating) > 0:
+                    for current_node_index in range(0, len(HSC.products.heating)):
+                        if "id" in HSC.products.heating[current_node_index]:
+                            if (HSC.products.heating[current_node_index]
+                                    ["id"] == node_id):
+                                node_index = current_node_index
+                                break
+
+                    if node_index != -1:
+                        if "id" in HSC.products.heating[node_index]:
+                            json_string_content = ('{"target":'
+                                                   + str(new_temperature)
+                                                   + '}')
+
+                            hive_api_url = (HIVE_API.urls.nodes + "/heating/"
+                                            + HSC.products.heating[node_index]["id"])
+                            api_resp_d = Pyhiveapi.hive_api_json_call("POST",
+                                                            hive_api_url,
+                                                            json_string_content,
+                                                            False)
+
+                            api_resp = api_resp_d['original']
+
+                            if str(api_resp) == "<Response [200]>":
+                                Pyhiveapi.hive_api_get_nodes(node_id, device_type)
+#                                fire_bus_event(node_id, device_type)
+                                set_temperature_success = True
+
+            return set_temperature_success
+
+
+        def p_hive_set_heating_mode(self, node_id, new_mode):
+            """Set heating mode."""
+            Pyhiveapi.check_hive_api_logon()
+
+            set_mode_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                node_index = -1
+                if len(HSC.products.heating) > 0:
+                    for current_node_index in range(0, len(HSC.products.heating)):
+                        if "id" in HSC.products.heating[current_node_index]:
+                            if (HSC.products.heating[current_node_index]
+                                    ["id"] == node_id):
+                                node_index = current_node_index
+                                break
+
+                    if node_index != -1:
+                        if "id" in HSC.products.heating[node_index]:
+                            if new_mode == "SCHEDULE":
+                                json_string_content = '{"mode": "SCHEDULE"}'
+                            elif new_mode == "MANUAL":
+                                json_string_content = '{"mode": "MANUAL"}'
+                            elif new_mode == "OFF":
+                                json_string_content = '{"mode": "OFF"}'
+
+                            if (new_mode == "SCHEDULE" or
+                                    new_mode == "MANUAL" or
+                                    new_mode == "OFF"):
+                                hive_api_url = (HIVE_API.urls.nodes
+                                                + "/heating/"
+                                                + HSC.products.heating[node_index]
+                                                ["id"])
+                                api_resp_d = Pyhiveapi.hive_api_json_call("POST",
+                                                                hive_api_url,
+                                                                json_string_content,
+                                                                False)
+
+                                api_resp = api_resp_d['original']
+
+                                if str(api_resp) == "<Response [200]>":
+                                    Pyhiveapi.hive_api_get_nodes(node_id, device_type)
+#                                    fire_bus_event(node_id, device_type)
+                                    set_mode_success = True
+
+            return set_mode_success
+
+
+        def p_hive_set_hotwater_mode(self, node_id, new_mode):
+            """Set hot water mode."""
+            Pyhiveapi.check_hive_api_logon()
+
+            set_mode_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                node_index = -1
+                if len(HSC.products.hotwater) > 0:
+                    for current_node_index in range(0, len(HSC.products.hotwater)):
+                        if "id" in HSC.products.hotwater[current_node_index]:
+                            if (HSC.products.hotwater[current_node_index]
+                                    ["id"] == node_id):
+                                node_index = current_node_index
+                                break
+
+                    if node_index != -1:
+                        if "id" in HSC.products.hotwater[node_index]:
+                            if new_mode == "SCHEDULE":
+                                json_string_content = '{"mode": "SCHEDULE"}'
+                            elif new_mode == "ON":
+                                json_string_content = '{"mode": "MANUAL"}'
+                            elif new_mode == "OFF":
+                                json_string_content = '{"mode": "OFF"}'
+
+                            if (new_mode == "SCHEDULE" or
+                                    new_mode == "ON" or
+                                    new_mode == "OFF"):
+                                hive_api_url = (HIVE_API.urls.nodes
+                                                + "/hotwater/"
+                                                + HSC.products.hotwater[node_index]
+                                                ["id"])
+                                api_resp_d = Pyhiveapi.hive_api_json_call("POST",
+                                                                hive_api_url,
+                                                                json_string_content,
+                                                                False)
+
+                                api_resp = api_resp_d['original']
+
+                                if str(api_resp) == "<Response [200]>":
+                                    Pyhiveapi.hive_api_get_nodes(node_id, device_type)
+#                                    fire_bus_event(node_id, device_type)
+                                    set_mode_success = True
+
+            return set_mode_success
+
+
     class Light():
         """Hive Switches."""
         temp_Switch = "Delete Me" #### DELETE ME #####
