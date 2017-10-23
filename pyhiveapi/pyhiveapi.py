@@ -973,6 +973,32 @@ class Pyhiveapi:
             return set_mode_success
 
 
+        def get_schedule_now_next_later(self, node_id):
+            """Hive get heating schedule now, next and later."""
+            heating_mode_current = Pyhiveapi.Heating.get_mode(self, node_id)
+
+            snan = None
+
+            if heating_mode_current == "SCHEDULE":
+                node_index = -1
+
+                if len(HSC.products.heating) > 0:
+                    for current_node_index in range(0, len(HSC.products.heating)):
+                        if "id" in HSC.products.heating[current_node_index]:
+                            if HSC.products.heating[current_node_index]["id"] == node_id:
+                                node_index = current_node_index
+                                break
+
+                if node_index != -1:
+                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.heating[node_index]["state"]["schedule"])
+                else:
+                    snan = None
+            else:
+                snan = None
+
+            return snan
+
+
     class Hotwater():
         """Hive Hotwater."""
         def get_mode(self, node_id):
@@ -1165,6 +1191,32 @@ class Pyhiveapi:
                                     set_mode_success = True
 
             return set_mode_success
+
+
+        def get_schedule_now_next_later(self, node_id):
+            """Hive get hotwater schedule now, next and later."""
+            hotwater_mode_current = Pyhiveapi.Hotwater.get_mode(self, node_id)
+
+            snan = None
+
+            if hotwater_mode_current == "SCHEDULE":
+                node_index = -1
+
+                if len(HSC.products.hotwater) > 0:
+                    for current_node_index in range(0, len(HSC.products.hotwater)):
+                        if "id" in HSC.products.hotwater[current_node_index]:
+                            if HSC.products.hotwater[current_node_index]["id"] == node_id:
+                                node_index = current_node_index
+                                break
+
+                if node_index != -1:
+                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.hotwater[node_index]["state"]["schedule"])
+                else:
+                    snan = None
+            else:
+                snan = None
+
+            return snan
 
 
     class Light():
