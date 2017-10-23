@@ -581,9 +581,9 @@ class Pyhiveapi:
         return HSC.session_id
 
 
-    class Climate():
+    class Heating():
         """Hive Switches."""
-        def p_get_heating_min_temp(self, node_id):
+        def min_temperature(self, node_id):
             """Get heating minimum target temperature."""
             heating_min_temp_default = 5
             heating_min_temp_return = 0
@@ -606,7 +606,7 @@ class Pyhiveapi:
             return heating_min_temp_return
 
 
-        def p_get_heating_max_temp(self, node_id):
+        def max_temperature(self, node_id):
             """Get heating maximum target temperature."""
             heating_max_temp_default = 32
             heating_max_temp_return = 0
@@ -629,7 +629,7 @@ class Pyhiveapi:
             return heating_max_temp_return
 
 
-        def p_get_heating_current_temp(self, node_id):
+        def current_temperature(self, node_id):
             """Get heating current temperature."""
             node_index = -1
 
@@ -706,7 +706,7 @@ class Pyhiveapi:
 
             return current_temp_return
 
-        def p_get_heating_target_temp(self, node_id):
+        def get_target_temperature(self, node_id):
             """Get heating target temperature."""
             node_index = -1
 
@@ -725,7 +725,7 @@ class Pyhiveapi:
                             break
 
                 if node_index != -1:
-                    heating_mode_current = Pyhiveapi.Climate.p_get_heating_mode(self, node_id)
+                    heating_mode_current = Pyhiveapi.Heating.get_mode(self, node_id)
                     if heating_mode_current == "SCHEDULE":
                         if ('props' in HSC.products.heating[node_index] and
                                 'scheduleOverride' in
@@ -770,7 +770,7 @@ class Pyhiveapi:
             return heating_target_temp_return
 
 
-        def p_get_heating_mode(self, node_id):
+        def get_mode(self, node_id):
             """Get heating current mode."""
             node_index = -1
 
@@ -814,7 +814,7 @@ class Pyhiveapi:
             return mode_return
 
 
-        def p_get_heating_state(self, node_id):
+        def get_state(self, node_id):
             """Get heating current state."""
             heating_state_return = "OFF"
             heating_state_tmp = "OFF"
@@ -823,10 +823,10 @@ class Pyhiveapi:
             current_node_attribute = "Heating_State_" + node_id
 
             if len(HSC.products.heating) > 0:
-                temperature_current = Pyhiveapi.Climate.p_get_heating_current_temp(self, node_id)
-                temperature_target = Pyhiveapi.Climate.p_get_heating_target_temp(self, node_id)
-                heating_boost = Pyhiveapi.Climate.p_get_heating_boost(self, node_id)
-                heating_mode = Pyhiveapi.Climate.p_get_heating_mode(self, node_id)
+                temperature_current = Pyhiveapi.Heating.current_temperature(self, node_id)
+                temperature_target = Pyhiveapi.Heating.get_target_temperature(self, node_id)
+                heating_boost = Pyhiveapi.Heating.get_boost(self, node_id)
+                heating_mode = Pyhiveapi.Heating.get_mode(self, node_id)
 
                 if (heating_mode == "SCHEDULE" or
                         heating_mode == "MANUAL" or
@@ -853,7 +853,7 @@ class Pyhiveapi:
             return heating_state_return
 
 
-        def p_get_heating_boost(self, node_id):
+        def get_boost(self, node_id):
             """Get heating boost current status."""
             node_index = -1
 
@@ -893,13 +893,89 @@ class Pyhiveapi:
             return heating_boost_return
 
 
-        def p_get_heating_operation_modes(self, node_id):
+        def get_operation_modes(self, node_id):
             """Get heating list of possible modes."""
             heating_operation_list = ["SCHEDULE", "MANUAL", "OFF"]
             return heating_operation_list
 
 
-        def p_get_hotwater_mode(self, node_id):
+        def set_target_temperature(self, node_id, new_temperature):
+            """Set heating target temperature."""
+            Pyhiveapi.check_hive_api_logon(self)
+
+            set_temperature_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                node_index = -1
+                if len(HSC.products.heating) > 0:
+                    for current_node_index in range(0, len(HSC.products.heating)):
+                        if "id" in HSC.products.heating[current_node_index]:
+                            if (HSC.products.heating[current_node_index]["id"] == node_id):
+                                node_index = current_node_index
+                                break
+
+                    if node_index != -1:
+                        if "id" in HSC.products.heating[node_index]:
+                            json_string_content = ('{"target":' + str(new_temperature) + '}')
+
+                            hive_api_url = (HIVE_API.urls.nodes + "/heating/" + HSC.products.heating[node_index]["id"])
+                            api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+
+                            api_resp = api_resp_d['original']
+
+                            if str(api_resp) == "<Response [200]>":
+                                Pyhiveapi.hive_api_get_nodes(self, node_id)
+#                                fire_bus_event(node_id, device_type)
+                                set_temperature_success = True
+
+            return set_temperature_success
+
+
+        def set_mode(self, node_id, new_mode):
+            """Set heating mode."""
+            Pyhiveapi.check_hive_api_logon(self)
+
+            set_mode_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                node_index = -1
+                if len(HSC.products.heating) > 0:
+                    for current_node_index in range(0, len(HSC.products.heating)):
+                        if "id" in HSC.products.heating[current_node_index]:
+                            if (HSC.products.heating[current_node_index]["id"] == node_id):
+                                node_index = current_node_index
+                                break
+
+                    if node_index != -1:
+                        if "id" in HSC.products.heating[node_index]:
+                            if new_mode == "SCHEDULE":
+                                json_string_content = '{"mode": "SCHEDULE"}'
+                            elif new_mode == "MANUAL":
+                                json_string_content = '{"mode": "MANUAL"}'
+                            elif new_mode == "OFF":
+                                json_string_content = '{"mode": "OFF"}'
+
+                            if (new_mode == "SCHEDULE" or new_mode == "MANUAL" or new_mode == "OFF"):
+                                hive_api_url = (HIVE_API.urls.nodes + "/heating/" + HSC.products.heating[node_index]["id"])
+                                api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+
+                                api_resp = api_resp_d['original']
+
+                                if str(api_resp) == "<Response [200]>":
+                                    Pyhiveapi.hive_api_get_nodes(self, node_id)
+#                                    fire_bus_event(node_id, device_type)
+                                    set_mode_success = True
+
+            return set_mode_success
+
+
+    class Hotwater():
+        """Hive Hotwater."""
+        def get_mode(self, node_id):
             """Get hot water current mode."""
             node_index = -1
 
@@ -946,13 +1022,13 @@ class Pyhiveapi:
             return hotwater_mode_return
 
 
-        def p_get_hotwater_operation_modes(self, node_id):
+        def get_operation_modes(self, node_id):
             """Get heating list of possible modes."""
             hotwater_operation_list = ["SCHEDULE", "ON", "OFF"]
             return hotwater_operation_list
 
 
-        def p_get_hotwater_boost(self, node_id):
+        def get_boost(self, node_id):
             """Get hot water current boost status."""
             node_index = -1
 
@@ -992,14 +1068,14 @@ class Pyhiveapi:
             return hotwater_boost_return
 
 
-        def p_get_hotwater_state(self, node_id):
+        def get_state(self, node_id):
             """Get hot water current state."""
             node_index = -1
 
             state_return = "OFF"
             state_tmp = "OFF"
             state_found = False
-            mode_current = Pyhiveapi.Climate.p_get_hotwater_mode(self, node_id)
+            mode_current = Pyhiveapi.Hotwater.get_mode(self, node_id)
 
             current_node_attribute = "HotWater_State_" + node_id
 
@@ -1020,7 +1096,7 @@ class Pyhiveapi:
                             state_tmp = "OFF"
                         else:
                             if mode_current == "SCHEDULE":
-                                if Pyhiveapi.Climate.p_get_hotwater_boost(self, node_id) == "ON":
+                                if Pyhiveapi.Hotwater.get_boost(self, node_id) == "ON":
                                     state_tmp = "ON"
                                     state_found = True
                                 else:
@@ -1051,81 +1127,7 @@ class Pyhiveapi:
             return state_return
 
 
-        def p_hive_set_temperature(self, node_id, new_temperature):
-            """Set heating target temperature."""
-            Pyhiveapi.check_hive_api_logon(self)
-
-            set_temperature_success = False
-            api_resp_d = {}
-            api_resp = ""
-
-            if HSC.session_id is not None:
-                node_index = -1
-                if len(HSC.products.heating) > 0:
-                    for current_node_index in range(0, len(HSC.products.heating)):
-                        if "id" in HSC.products.heating[current_node_index]:
-                            if (HSC.products.heating[current_node_index]["id"] == node_id):
-                                node_index = current_node_index
-                                break
-
-                    if node_index != -1:
-                        if "id" in HSC.products.heating[node_index]:
-                            json_string_content = ('{"target":' + str(new_temperature) + '}')
-
-                            hive_api_url = (HIVE_API.urls.nodes + "/heating/" + HSC.products.heating[node_index]["id"])
-                            api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
-
-                            api_resp = api_resp_d['original']
-
-                            if str(api_resp) == "<Response [200]>":
-                                Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                                fire_bus_event(node_id, device_type)
-                                set_temperature_success = True
-
-            return set_temperature_success
-
-
-        def p_hive_set_heating_mode(self, node_id, new_mode):
-            """Set heating mode."""
-            Pyhiveapi.check_hive_api_logon(self)
-
-            set_mode_success = False
-            api_resp_d = {}
-            api_resp = ""
-
-            if HSC.session_id is not None:
-                node_index = -1
-                if len(HSC.products.heating) > 0:
-                    for current_node_index in range(0, len(HSC.products.heating)):
-                        if "id" in HSC.products.heating[current_node_index]:
-                            if (HSC.products.heating[current_node_index]["id"] == node_id):
-                                node_index = current_node_index
-                                break
-
-                    if node_index != -1:
-                        if "id" in HSC.products.heating[node_index]:
-                            if new_mode == "SCHEDULE":
-                                json_string_content = '{"mode": "SCHEDULE"}'
-                            elif new_mode == "MANUAL":
-                                json_string_content = '{"mode": "MANUAL"}'
-                            elif new_mode == "OFF":
-                                json_string_content = '{"mode": "OFF"}'
-
-                            if (new_mode == "SCHEDULE" or new_mode == "MANUAL" or new_mode == "OFF"):
-                                hive_api_url = (HIVE_API.urls.nodes + "/heating/" + HSC.products.heating[node_index]["id"])
-                                api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
-
-                                api_resp = api_resp_d['original']
-
-                                if str(api_resp) == "<Response [200]>":
-                                    Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                                    fire_bus_event(node_id, device_type)
-                                    set_mode_success = True
-
-            return set_mode_success
-
-
-        def p_hive_set_hotwater_mode(self, node_id, new_mode):
+        def set_mode(self, node_id, new_mode):
             """Set hot water mode."""
             Pyhiveapi.check_hive_api_logon(self)
 
