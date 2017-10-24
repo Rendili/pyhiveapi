@@ -577,9 +577,6 @@ class Pyhiveapi:
 
         return device_list_all
 
-    def GetSessionID(self): #### DELETE ME #####
-        return HSC.session_id
-
 
     class Heating():
         """Hive Switches."""
@@ -893,10 +890,64 @@ class Pyhiveapi:
             return heating_boost_return
 
 
+        def get_boost_time(self, node_id):
+            """Get heating boost time remaining."""
+            heating_boost = "UNKNOWN"
+
+            if Pyhiveapi.Heating.get_boost(self, node_id) == "ON":
+                node_index = -1
+
+                heating_boost_tmp = "UNKNOWN"
+                heating_boost_found = False
+
+                if len(HSC.products.heating) > 0:
+                    for current_node_index in range(0, len(HSC.products.heating)):
+                        if "id" in HSC.products.heating[current_node_index]:
+                            if (HSC.products.heating[current_node_index]["id"] == node_id):
+                                node_index = current_node_index
+                                break
+
+                    if node_index != -1:
+                        if ("state" in HSC.products.heating[node_index] and "boost" in HSC.products.heating[node_index]["state"]):
+                            heating_boost_tmp = (HSC.products.heating[node_index]["state"]["boost"])
+                            heating_boost_found = True
+
+                if heating_boost_found:
+                    heating_boost = heating_boost_tmp
+
+            return heating_boost
+
+
         def get_operation_modes(self, node_id):
             """Get heating list of possible modes."""
             heating_operation_list = ["SCHEDULE", "MANUAL", "OFF"]
             return heating_operation_list
+
+
+        def get_schedule_now_next_later(self, node_id):
+            """Hive get heating schedule now, next and later."""
+            heating_mode_current = Pyhiveapi.Heating.get_mode(self, node_id)
+
+            snan = None
+
+            if heating_mode_current == "SCHEDULE":
+                node_index = -1
+
+                if len(HSC.products.heating) > 0:
+                    for current_node_index in range(0, len(HSC.products.heating)):
+                        if "id" in HSC.products.heating[current_node_index]:
+                            if HSC.products.heating[current_node_index]["id"] == node_id:
+                                node_index = current_node_index
+                                break
+
+                if node_index != -1:
+                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.heating[node_index]["state"]["schedule"])
+                else:
+                    snan = None
+            else:
+                snan = None
+
+            return snan
 
 
         def set_target_temperature(self, node_id, new_temperature):
@@ -973,30 +1024,7 @@ class Pyhiveapi:
             return set_mode_success
 
 
-        def get_schedule_now_next_later(self, node_id):
-            """Hive get heating schedule now, next and later."""
-            heating_mode_current = Pyhiveapi.Heating.get_mode(self, node_id)
 
-            snan = None
-
-            if heating_mode_current == "SCHEDULE":
-                node_index = -1
-
-                if len(HSC.products.heating) > 0:
-                    for current_node_index in range(0, len(HSC.products.heating)):
-                        if "id" in HSC.products.heating[current_node_index]:
-                            if HSC.products.heating[current_node_index]["id"] == node_id:
-                                node_index = current_node_index
-                                break
-
-                if node_index != -1:
-                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.heating[node_index]["state"]["schedule"])
-                else:
-                    snan = None
-            else:
-                snan = None
-
-            return snan
 
 
     class Hotwater():
@@ -1094,6 +1122,34 @@ class Pyhiveapi:
             return hotwater_boost_return
 
 
+        def get_boost_time(self, node_id):
+            """Get hotwater boost time remaining."""
+            hotwater_boost = "UNKNOWN"
+
+            if Pyhiveapi.Hotwater.get_boost(self, node_id) == "ON":
+                node_index = -1
+
+                hotwater_boost_tmp = "UNKNOWN"
+                hotwater_boost_found = False
+
+                if len(HSC.products.hotwater) > 0:
+                    for current_node_index in range(0, len(HSC.products.hotwater)):
+                        if "id" in HSC.products.hotwater[current_node_index]:
+                            if (HSC.products.hotwater[current_node_index]["id"] == node_id):
+                                node_index = current_node_index
+                                break
+
+                    if node_index != -1:
+                        if ("state" in HSC.products.hotwater[node_index] and "boost" in HSC.products.hotwater[node_index]["state"]):
+                            hotwater_boost_tmp = (HSC.products.hotwater[node_index]["state"]["boost"])
+                            hotwater_boost_found = True
+
+                if hotwater_boost_found:
+                    hotwater_boost = hotwater_boost_tmp
+
+            return hotwater_boost
+
+
         def get_state(self, node_id):
             """Get hot water current state."""
             node_index = -1
@@ -1153,6 +1209,32 @@ class Pyhiveapi:
             return state_return
 
 
+        def get_schedule_now_next_later(self, node_id):
+            """Hive get hotwater schedule now, next and later."""
+            hotwater_mode_current = Pyhiveapi.Hotwater.get_mode(self, node_id)
+
+            snan = None
+
+            if hotwater_mode_current == "SCHEDULE":
+                node_index = -1
+
+                if len(HSC.products.hotwater) > 0:
+                    for current_node_index in range(0, len(HSC.products.hotwater)):
+                        if "id" in HSC.products.hotwater[current_node_index]:
+                            if HSC.products.hotwater[current_node_index]["id"] == node_id:
+                                node_index = current_node_index
+                                break
+
+                if node_index != -1:
+                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.hotwater[node_index]["state"]["schedule"])
+                else:
+                    snan = None
+            else:
+                snan = None
+
+            return snan
+
+
         def set_mode(self, node_id, new_mode):
             """Set hot water mode."""
             Pyhiveapi.check_hive_api_logon(self)
@@ -1193,34 +1275,8 @@ class Pyhiveapi:
             return set_mode_success
 
 
-        def get_schedule_now_next_later(self, node_id):
-            """Hive get hotwater schedule now, next and later."""
-            hotwater_mode_current = Pyhiveapi.Hotwater.get_mode(self, node_id)
-
-            snan = None
-
-            if hotwater_mode_current == "SCHEDULE":
-                node_index = -1
-
-                if len(HSC.products.hotwater) > 0:
-                    for current_node_index in range(0, len(HSC.products.hotwater)):
-                        if "id" in HSC.products.hotwater[current_node_index]:
-                            if HSC.products.hotwater[current_node_index]["id"] == node_id:
-                                node_index = current_node_index
-                                break
-
-                if node_index != -1:
-                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.hotwater[node_index]["state"]["schedule"])
-                else:
-                    snan = None
-            else:
-                snan = None
-
-            return snan
-
-
     class Light():
-        """Hive Switches."""
+        """Hive Lights."""
         temp_Switch = "Delete Me" #### DELETE ME #####
 
         def GetSessionID(self): #### DELETE ME #####
@@ -1228,11 +1284,40 @@ class Pyhiveapi:
 
 
     class Sensor():
-        """Hive Switches."""
-        temp_Switch = "Delete Me" #### DELETE ME #####
+        """Hive Sensors."""
+        def battery_level(self, node_id):
+            """Get device battery level."""
+            node_index = -1
 
-        def GetSessionID(self): #### DELETE ME #####
-            return HSC.session_id
+            battery_level_return = 0
+            battery_level_tmp = 0
+            battery_level_found = False
+            all_devices = HSC.devices.thermostat + HSC.devices.sensors
+
+            current_node_attribute = "BatteryLevel_" + node_id
+
+            if len(HSC.devices.thermostat) > 0 or len(HSC.devices.sensors) > 0:
+                for current_node_index in range(0, len(all_devices)):
+                    if "id" in all_devices[current_node_index]:
+                        if all_devices[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("props" in all_devices[node_index] and "battery" in all_devices[node_index]["props"]):
+                        battery_level_tmp = (all_devices[node_index]["props"]["battery"])
+                        battery_level_found = True
+
+            if battery_level_found:
+                NODE_ATTRIBS[current_node_attribute] = battery_level_tmp
+                battery_level_return = battery_level_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    battery_level_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    battery_level_return = 0
+
+            return battery_level_return
 
 
     class Switch():
@@ -1241,3 +1326,4 @@ class Pyhiveapi:
 
         def GetSessionID(self): #### DELETE ME #####
             return HSC.session_id
+
