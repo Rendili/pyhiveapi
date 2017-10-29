@@ -1277,11 +1277,372 @@ class Pyhiveapi:
 
     class Light():
         """Hive Lights."""
-        temp_Switch = "Delete Me" #### DELETE ME #####
+        def get_state(self, node_id):
+            """Get light current state."""
+            node_index = -1
 
-        def GetSessionID(self): #### DELETE ME #####
-            return HSC.session_id
+            light_state_return = "UNKNOWN"
+            light_state_tmp = "UNKNOWN"
+            light_state_found = False
 
+            current_node_attribute = "Light_State_" + node_id
+
+            if len(HSC.products.light) > 0:
+                for current_node_index in range(0, len(HSC.products.light)):
+                    if "id" in HSC.products.light[current_node_index]:
+                        if HSC.products.light[current_node_index][
+                            "id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in HSC.products.light[
+                        node_index] and "status" in
+                        HSC.products.light[node_index]["state"]):
+                        light_state_tmp = (HSC.products.light[node_index]
+                                           ["state"]["status"])
+                        light_state_found = True
+
+            if light_state_found:
+                NODE_ATTRIBS[current_node_attribute] = light_state_tmp
+                light_state_return = light_state_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    light_state_return = NODE_ATTRIBS.get(
+                        current_node_attribute)
+                else:
+                    light_state_return = "UNKNOWN"
+
+            return light_state_return
+
+        def get_brightness(self, node_id):
+            """Get light current brightness."""
+            node_index = -1
+
+            tmp_brightness_return = 0
+            light_brightness_return = 0
+            light_brightness_tmp = 0
+            light_brightness_found = False
+
+            current_node_attribute = "Light_Brightness_" + node_id
+
+            if len(HSC.products.light) > 0:
+                for current_node_index in range(0, len(HSC.products.light)):
+                    if "id" in HSC.products.light[current_node_index]:
+                        if HSC.products.light[current_node_index][
+                            "id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in HSC.products.light[
+                        node_index] and "brightness" in
+                        HSC.products.light[node_index]["state"]):
+                        light_brightness_tmp = (HSC.products.light[node_index]
+                                                ["state"]["brightness"])
+                        light_brightness_found = True
+
+            if light_brightness_found:
+                NODE_ATTRIBS[current_node_attribute] = light_brightness_tmp
+                tmp_brightness_return = light_brightness_tmp
+                light_brightness_return = ((tmp_brightness_return / 100) * 255)
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    tmp_brightness_return = NODE_ATTRIBS.get(
+                        current_node_attribute)
+                    light_brightness_return = (
+                    (tmp_brightness_return / 100) * 255)
+                else:
+                    light_brightness_return = 0
+
+            return light_brightness_return
+
+        def get_min_colour_temp(self, node_id):
+            """Get light minimum colour temperature."""
+            node_index = -1
+
+            light_min_color_temp_tmp = 0
+            light_min_color_temp_return = 0
+            light_min_color_temp_found = False
+
+            node_attrib = "Light_Min_Color_Temp_" + node_id
+
+            if len(HSC.products.light) > 0:
+                for current_node_index in range(0, len(HSC.products.light)):
+                    if "id" in HSC.products.light[current_node_index]:
+                        if HSC.products.light[current_node_index][
+                            "id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("props" in HSC.products.light[node_index] and
+                                "colourTemperature" in
+                                HSC.products.light[node_index][
+                                    "props"] and "max" in
+                        HSC.products.light[node_index]
+                        ["props"]["colourTemperature"]):
+                        light_min_color_temp_tmp = (
+                        HSC.products.light[node_index]
+                        ["props"]
+                        ["colourTemperature"]["max"])
+                        light_min_color_temp_found = True
+
+            if light_min_color_temp_found:
+                NODE_ATTRIBS[node_attrib] = light_min_color_temp_tmp
+                light_min_color_temp_return = round(
+                    (1 / light_min_color_temp_tmp)
+                    * 1000000)
+            else:
+                if node_attrib in NODE_ATTRIBS:
+                    light_min_color_temp_return = (
+                    NODE_ATTRIBS.get(node_attrib))
+                else:
+                    light_min_color_temp_return = 0
+
+            return light_min_color_temp_return
+
+        def get_max_color_temp(self, node_id):
+            """Get light maximum colour temperature."""
+            node_index = -1
+
+            light_max_color_temp_tmp = 0
+            light_max_color_temp_return = 0
+            light_max_color_temp_found = False
+
+            node_attrib = "Light_Max_Color_Temp_" + node_id
+
+            if len(HSC.products.light) > 0:
+                for current_node_index in range(0, len(HSC.products.light)):
+                    if "id" in HSC.products.light[current_node_index]:
+                        if HSC.products.light[current_node_index][
+                            "id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("props" in HSC.products.light[node_index] and
+                                "colourTemperature" in
+                                HSC.products.light[node_index]["props"] and
+                                "min" in
+                                HSC.products.light[node_index]["props"]
+                                ["colourTemperature"]):
+                        light_max_color_temp_tmp = (
+                        HSC.products.light[node_index]
+                        ["props"]["colourTemperature"]
+                        ["min"])
+                        light_max_color_temp_found = True
+
+            if light_max_color_temp_found:
+                NODE_ATTRIBS[node_attrib] = light_max_color_temp_tmp
+                light_max_color_temp_return = round(
+                    (1 / light_max_color_temp_tmp)
+                    * 1000000)
+            else:
+                if node_attrib in NODE_ATTRIBS:
+                    light_max_color_temp_return = NODE_ATTRIBS.get(node_attrib)
+                else:
+                    light_max_color_temp_return = 0
+
+            return light_max_color_temp_return
+
+        def get_color_temp(self, node_id    ):
+            """Get light current colour temperature."""
+            node_index = -1
+
+            light_color_temp_tmp = 0
+            light_color_temp_return = 0
+            light_color_temp_found = False
+
+            current_node_attribute = "Light_Color_Temp_" + node_id
+
+            if len(HSC.products.light) > 0:
+                for current_node_index in range(0, len(HSC.products.light)):
+                    if "id" in HSC.products.light[current_node_index]:
+                        if HSC.products.light[current_node_index][
+                            "id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in HSC.products.light[node_index] and
+                                "colourTemperature" in
+                                HSC.products.light[node_index]["state"]):
+                        light_color_temp_tmp = (HSC.products.light[node_index]
+                                                ["state"]["colourTemperature"])
+                        light_color_temp_found = True
+
+            if light_color_temp_found:
+                NODE_ATTRIBS[current_node_attribute] = light_color_temp_tmp
+                light_color_temp_return = round(
+                    (1 / light_color_temp_tmp) * 1000000)
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    light_color_temp_return = NODE_ATTRIBS.get(
+                        current_node_attribute)
+                else:
+                    light_color_temp_return = 0
+
+            return light_color_temp_return
+
+        def turn_off(self, node_id):
+            """Set light to turn off."""
+            Pyhiveapi.check_hive_api_logon(self)
+
+            node_index = -1
+
+            set_mode_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                if len(HSC.products.light) > 0:
+                    for current_node_index in range(0,
+                                                    len(HSC.products.light)):
+                        if "id" in HSC.products.light[current_node_index]:
+                            if (HSC.products.light[current_node_index]
+                                ["id"] == node_id):
+                                node_index = current_node_index
+                                break
+                    if node_index != -1:
+                        json_string_content = '{"status": "OFF"}'
+                        hive_api_url = (HIVE_API.urls.nodes
+                                        + '/'
+                                        + HSC.products.light[node_index]["type"]
+                                        + '/'
+                                        + HSC.products.light[node_index]["id"])
+                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
+                                                        hive_api_url,
+                                                        json_string_content,
+                                                        False)
+
+                        api_resp = api_resp_d['original']
+
+                        if str(api_resp) == "<Response [200]>":
+                            Pyhiveapi.hive_api_get_nodes(self, node_id)
+#                           fire_bus_event(node_id, device_type)
+                            set_mode_success = True
+
+            return set_mode_success
+
+        def turn_on(self, node_id):
+            """Set light to turn on."""
+            Pyhiveapi.check_hive_api_logon(self)
+
+            node_index = -1
+
+            set_mode_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                if len(HSC.products.light) > 0:
+                    for cni in range(0, len(HSC.products.light)):
+                        if "id" in HSC.products.light[cni]:
+                            if HSC.products.light[cni]["id"] == node_id:
+                                node_index = cni
+                                break
+                    if node_index != -1:
+                        json_string_content = '{"status": "ON"}'
+                        hive_api_url = (HIVE_API.urls.nodes
+                                        + '/' + HSC.products.light[node_index][
+                                            "type"]
+                                        + '/' + HSC.products.light[node_index][
+                                            "id"])
+                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
+                                                        hive_api_url,
+                                                        json_string_content,
+                                                        False)
+
+                        api_resp = api_resp_d['original']
+
+                    if str(api_resp) == "<Response [200]>":
+                        Pyhiveapi.hive_api_get_nodes(self, node_id)
+#                       fire_bus_event(node_id, device_type)
+                        set_mode_success = True
+
+            return set_mode_success
+
+        def set_brightness(self, node_id, new_brightness):
+            """Set light to turn on."""
+            Pyhiveapi.check_hive_api_logon(self)
+
+            node_index = -1
+
+            set_mode_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                if len(HSC.products.light) > 0:
+                    for cni in range(0, len(HSC.products.light)):
+                        if "id" in HSC.products.light[cni]:
+                            if HSC.products.light[cni]["id"] == node_id:
+                                node_index = cni
+                                break
+                    if node_index != -1:
+                        json_string_content = \
+                            ('{"status": "ON", "brightness": '
+                            + str(new_brightness)
+                            + '}')
+                        hive_api_url = (HIVE_API.urls.nodes
+                                        + '/' + HSC.products.light[node_index][
+                                            "type"]
+                                        + '/' + HSC.products.light[node_index][
+                                            "id"])
+                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
+                                                        hive_api_url,
+                                                        json_string_content,
+                                                        False)
+
+                        api_resp = api_resp_d['original']
+
+                    if str(api_resp) == "<Response [200]>":
+                        Pyhiveapi.hive_api_get_nodes(self, node_id)
+#                       fire_bus_event(node_id, device_type)
+                        set_mode_success = True
+
+            return set_mode_success
+
+        def set_colour_temp(self, node_id, new_colour_temp):
+            """Set light to turn on."""
+            Pyhiveapi.check_hive_api_logon(self)
+
+            node_index = -1
+
+            set_mode_success = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if HSC.session_id is not None:
+                if len(HSC.products.light) > 0:
+                    for cni in range(0, len(HSC.products.light)):
+                        if "id" in HSC.products.light[cni]:
+                            if HSC.products.light[cni]["id"] == node_id:
+                                node_index = cni
+                                break
+                    if node_index != -1:
+                        json_string_content = ('{"colourTemperature": '
+                                                + str(new_colour_temp)
+                                                + '}')
+                        hive_api_url = (HIVE_API.urls.nodes
+                                        + '/' + HSC.products.light[node_index][
+                                            "type"]
+                                        + '/' + HSC.products.light[node_index][
+                                            "id"])
+                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
+                                                        hive_api_url,
+                                                        json_string_content,
+                                                        False)
+
+                        api_resp = api_resp_d['original']
+
+                    if str(api_resp) == "<Response [200]>":
+                        Pyhiveapi.hive_api_get_nodes(self, node_id)
+#                       fire_bus_event(node_id, device_type)
+                        set_mode_success = True
+
+            return set_mode_success
 
     class Sensor():
         """Hive Sensors."""
@@ -1357,9 +1718,6 @@ class Pyhiveapi:
                 else:
                     smartplug_state_return = "UNKNOWN"
 
-            if HSC.logging:
-                _LOGGER.warning("State is %s", smartplug_state_return)
-
             return smartplug_state_return
 
         def get_power_usage(self, node_id):
@@ -1397,9 +1755,6 @@ class Pyhiveapi:
                 else:
                     current_power_return = 0
 
-            if HSC.logging:
-                _LOGGER.warning("Power consumption is %s",
-                                current_power_return)
             return current_power_return
 
         def turn_on(self, node_id):
@@ -1424,27 +1779,24 @@ class Pyhiveapi:
                         json_string_content = '{"status": "ON"}'
                         hive_api_url = (HIVE_API.urls.nodes
                                         + '/'
-                                        + node_device_type
+                                        + HSC.products.plug[node_index]["type"]
                                         + '/'
                                         + HSC.products.plug[node_index]["id"])
-                        api_resp_d = hive_api_json_call("POST",
+                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
                                                         hive_api_url,
                                                         json_string_content,
                                                         False)
 
                         api_resp = api_resp_d['original']
 
-                    else:
-                        _LOGGER.error("Unable to control %s", node_name)
-
-                    if str(api_resp) == "<Response [200]>":
-                        hive_api_get_nodes(node_id, device_type)
-                        fire_bus_event(node_id, device_type)
-                        set_mode_success = True
+                        if str(api_resp) == "<Response [200]>":
+                            Pyhiveapi.hive_api_get_nodes(self, node_id)
+#                           fire_bus_event(node_id, device_type)
+                            set_mode_success = True
 
             return set_mode_success
 
-        def turn_off(self, node_id):
+        def turn_off(self, node_id, ):
             """Set smart plug to turn off."""
             Pyhiveapi.check_hive_api_logon(self)
 
@@ -1466,22 +1818,19 @@ class Pyhiveapi:
                         json_string_content = '{"status": "OFF"}'
                         hive_api_url = (HIVE_API.urls.nodes
                                         + '/'
-                                        + node_device_type
+                                        + HSC.products.plug[node_index]["type"]
                                         + '/'
                                         + HSC.products.plug[node_index]["id"])
-                        api_resp_d = hive_api_json_call("POST",
+                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
                                                         hive_api_url,
                                                         json_string_content,
                                                         False)
 
                         api_resp = api_resp_d['original']
 
-                    else:
-                        _LOGGER.error("Unable to control %s", node_name)
-
-                    if str(api_resp) == "<Response [200]>":
-                        hive_api_get_nodes(node_id, device_type)
-                        fire_bus_event(node_id, device_type)
-                        set_mode_success = True
+                        if str(api_resp) == "<Response [200]>":
+                            Pyhiveapi.hive_api_get_nodes(self, node_id)
+#                           fire_bus_event(node_id, device_type)
+                            set_mode_success = True
 
             return set_mode_success

@@ -4,7 +4,7 @@ from os import path
 
 setup(
     name='pyhiveapi',
-    version='0.0.33',
+    version='0.0.34',
     description='A Python library to interface with the Hive API',
     long_description="A Python library to interface with the Hive API",
     url='https://github.com/Rendili/pyhiveapi',
@@ -33,5 +33,5 @@ setup(
         'console_scripts': [
             'pyhiveapi=pyhiveapi.pyhiveapi:Pyhiveapi',
         ],
-    },
+    }, install_requires=['requests']
 )
