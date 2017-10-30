@@ -1023,10 +1023,6 @@ class Pyhiveapi:
 
             return set_mode_success
 
-
-
-
-
     class Hotwater():
         """Hive Hotwater."""
         def get_mode(self, node_id):
@@ -1273,7 +1269,6 @@ class Pyhiveapi:
                                     set_mode_success = True
 
             return set_mode_success
-
 
     class Light():
         """Hive Lights."""
@@ -1684,7 +1679,6 @@ class Pyhiveapi:
                     battery_level_return = 0
 
             return battery_level_return
-
 
     class Switch():
         """Hive Switches."""
