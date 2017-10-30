@@ -1313,7 +1313,12 @@ class Pyhiveapi:
                 else:
                     light_state_return = "UNKNOWN"
 
-            return light_state_return
+            light_state_return_b = False
+
+            if light_state_return == "ON":
+                light_state_return_b = True
+
+            return light_state_return_b
 
         def get_brightness(self, node_id):
             """Get light current brightness."""
@@ -1718,7 +1723,12 @@ class Pyhiveapi:
                 else:
                     smartplug_state_return = "UNKNOWN"
 
-            return smartplug_state_return
+            smartplug_state_return_b = False
+
+            if smartplug_state_return == "ON":
+                smartplug_state_return_b = True
+
+            return smartplug_state_return_b
 
         def get_power_usage(self, node_id):
             """Get smart plug current power usage."""
