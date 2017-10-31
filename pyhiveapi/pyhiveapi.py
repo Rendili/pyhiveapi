@@ -9,6 +9,7 @@ from datetime import timedelta
 import requests
 
 HIVE_NODE_UPDATE_INTERVAL_DEFAULT = 120
+HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT = 60  #### Update to 900 or 600
 MINUTES_BETWEEN_LOGONS = 15
 
 NODE_ATTRIBS = {"Header": "HeaderText"}
@@ -41,6 +42,23 @@ class HivePlatformData:
     min_max_data = {}
 
 
+class HiveTemperature:
+    """Initiate Hive Temperature Class."""
+
+    unit = ""
+    value = 0.00
+
+
+class HiveWeather:
+    """Initiate Hive Weather Class."""
+
+    last_update = datetime(2017, 1, 1, 12, 0, 0)
+    nodeid = ""
+    icon = ""
+    description = ""
+    temperature = HiveTemperature()
+
+
 class HiveSession:
     """Initiate Hive Session Class."""
 
@@ -55,12 +73,14 @@ class HiveSession:
     temperature_unit = ""
     devices = HiveDevices()
     products = HiveProducts()
+    weather = HiveWeather()
     platform_data = HivePlatformData()
 #    holiday_mode = Hive_HolidayMode()
-    update_interval_seconds = HIVE_NODE_UPDATE_INTERVAL_DEFAULT
+    update_node_interval_seconds = HIVE_NODE_UPDATE_INTERVAL_DEFAULT
+    update_weather_interval_seconds = HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT
     last_update = datetime(2017, 1, 1, 12, 0, 0)
     logging = False
-    hass = None
+#    hass = None
 
 
 class HiveAPIURLS:
@@ -120,7 +140,7 @@ class Pyhiveapi:
         HIVE_API.headers.session_id_value = None
 
 
-    def hive_api_json_call(self, request_type, request_url, json_string_content, login_request):
+    def hive_api_json_call(self, request_type, request_url, json_string_content, absolute_request_url):
         """Call the JSON Hive API and return any returned data."""
         api_headers = {HIVE_API.headers.content_type_key:
                        HIVE_API.headers.content_type_value,
@@ -132,7 +152,7 @@ class Pyhiveapi:
         json_return = {}
         full_request_url = ""
 
-        if login_request:
+        if absolute_request_url:
             full_request_url = request_url
         else:
             full_request_url = HIVE_API.urls.base + request_url
@@ -265,7 +285,7 @@ class Pyhiveapi:
         nodes_updated = False
         current_time = datetime.now()
         last_update_secs = (current_time - HSC.last_update).total_seconds()
-        if last_update_secs >= HSC.update_interval_seconds:
+        if last_update_secs >= HSC.update_node_interval_seconds:
             HSC.last_update = current_time
             nodes_updated = Pyhiveapi.hive_api_get_nodes(self, node_id)
         return nodes_updated
@@ -397,16 +417,51 @@ class Pyhiveapi:
         return get_nodes_successful
 
 
-        if mode_found:
-            NODE_ATTRIBS[current_node_attribute] = mode_tmp
-            mode_return = mode_tmp
-        else:
-            if current_node_attribute in NODE_ATTRIBS:
-                mode_return = NODE_ATTRIBS.get(current_node_attribute)
-            else:
-                mode_return = "UNKNOWN"
+    def hive_api_get_weather(self):
+        """Get latest weather data from Hive."""
+        get_weather_successful = True
 
-        return mode_return
+        current_time = datetime.now()
+        last_update_secs = (current_time - HSC.weather.last_update).total_seconds()
+        if last_update_secs >= HSC.update_weather_interval_seconds:
+            Pyhiveapi.check_hive_api_logon(self)
+
+            if HSC.session_id is not None:
+                try_finished = False
+                try:
+                    api_resp_d = {}
+                    api_resp_p = None
+                    weather_url = HIVE_API.urls.weather + "?postcode=" + HSC.postcode + "&country=" + HSC.countrycode
+                    weather_url = weather_url.replace(" ", "%20")
+
+                    api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", weather_url, "", True)
+                    api_resp_p = api_resp_d['parsed']
+
+                    if "weather" in api_resp_p:
+                        if "icon" in api_resp_p["weather"]:
+                            HSC.weather.icon = api_resp_p["weather"]["icon"]
+                        if "description" in api_resp_p["weather"]:
+                            HSC.weather.description = api_resp_p["weather"]["icon"]
+                        if "temperature" in api_resp_p["weather"]:
+                            if "unit" in api_resp_p["weather"]["temperature"]:
+                                HSC.weather.temperature.unit = api_resp_p["weather"]["temperature"]["unit"]
+                            if "unit" in api_resp_p["weather"]["temperature"]:
+                                HSC.weather.temperature.value = api_resp_p["weather"]["temperature"]["value"]
+                        HSC.weather.nodeid = "HiveWeather"
+                    else:
+                        get_weather_successful = False
+
+                    HSC.weather.last_update = current_time
+                    try_finished = True
+                except (IOError, RuntimeError, ZeroDivisionError):
+                    try_finished = False
+                finally:
+                    if not try_finished:
+                        try_finished = False
+            else:
+                get_weather_successful = False
+
+        return get_weather_successful
 
 
     def p_minutes_to_time(self, minutes_to_convert):
@@ -497,8 +552,9 @@ class Pyhiveapi:
         else:
             Pyhiveapi.hive_api_logon(self)
             if HSC.session_id is not None:
-                HSC.update_interval_seconds = hive_node_update_interval
+                HSC.update_node_interval_seconds = hive_node_update_interval
                 Pyhiveapi.hive_api_get_nodes_nl(self)
+                Pyhiveapi.hive_api_get_weather(self)
 
 
         device_list_all = {}
@@ -569,6 +625,8 @@ class Pyhiveapi:
                         hive_sensor_device_type = product["type"]
                         device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Sensor', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": hive_sensor_device_type})
 
+#        if HSC.weather.nodeid == "HiveWeather":
+        device_list_sensor.append({'HA_DeviceType': 'Weather_OutsideTemperature', 'Hive_NodeID': HSC.weather.nodeid, 'Hive_NodeName': "Hive Weather"})
 
         device_list_all['device_list_sensor'] = device_list_sensor
         device_list_all['device_list_climate'] = device_list_climate
@@ -1680,6 +1738,96 @@ class Pyhiveapi:
 
             return battery_level_return
 
+        def get_state(self, node_id, node_device_type):
+            """Get sensor state."""
+            node_index = -1
+
+            sensor_state_tmp = ""
+            sensor_state_return = ""
+            sensor_found = False
+
+            current_node_attribute = "Sensor_State_" + node_id
+
+            if len(HSC.products.sensors) > 0:
+                for current_node_index in range(0, len(HSC.products.sensors)):
+                    if "id" in HSC.products.sensors[current_node_index]:
+                        if HSC.products.sensors[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if node_device_type == "contactsensor":
+                        if ("props" in HSC.products.sensors[node_index] and
+                                "status" in
+                                HSC.products.sensors[node_index]["props"]):
+                            sensor_state_tmp = (HSC.products.sensors[node_index]
+                                                ["props"]["status"])
+                            sensor_found = True
+                    elif node_device_type == "motionsensor":
+                        if ("props" in HSC.products.sensors[node_index] and
+                                "motion" in HSC.products.sensors[node_index]["props"]
+                                and "status" in
+                                HSC.products.sensors[node_index]["props"]["motion"]):
+                            if (HSC.products.sensors[node_index]
+                                    ["props"]["motion"]["status"]):
+                                sensor_state_tmp = "MOTION"
+                                sensor_found = True
+                            elif not (HSC.products.sensors[node_index]
+                                      ["props"]["motion"]["status"]):
+                                sensor_state_tmp = "NO MOTION"
+                                sensor_found = True
+                            else:
+                                sensor_state_tmp = "UNKNOWN"
+                                sensor_found = True
+
+            if sensor_found:
+                NODE_ATTRIBS[current_node_attribute] = sensor_state_tmp
+                sensor_state_return = sensor_state_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    sensor_state_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    sensor_state_return = "UNKNOWN"
+
+            return sensor_state_return
+
+        def get_mode(self, node_id):
+            """Get sensor mode."""
+
+            node_index = -1
+
+            hive_device_mode_tmp = ""
+            hive_device_mode_return = ""
+            hive_device_mode_found = False
+            all_devices = HSC.products.light + HSC.products.plug
+
+            current_node_attribute = "Device_Mode_" + node_id
+
+            if len(HSC.products.light) > 0 or len(HSC.products.plug) > 0:
+                for current_node_index in range(0, len(all_devices)):
+                    if "id" in all_devices[current_node_index]:
+                        if all_devices[current_node_index]["id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    if ("state" in all_devices[node_index] and
+                            "mode" in all_devices[node_index]["state"]):
+                        hive_device_mode_tmp = (all_devices[node_index]
+                                                ["state"]["mode"])
+                        hive_device_mode_found = True
+
+            if hive_device_mode_found:
+                NODE_ATTRIBS[current_node_attribute] = hive_device_mode_tmp
+                hive_device_mode_return = hive_device_mode_tmp
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    hive_device_mode_return = NODE_ATTRIBS.get(current_node_attribute)
+                else:
+                    hive_device_mode_return = "UNKNOWN"
+
+            return hive_device_mode_return
+
     class Switch():
         """Hive Switches."""
         def get_state(self, node_id):
@@ -1838,3 +1986,10 @@ class Pyhiveapi:
                             set_mode_success = True
 
             return set_mode_success
+
+
+    class Weather():
+        """Hive Weather."""
+        def temperature(self):
+            """Get Hive Weather temperature."""
+            return HSC.weather.temperature.value
