@@ -554,7 +554,7 @@ class Pyhiveapi:
             if HSC.session_id is not None:
                 HSC.update_node_interval_seconds = hive_node_update_interval
                 Pyhiveapi.hive_api_get_nodes_nl(self)
-                Pyhiveapi.hive_api_get_weather(self)
+#                Pyhiveapi.hive_api_get_weather(self)
 
 
         device_list_all = {}
@@ -626,7 +626,7 @@ class Pyhiveapi:
                         device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Sensor', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": hive_sensor_device_type})
 
 #        if HSC.weather.nodeid == "HiveWeather":
-        device_list_sensor.append({'HA_DeviceType': 'Weather_OutsideTemperature', 'Hive_NodeID': HSC.weather.nodeid, 'Hive_NodeName': "Hive Weather"})
+#        device_list_sensor.append({'HA_DeviceType': 'Weather_OutsideTemperature', 'Hive_NodeID': HSC.weather.nodeid, 'Hive_NodeName': "Hive Weather"})
 
         device_list_all['device_list_sensor'] = device_list_sensor
         device_list_all['device_list_climate'] = device_list_climate
@@ -716,48 +716,6 @@ class Pyhiveapi:
                     current_temp_return = NODE_ATTRIBS.get(current_node_attribute)
                 else:
                     current_temp_return = -1000
-
-    #        if current_temp_return != -1000:
-    #            if node_id in HSC.platform_data.min_max_data:
-    #                if (HSC.platform_data.min_max_data[node_id]['TodayDate'] !=
-    #                        datetime.date(datetime.now())):
-    #                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = 1000
-    #                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = -1000
-    #                    HSC.platform_data.min_max_data[node_id]['TodayDate'] = \
-    #                        datetime.date(datetime.now())
-
-    #                if (current_temp_return <
-    #                        HSC.platform_data.min_max_data[node_id]['TodayMin']):
-    #                    HSC.platform_data.min_max_data[node_id]['TodayMin'] = \
-    #                        current_temp_return
-
-    #                if (current_temp_return >
-    #                        HSC.platform_data.min_max_data[node_id]['TodayMax']):
-    #                    HSC.platform_data.min_max_data[node_id]['TodayMax'] = \
-    #                        current_temp_return
-
-    #                if (current_temp_return <
-    #                        HSC.platform_data.min_max_data[node_id]['RestartMin']):
-    #                    HSC.platform_data.min_max_data[node_id]['RestartMin'] = \
-    #                        current_temp_return
-
-    #                if current_temp_return > \
-    #                        HSC.platform_data.min_max_data[node_id]['RestartMax']:
-    #                    HSC.platform_data.min_max_data[node_id]['RestartMax'] = \
-    #                        current_temp_return
-    #            else:
-    #                current_node_max_min_data = {}
-    #                current_node_max_min_data['TodayMin'] = current_temp_return
-    #                current_node_max_min_data['TodayMax'] = current_temp_return
-    #                current_node_max_min_data['TodayDate'] = \
-    #                    datetime.date(datetime.now())
-    #                current_node_max_min_data['RestartMin'] = current_temp_return
-    #                current_node_max_min_data['RestartMax'] = current_temp_return
-    #                HSC.platform_data.min_max_data[node_id] = \
-    #                    current_node_max_min_data
-
-    #        else:
-    #            current_temp_return = 0
 
             return current_temp_return
 
