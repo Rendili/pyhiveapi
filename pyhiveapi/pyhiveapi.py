@@ -295,7 +295,7 @@ class Pyhiveapi:
         """Get latest data for Hive nodes - not rate limiting."""
         Pyhiveapi.hive_api_get_nodes(self, "NoID")
 
-#### Add support for fire_bus_event once nodes updated ####
+
     def hive_api_get_nodes(self, node_id):
         """Get latest data for Hive nodes."""
         get_nodes_successful = True
@@ -1034,7 +1034,6 @@ class Pyhiveapi:
 
                                 if str(api_resp) == "<Response [200]>":
                                     Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                                    fire_bus_event(node_id, device_type)
                                     set_mode_success = True
 
             return set_mode_success
@@ -1173,7 +1172,6 @@ class Pyhiveapi:
 
             current_node_attribute = "HotWater_State_" + node_id
 
-            # pylint: disable=too-many-nested-blocks
             if len(HSC.products.hotwater) > 0:
                 for current_node_index in range(0, len(HSC.products.hotwater)):
                     if "id" in HSC.products.hotwater[current_node_index]:
@@ -1418,7 +1416,7 @@ class Pyhiveapi:
 
             return light_min_color_temp_return
 
-        def get_max_color_temp(self, node_id):
+        def get_max_colour_temp(self, node_id):
             """Get light maximum colour temperature."""
             node_index = -1
 
@@ -1536,7 +1534,6 @@ class Pyhiveapi:
 
                         if str(api_resp) == "<Response [200]>":
                             Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                           fire_bus_event(node_id, device_type)
                             set_mode_success = True
 
             return set_mode_success
@@ -1574,7 +1571,6 @@ class Pyhiveapi:
 
                     if str(api_resp) == "<Response [200]>":
                         Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                       fire_bus_event(node_id, device_type)
                         set_mode_success = True
 
             return set_mode_success
@@ -1615,7 +1611,6 @@ class Pyhiveapi:
 
                     if str(api_resp) == "<Response [200]>":
                         Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                       fire_bus_event(node_id, device_type)
                         set_mode_success = True
 
             return set_mode_success
@@ -1655,7 +1650,6 @@ class Pyhiveapi:
 
                     if str(api_resp) == "<Response [200]>":
                         Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                       fire_bus_event(node_id, device_type)
                         set_mode_success = True
 
             return set_mode_success
@@ -1901,7 +1895,6 @@ class Pyhiveapi:
 
                         if str(api_resp) == "<Response [200]>":
                             Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                           fire_bus_event(node_id, device_type)
                             set_mode_success = True
 
             return set_mode_success
@@ -1940,7 +1933,6 @@ class Pyhiveapi:
 
                         if str(api_resp) == "<Response [200]>":
                             Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                           fire_bus_event(node_id, device_type)
                             set_mode_success = True
 
             return set_mode_success
