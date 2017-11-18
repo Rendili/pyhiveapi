@@ -39,7 +39,7 @@ class HiveProducts:
 class HivePlatformData:
     """Initiate Hive PlatformData Class."""
 
-    min_max_data = {}
+    minmax = {}
 
 
 class HiveTemperature:
@@ -74,13 +74,12 @@ class HiveSession:
     devices = HiveDevices()
     products = HiveProducts()
     weather = HiveWeather()
-    platform_data = HivePlatformData()
+    data = HivePlatformData()
 #    holiday_mode = Hive_HolidayMode()
     update_node_interval_seconds = HIVE_NODE_UPDATE_INTERVAL_DEFAULT
     update_weather_interval_seconds = HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT
     last_update = datetime(2017, 1, 1, 12, 0, 0)
     logging = False
-#    hass = None
 
 
 class HiveAPIURLS:
@@ -280,7 +279,7 @@ class Pyhiveapi:
             Pyhiveapi.hive_api_logon(self)
 
 
-    def hive_api_get_nodes_rl(self, node_id):
+    def update_data(self, node_id):
         """Get latest data for Hive nodes - rate limiting."""
         nodes_updated = False
         current_time = datetime.now()
@@ -717,7 +716,42 @@ class Pyhiveapi:
                 else:
                     current_temp_return = -1000
 
+            if current_temp_return != -1000:
+                if node_id in HSC.data.minmax:
+                    if (HSC.data.minmax[node_id]['TodayDate'] != datetime.date(datetime.now())):
+                        HSC.data.minmax[node_id]['TodayMin'] = 1000
+                        HSC.data.minmax[node_id]['TodayMax'] = -1000
+                        HSC.data.minmax[node_id]['TodayDate'] = datetime.date(datetime.now())
+
+                    if (current_temp_return < HSC.data.minmax[node_id]['TodayMin']):
+                        HSC.data.minmax[node_id]['TodayMin'] = current_temp_return
+
+                    if (current_temp_return > HSC.data.minmax[node_id]['TodayMax']):
+                        HSC.data.minmax[node_id]['TodayMax'] = current_temp_return
+
+                    if (current_temp_return < HSC.data.minmax[node_id]['RestartMin']):
+                        HSC.data.minmax[node_id]['RestartMin'] = current_temp_return
+
+                    if (current_temp_return > HSC.data.minmax[node_id]['RestartMax']):
+                        HSC.data.minmax[node_id]['RestartMax'] = current_temp_return
+                else:
+                    current_node_max_min_data = {}
+                    current_node_max_min_data['TodayMin'] = current_temp_return
+                    current_node_max_min_data['TodayMax'] = current_temp_return
+                    current_node_max_min_data['TodayDate'] = datetime.date(datetime.now())
+                    current_node_max_min_data['RestartMin'] = current_temp_return
+                    current_node_max_min_data['RestartMax'] = current_temp_return
+                    HSC.data.minmax[node_id] = current_node_max_min_data
+            else:
+                current_temp_return = 0
+
             return current_temp_return
+
+        def minmax_temperatures(self, node_id):
+            if node_id in HSC.data.minmax:
+                return HSC.data.minmax[node_id]
+            else:
+                return None
 
         def get_target_temperature(self, node_id):
             """Get heating target temperature."""
