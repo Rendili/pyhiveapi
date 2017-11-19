@@ -1723,8 +1723,8 @@ class Pyhiveapi:
             """Get sensor state."""
             node_index = -1
 
-            sensor_state_tmp = ""
-            sensor_state_return = ""
+            sensor_state_tmp = False
+            sensor_state_return = False
             sensor_found = False
 
             current_node_attribute = "Sensor_State_" + node_id
@@ -1738,28 +1738,13 @@ class Pyhiveapi:
 
                 if node_index != -1:
                     if node_device_type == "contactsensor":
-                        if ("props" in HSC.products.sensors[node_index] and
-                                "status" in
-                                HSC.products.sensors[node_index]["props"]):
-                            sensor_state_tmp = (HSC.products.sensors[node_index]
-                                                ["props"]["status"])
-                            sensor_found = True
+                        state = (HSC.products.sensors[node_index]["props"]["status"])
+                        if state == 'OPEN':
+                            sensor_state_tmp = True
                     elif node_device_type == "motionsensor":
-                        if ("props" in HSC.products.sensors[node_index] and
-                                "motion" in HSC.products.sensors[node_index]["props"]
-                                and "status" in
-                                HSC.products.sensors[node_index]["props"]["motion"]):
-                            if (HSC.products.sensors[node_index]
-                                    ["props"]["motion"]["status"]):
-                                sensor_state_tmp = "MOTION"
-                                sensor_found = True
-                            elif not (HSC.products.sensors[node_index]
-                                      ["props"]["motion"]["status"]):
-                                sensor_state_tmp = "NO MOTION"
-                                sensor_found = True
-                            else:
-                                sensor_state_tmp = "UNKNOWN"
-                                sensor_found = True
+                        sensor_state_tmp = (HSC.products.sensors[node_index]["props"]["motion"]["status"])
+                if sensor_state_tmp != None:
+                    sensor_found = True
 
             if sensor_found:
                 NODE_ATTRIBS[current_node_attribute] = sensor_state_tmp
@@ -1768,7 +1753,7 @@ class Pyhiveapi:
                 if current_node_attribute in NODE_ATTRIBS:
                     sensor_state_return = NODE_ATTRIBS.get(current_node_attribute)
                 else:
-                    sensor_state_return = "UNKNOWN"
+                    sensor_state_return = False
 
             return sensor_state_return
 
