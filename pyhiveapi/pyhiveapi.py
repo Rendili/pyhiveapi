@@ -553,6 +553,7 @@ class Pyhiveapi:
 
         device_list_all = {}
         device_list_sensor = []
+        device_list_binary_sensor = []
         device_list_climate = []
         device_list_light = []
         device_list_plug = []
@@ -617,12 +618,13 @@ class Pyhiveapi:
                 if ("id" in product and "state" in product and "name" in product["state"]):
                     if "type" in product:
                         hive_sensor_device_type = product["type"]
-                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Sensor', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": hive_sensor_device_type})
+                        device_list_binary_sensor.append({'HA_DeviceType': 'Hive_Device_Sensor', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": hive_sensor_device_type})
 
 #        if HSC.weather.nodeid == "HiveWeather":
 #        device_list_sensor.append({'HA_DeviceType': 'Weather_OutsideTemperature', 'Hive_NodeID': HSC.weather.nodeid, 'Hive_NodeName': "Hive Weather"})
 
         device_list_all['device_list_sensor'] = device_list_sensor
+        device_list_all['device_list_binary_sensor'] = device_list_binary_sensor
         device_list_all['device_list_climate'] = device_list_climate
         device_list_all['device_list_light'] = device_list_light
         device_list_all['device_list_plug'] = device_list_plug
