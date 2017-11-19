@@ -1,8 +1,3 @@
-#### Check if data needs updating on each get and set
-#### Set private def prefix
-#### Move NODE_ATTRIBS to HSC
-#### Move HSC to self
-
 import operator
 from datetime import datetime
 from datetime import timedelta
