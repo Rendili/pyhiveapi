@@ -558,6 +558,12 @@ class Pyhiveapi:
         device_list_light = []
         device_list_plug = []
 
+        if len(HSC.devices.hub) > 0:
+            for a_device in HSC.devices.hub:
+                if ("id" in a_device and "state" in a_device and "name" in a_device["state"]):
+                    device_list_sensor.append({'HA_DeviceType': 'Hub_OnlineStatus', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': a_device["state"]["name"], "Hive_DeviceType": "Hub"})
+
+
         if len(HSC.products.heating) > 0:
             for product in HSC.products.heating:
                 if ("id" in product and "state" in product and "name" in product["state"]):
@@ -1687,6 +1693,22 @@ class Pyhiveapi:
 
     class Sensor():
         """Hive Sensors."""
+        def hub_online_status(self, node_id):
+            """Get the online status of the Hive hub."""
+            return_status = "Offline"
+
+            for a_hub in HSC.devices.hub:
+                if "id" in a_hub:
+                    if a_hub["id"] == node_id:
+                        if "props" in a_hub and "online" in a_hub["props"]:
+                            if a_hub["props"]["online"]:
+                                return "Online"
+                            else:
+                                return "Offline"
+
+            return return_status
+
+
         def battery_level(self, node_id):
             """Get device battery level."""
             node_index = -1
