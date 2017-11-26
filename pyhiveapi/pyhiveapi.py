@@ -143,6 +143,7 @@ class Pyhiveapi:
                        HIVE_API.headers.session_id_key:
                        HIVE_API.headers.session_id_value}
 
+        requests_timeout = 10
         json_return = {}
         full_request_url = ""
 
@@ -156,15 +157,18 @@ class Pyhiveapi:
             if request_type == "POST":
                 json_response = requests.post(full_request_url,
                                               data=json_string_content,
-                                              headers=api_headers)
+                                              headers=api_headers,
+                                              timeout=requests_timeout)
             elif request_type == "GET":
                 json_response = requests.get(full_request_url,
                                              data=json_string_content,
-                                             headers=api_headers)
+                                             headers=api_headers,
+                                             timeout=requests_timeout)
             elif request_type == "PUT":
                 json_response = requests.put(full_request_url,
                                              data=json_string_content,
-                                             headers=api_headers)
+                                             headers=api_headers,
+                                             timeout=requests_timeout)
             else:
                 json_response = ""
 
@@ -280,7 +284,6 @@ class Pyhiveapi:
         current_time = datetime.now()
         last_update_secs = (current_time - HSC.last_update).total_seconds()
         if last_update_secs >= HSC.update_node_interval_seconds:
-            HSC.last_update = current_time
             nodes_updated = Pyhiveapi.hive_api_get_nodes(self, node_id)
         return nodes_updated
 
@@ -407,6 +410,9 @@ class Pyhiveapi:
                     get_nodes_successful = False
         else:
             get_nodes_successful = False
+
+        if get_nodes_successful:
+            HSC.last_update = datetime.now()
 
         return get_nodes_successful
 
@@ -766,7 +772,6 @@ class Pyhiveapi:
 
             current_node_attribute = "Heating_TargetTemp_" + node_id
 
-            # pylint: disable=too-many-nested-blocks
             if len(HSC.products.heating) > 0:
                 for current_node_index in range(0, len(HSC.products.heating)):
                     if "id" in HSC.products.heating[current_node_index]:
@@ -1031,7 +1036,6 @@ class Pyhiveapi:
 
                             if str(api_resp) == "<Response [200]>":
                                 Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                                fire_bus_event(node_id, device_type)
                                 set_temperature_success = True
 
             return set_temperature_success
@@ -1074,6 +1078,91 @@ class Pyhiveapi:
                                     set_mode_success = True
 
             return set_mode_success
+
+
+        def turn_boost_on(self, node_id, length_minutes, target_temperature):
+            """Turn boost on."""
+            set_boost_success = False
+            heating_node_found = False
+            api_resp_d = {}
+            api_resp = ""
+
+            if length_minutes > 0 and target_temperature >= self.min_temperature(node_id) and target_temperature <= self.max_temperature(node_id):
+                heating_node_found = False
+            else:
+                return False
+
+            for a_heating in HSC.products.heating:
+                if "id" in a_heating:
+                    if a_heating["id"] == node_id:
+                        heating_node_found = True
+                        break
+
+            Pyhiveapi.check_hive_api_logon(self)
+
+            if heating_node_found:
+                json_string_content = '{"mode": "BOOST", "boost": ' + str(length_minutes) + ', "target": ' + str(target_temperature) + '}'
+                hive_api_url = (HIVE_API.urls.nodes + "/heating/" + node_id)
+                api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+
+                api_resp = api_resp_d['original']
+
+                if str(api_resp) == "<Response [200]>":
+                    Pyhiveapi.hive_api_get_nodes(self, node_id)
+                    set_boost_success = True
+
+            return set_boost_success
+
+
+        def turn_boost_off(self, node_id):
+            """Turn boost on."""
+            set_boost_success = False
+            heating_node_found = False
+            api_resp_d = {}
+            api_resp = ""
+
+            for a_heating in HSC.products.heating:
+                if "id" in a_heating:
+                    if a_heating["id"] == node_id:
+                        heating_node_found = True
+                        break
+
+            Pyhiveapi.check_hive_api_logon(self)
+
+            if heating_node_found:
+                Pyhiveapi.hive_api_get_nodes(self, node_id)
+                boost_state = self.get_boost(node_id)
+
+                node_index = -1
+                for current_node_index in range(0, len(HSC.products.heating)):
+                    if "id" in HSC.products.heating[current_node_index]:
+                        if (HSC.products.heating[current_node_index]["id"] == node_id):
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1 and boost_state == "ON":
+                    send_previous_mode = ''
+                    send_previous_temperature = ''
+
+                    if ("props" in HSC.products.heating[node_index] and "previous" in HSC.products.heating[node_index]["props"] and "mode" in HSC.products.heating[node_index]["props"]["previous"]):
+                        previous_mode = HSC.products.heating[node_index]["props"]["previous"]["mode"]
+                        send_previous_mode = '"mode": "' + str(previous_mode) + '"'
+                        if previous_mode == "MANUAL":
+                            previous_temperature = HSC.products.heating[node_index]["props"]["previous"]["target"]
+                            send_previous_temperature  = ', "target": ' + str(previous_temperature)
+
+                    json_string_content = '{' + send_previous_mode + send_previous_temperature + '}'
+                    hive_api_url = (HIVE_API.urls.nodes + "/heating/" + node_id)
+                    api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+
+                    api_resp = api_resp_d['original']
+
+                    if str(api_resp) == "<Response [200]>":
+                        Pyhiveapi.hive_api_get_nodes(self, node_id)
+                        set_boost_success = True
+
+            return set_boost_success
+
 
     class Hotwater():
         """Hive Hotwater."""
@@ -1316,7 +1405,6 @@ class Pyhiveapi:
 
                                 if str(api_resp) == "<Response [200]>":
                                     Pyhiveapi.hive_api_get_nodes(self, node_id)
-#                                    fire_bus_event(node_id, device_type)
                                     set_mode_success = True
 
             return set_mode_success
