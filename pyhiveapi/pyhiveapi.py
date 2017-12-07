@@ -2,6 +2,7 @@ import operator
 from datetime import datetime
 from datetime import timedelta
 import requests
+import colorsys
 
 HIVE_NODE_UPDATE_INTERVAL_DEFAULT = 120
 HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT = 60  #### Update to 900 or 600
@@ -75,6 +76,7 @@ class HiveSession:
     update_weather_interval_seconds = HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT
     last_update = datetime(2017, 1, 1, 12, 0, 0)
     logging = False
+    file = False
 
 
 class HiveAPIURLS:
@@ -276,6 +278,10 @@ class Pyhiveapi:
 
         if l_logon_mins >= MINUTES_BETWEEN_LOGONS or HSC.session_id is None:
             Pyhiveapi.hive_api_logon(self)
+
+        if HSC.file == True:
+            HSC.session_id = "Test"
+
 
 
     def update_data(self, node_id):
@@ -642,6 +648,130 @@ class Pyhiveapi:
         device_list_all['device_list_plug'] = device_list_plug
 
         return device_list_all
+
+    def test_use_file(self, devices, products):
+        """Get latest data for Hive nodes."""
+        get_nodes_successful = True
+
+        UseFile = True
+        if UseFile == True:
+            HSC.file = True
+            HSC.session_id = 'Test'
+
+
+
+        tmp_devices_hub = []
+        tmp_devices_thermostat = []
+        tmp_devices_boiler_module = []
+        tmp_devices_plug = []
+        tmp_devices_light = []
+        tmp_devices_sensors = []
+
+        tmp_products_heating = []
+        tmp_products_hotwater = []
+        tmp_products_light = []
+        tmp_products_plug = []
+        tmp_products_sensors = []
+
+        if devices != None:
+            try_finished = False
+            try:
+                api_resp_d = {}
+                api_resp_p = None
+                api_resp_d = devices
+
+                api_resp_p = api_resp_d
+
+                for a_device in api_resp_p:
+                    if "type" in a_device:
+                        if a_device["type"] == "hub":
+                            tmp_devices_hub.append(a_device)
+                        if a_device["type"] == "thermostatui":
+                            tmp_devices_thermostat.append(a_device)
+                        if a_device["type"] == "boilermodule":
+                            tmp_devices_boiler_module.append(a_device)
+                        if a_device["type"] == "activeplug":
+                            tmp_devices_plug.append(a_device)
+                        if (a_device["type"] == "warmwhitelight" or
+                                a_device["type"] == "tuneablelight" or
+                                a_device["type"] == "colourtuneablelight"):
+                            tmp_devices_light.append(a_device)
+                        if (a_device["type"] == "motionsensor" or
+                                a_device["type"] == "contactsensor"):
+                            tmp_devices_sensors.append(a_device)
+
+                try_finished = True
+            except (IOError, RuntimeError, ZeroDivisionError):
+                try_finished = False
+            finally:
+                if not try_finished:
+                    try_finished = False
+
+        if products != None:
+
+            try_finished = False
+            try:
+                api_resp_d = {}
+                api_resp_p = None
+                api_resp_d = products
+
+                api_resp_p = api_resp_d
+                for a_product in api_resp_p:
+                    if "type" in a_product:
+                        if a_product["type"] == "heating":
+                            tmp_products_heating.append(a_product)
+                        if a_product["type"] == "hotwater":
+                            tmp_products_hotwater.append(a_product)
+                        if a_product["type"] == "activeplug":
+                            tmp_products_plug.append(a_product)
+                        if (a_product["type"] == "warmwhitelight" or
+                                a_product["type"] == "tuneablelight" or
+                                a_product["type"] == "colourtuneablelight"):
+                            tmp_products_light.append(a_product)
+                        if (a_product["type"] == "motionsensor" or
+                                a_product["type"] == "contactsensor"):
+                            tmp_products_sensors.append(a_product)
+                try_finished = True
+            except (IOError, RuntimeError, ZeroDivisionError):
+                try_finished = False
+            finally:
+                if not try_finished:
+                    try_finished = False
+
+        try_finished = False
+        try:
+            if len(tmp_devices_hub) > 0:
+                HSC.devices.hub = tmp_devices_hub
+            if len(tmp_devices_thermostat) > 0:
+                HSC.devices.thermostat = tmp_devices_thermostat
+            if len(tmp_devices_boiler_module) > 0:
+                HSC.devices.boiler_module = tmp_devices_boiler_module
+            if len(tmp_devices_plug) > 0:
+                HSC.devices.plug = tmp_devices_plug
+            if len(tmp_devices_light) > 0:
+                HSC.devices.light = tmp_devices_light
+            if len(tmp_devices_sensors) > 0:
+                HSC.devices.sensors = tmp_devices_sensors
+
+            if len(tmp_products_heating) > 0:
+                HSC.products.heating = tmp_products_heating
+            if len(tmp_products_hotwater) > 0:
+                HSC.products.hotwater = tmp_products_hotwater
+            if len(tmp_products_plug) > 0:
+                HSC.products.plug = tmp_products_plug
+            if len(tmp_products_light) > 0:
+                HSC.products.light = tmp_products_light
+            if len(tmp_products_sensors) > 0:
+                HSC.products.sensors = tmp_products_sensors
+
+            try_finished = True
+        except (IOError, RuntimeError, ZeroDivisionError):
+                try_finished = False
+        finally:
+            if not try_finished:
+                get_nodes_successful = False
+
+        return get_nodes_successful
 
 
     class Heating():
@@ -1581,11 +1711,11 @@ class Pyhiveapi:
             """Get light minimum colour temperature."""
             node_index = -1
 
-            light_min_color_temp_tmp = 0
-            light_min_color_temp_return = 0
-            light_min_color_temp_found = False
+            light_min_colour_temp_tmp = 0
+            light_min_colour_temp_return = 0
+            light_min_colour_temp_found = False
 
-            node_attrib = "Light_Min_Color_Temp_" + node_id
+            node_attrib = "Light_Min_colour_Temp_" + node_id
 
             if len(HSC.products.light) > 0:
                 for current_node_index in range(0, len(HSC.products.light)):
@@ -1602,35 +1732,35 @@ class Pyhiveapi:
                                     "props"] and "max" in
                         HSC.products.light[node_index]
                         ["props"]["colourTemperature"]):
-                        light_min_color_temp_tmp = (
+                        light_min_colour_temp_tmp = (
                         HSC.products.light[node_index]
                         ["props"]
                         ["colourTemperature"]["max"])
-                        light_min_color_temp_found = True
+                        light_min_colour_temp_found = True
 
-            if light_min_color_temp_found:
-                NODE_ATTRIBS[node_attrib] = light_min_color_temp_tmp
-                light_min_color_temp_return = round(
-                    (1 / light_min_color_temp_tmp)
+            if light_min_colour_temp_found:
+                NODE_ATTRIBS[node_attrib] = light_min_colour_temp_tmp
+                light_min_colour_temp_return = round(
+                    (1 / light_min_colour_temp_tmp)
                     * 1000000)
             else:
                 if node_attrib in NODE_ATTRIBS:
-                    light_min_color_temp_return = (
+                    light_min_colour_temp_return = (
                     NODE_ATTRIBS.get(node_attrib))
                 else:
-                    light_min_color_temp_return = 0
+                    light_min_colour_temp_return = 0
 
-            return light_min_color_temp_return
+            return light_min_colour_temp_return
 
         def get_max_colour_temp(self, node_id):
             """Get light maximum colour temperature."""
             node_index = -1
 
-            light_max_color_temp_tmp = 0
-            light_max_color_temp_return = 0
-            light_max_color_temp_found = False
+            light_max_colour_temp_tmp = 0
+            light_max_colour_temp_return = 0
+            light_max_colour_temp_found = False
 
-            node_attrib = "Light_Max_Color_Temp_" + node_id
+            node_attrib = "Light_Max_colour_Temp_" + node_id
 
             if len(HSC.products.light) > 0:
                 for current_node_index in range(0, len(HSC.products.light)):
@@ -1647,34 +1777,34 @@ class Pyhiveapi:
                                 "min" in
                                 HSC.products.light[node_index]["props"]
                                 ["colourTemperature"]):
-                        light_max_color_temp_tmp = (
+                        light_max_colour_temp_tmp = (
                         HSC.products.light[node_index]
                         ["props"]["colourTemperature"]
                         ["min"])
-                        light_max_color_temp_found = True
+                        light_max_colour_temp_found = True
 
-            if light_max_color_temp_found:
-                NODE_ATTRIBS[node_attrib] = light_max_color_temp_tmp
-                light_max_color_temp_return = round(
-                    (1 / light_max_color_temp_tmp)
+            if light_max_colour_temp_found:
+                NODE_ATTRIBS[node_attrib] = light_max_colour_temp_tmp
+                light_max_colour_temp_return = round(
+                    (1 / light_max_colour_temp_tmp)
                     * 1000000)
             else:
                 if node_attrib in NODE_ATTRIBS:
-                    light_max_color_temp_return = NODE_ATTRIBS.get(node_attrib)
+                    light_max_colour_temp_return = NODE_ATTRIBS.get(node_attrib)
                 else:
-                    light_max_color_temp_return = 0
+                    light_max_colour_temp_return = 0
 
-            return light_max_color_temp_return
+            return light_max_colour_temp_return
 
-        def get_color_temp(self, node_id    ):
+        def get_colour_temp(self, node_id    ):
             """Get light current colour temperature."""
             node_index = -1
 
-            light_color_temp_tmp = 0
-            light_color_temp_return = 0
-            light_color_temp_found = False
+            light_colour_temp_tmp = 0
+            light_colour_temp_return = 0
+            light_colour_temp_found = False
 
-            current_node_attribute = "Light_Color_Temp_" + node_id
+            current_node_attribute = "Light_Colour_Temp_" + node_id
 
             if len(HSC.products.light) > 0:
                 for current_node_index in range(0, len(HSC.products.light)):
@@ -1688,22 +1818,65 @@ class Pyhiveapi:
                     if ("state" in HSC.products.light[node_index] and
                                 "colourTemperature" in
                                 HSC.products.light[node_index]["state"]):
-                        light_color_temp_tmp = (HSC.products.light[node_index]
+                        light_colour_temp_tmp = (HSC.products.light[node_index]
                                                 ["state"]["colourTemperature"])
-                        light_color_temp_found = True
+                        light_colour_temp_found = True
 
-            if light_color_temp_found:
-                NODE_ATTRIBS[current_node_attribute] = light_color_temp_tmp
-                light_color_temp_return = round(
-                    (1 / light_color_temp_tmp) * 1000000)
+            if light_colour_temp_found:
+                NODE_ATTRIBS[current_node_attribute] = light_colour_temp_tmp
+                light_colour_temp_return = round(
+                    (1 / light_colour_temp_tmp) * 1000000)
             else:
                 if current_node_attribute in NODE_ATTRIBS:
-                    light_color_temp_return = NODE_ATTRIBS.get(
+                    light_colour_temp_return = NODE_ATTRIBS.get(
                         current_node_attribute)
                 else:
-                    light_color_temp_return = 0
+                    light_colour_temp_return = 0
 
-            return light_color_temp_return
+            return light_colour_temp_return
+
+        def get_colour(self,node_id):
+            """Get colour"""
+            node_index = -1
+
+            light_colour_hue_tmp = 0
+            light_colour_saturation_tmp = 0
+            light_colour_value_tmp = 0
+            rgb = 0
+            light_colour_return = 0
+            light_colour_found = False
+
+            current_node_attribute = "Light_Colour_" + node_id
+
+            if len(HSC.products.light) > 0:
+                for current_node_index in range(0, len(HSC.products.light)):
+                    if "id" in HSC.products.light[current_node_index]:
+                        if HSC.products.light[current_node_index][
+                            "id"] == node_id:
+                            node_index = current_node_index
+                            break
+
+                if node_index != -1:
+                    light_colour_hue_tmp = (HSC.products.light[node_index]["state"]["hue"])
+                    light_colour_saturation_tmp = (HSC.products.light[node_index]["state"]["saturation"])
+                    light_colour_value_tmp = (HSC.products.light[node_index]["state"]["value"])
+                    light_colour_found = True
+
+            if light_colour_found:
+                h = light_colour_hue_tmp / 360
+                s = light_colour_saturation_tmp / 100
+                v = light_colour_value_tmp / 100
+                rgb = tuple(int(i * 255) for i in colorsys.hsv_to_rgb(h, s, v))
+                NODE_ATTRIBS[current_node_attribute] = rgb
+                light_colour_return = rgb
+            else:
+                if current_node_attribute in NODE_ATTRIBS:
+                    light_colour_return = NODE_ATTRIBS.get(
+                        current_node_attribute)
+                else:
+                    light_colour_return = 0
+
+            return light_colour_return
 
         def turn_off(self, node_id):
             """Set light to turn off."""
@@ -1821,7 +1994,7 @@ class Pyhiveapi:
 
             return set_mode_success
 
-        def set_colour_temp(self, node_id, new_colour_temp):
+        def set_colour_temp(self, node_id, nodedevicetype, new_colour_temp):
             """Set light to turn on."""
             Pyhiveapi.check_hive_api_logon(self)
 
@@ -1839,9 +2012,56 @@ class Pyhiveapi:
                                 node_index = cni
                                 break
                     if node_index != -1:
-                        json_string_content = ('{"colourTemperature": '
-                                                + str(new_colour_temp)
-                                                + '}')
+                        if nodedevicetype == "tuneablelight":
+                            json_string_content = '{"colourTemperature": ' + str(new_colour_temp) + '}'
+                        else:
+                            json_string_content = '{"colourMode": "WHITE", "colourTemperature": ' + str(new_colour_temp) + '}'
+                        hive_api_url = (HIVE_API.urls.nodes
+                                        + '/' + HSC.products.light[node_index][
+                                            "type"]
+                                        + '/' + HSC.products.light[node_index][
+                                            "id"])
+                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
+                                                        hive_api_url,
+                                                        json_string_content,
+                                                        False)
+
+                        api_resp = api_resp_d['original']
+
+                    if str(api_resp) == "<Response [200]>":
+                        Pyhiveapi.hive_api_get_nodes(self, node_id)
+                        set_mode_success = True
+
+            return set_mode_success
+
+        def set_colour(self, node_id, new_colour):
+            """Set light to turn on."""
+            Pyhiveapi.check_hive_api_logon(self)
+
+            node_index = -1
+
+            set_mode_success = False
+            api_resp_d = {}
+            api_resp = ""
+            new_hue = None
+            new_saturation = None
+            new_value = None
+
+            if HSC.session_id is not None:
+                if len(HSC.products.light) > 0:
+                    for cni in range(0, len(HSC.products.light)):
+                        if "id" in HSC.products.light[cni]:
+                            if HSC.products.light[cni]["id"] == node_id:
+                                node_index = cni
+                                break
+                    if node_index != -1:
+                        new_hue = new_colour[0]
+                        new_saturation = new_colour[1]
+                        new_value = new_colour[2]
+                        json_string_content = '{"colourMode": "COLOUR", "hue": ' + str(
+                            new_hue) + ', "saturation": ' + str(
+                            new_saturation) + ', "value": ' + str(
+                            new_value) + '}'
                         hive_api_url = (HIVE_API.urls.nodes
                                         + '/' + HSC.products.light[node_index][
                                             "type"]
