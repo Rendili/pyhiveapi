@@ -1708,14 +1708,14 @@ class Pyhiveapi:
             return light_brightness_return
 
         def get_min_color_temp(self, node_id):
-            """Get light minimum colour temperature."""
+            """Get light minimum color temperature."""
             node_index = -1
 
-            light_min_colour_temp_tmp = 0
-            light_min_colour_temp_return = 0
-            light_min_colour_temp_found = False
+            light_min_color_temp_tmp = 0
+            light_min_color_temp_return = 0
+            light_min_color_temp_found = False
 
-            node_attrib = "Light_Min_colour_Temp_" + node_id
+            node_attrib = "Light_Min_color_Temp_" + node_id
 
             if len(HSC.products.light) > 0:
                 for current_node_index in range(0, len(HSC.products.light)):
@@ -1732,35 +1732,35 @@ class Pyhiveapi:
                                     "props"] and "max" in
                         HSC.products.light[node_index]
                         ["props"]["colourTemperature"]):
-                        light_min_colour_temp_tmp = (
+                        light_min_color_temp_tmp = (
                         HSC.products.light[node_index]
                         ["props"]
                         ["colourTemperature"]["max"])
-                        light_min_colour_temp_found = True
+                        light_min_color_temp_found = True
 
-            if light_min_colour_temp_found:
-                NODE_ATTRIBS[node_attrib] = light_min_colour_temp_tmp
-                light_min_colour_temp_return = round(
-                    (1 / light_min_colour_temp_tmp)
+            if light_min_color_temp_found:
+                NODE_ATTRIBS[node_attrib] = light_min_color_temp_tmp
+                light_min_color_temp_return = round(
+                    (1 / light_min_color_temp_tmp)
                     * 1000000)
             else:
                 if node_attrib in NODE_ATTRIBS:
-                    light_min_colour_temp_return = (
+                    light_min_color_temp_return = (
                     NODE_ATTRIBS.get(node_attrib))
                 else:
-                    light_min_colour_temp_return = 0
+                    light_min_color_temp_return = 0
 
-            return light_min_colour_temp_return
+            return light_min_color_temp_return
 
         def get_max_color_temp(self, node_id):
-            """Get light maximum colour temperature."""
+            """Get light maximum color temperature."""
             node_index = -1
 
-            light_max_colour_temp_tmp = 0
-            light_max_colour_temp_return = 0
-            light_max_colour_temp_found = False
+            light_max_color_temp_tmp = 0
+            light_max_color_temp_return = 0
+            light_max_color_temp_found = False
 
-            node_attrib = "Light_Max_colour_Temp_" + node_id
+            node_attrib = "Light_Max_color_Temp_" + node_id
 
             if len(HSC.products.light) > 0:
                 for current_node_index in range(0, len(HSC.products.light)):
@@ -1777,34 +1777,34 @@ class Pyhiveapi:
                                 "min" in
                                 HSC.products.light[node_index]["props"]
                                 ["colourTemperature"]):
-                        light_max_colour_temp_tmp = (
+                        light_max_color_temp_tmp = (
                         HSC.products.light[node_index]
                         ["props"]["colourTemperature"]
                         ["min"])
-                        light_max_colour_temp_found = True
+                        light_max_color_temp_found = True
 
-            if light_max_colour_temp_found:
-                NODE_ATTRIBS[node_attrib] = light_max_colour_temp_tmp
-                light_max_colour_temp_return = round(
-                    (1 / light_max_colour_temp_tmp)
+            if light_max_color_temp_found:
+                NODE_ATTRIBS[node_attrib] = light_max_color_temp_tmp
+                light_max_color_temp_return = round(
+                    (1 / light_max_color_temp_tmp)
                     * 1000000)
             else:
                 if node_attrib in NODE_ATTRIBS:
-                    light_max_colour_temp_return = NODE_ATTRIBS.get(node_attrib)
+                    light_max_color_temp_return = NODE_ATTRIBS.get(node_attrib)
                 else:
-                    light_max_colour_temp_return = 0
+                    light_max_color_temp_return = 0
 
-            return light_max_colour_temp_return
+            return light_max_color_temp_return
 
         def get_color_temp(self, node_id):
-            """Get light current colour temperature."""
+            """Get light current color temperature."""
             node_index = -1
 
-            light_colour_temp_tmp = 0
-            light_colour_temp_return = 0
-            light_colour_temp_found = False
+            light_color_temp_tmp = 0
+            light_color_temp_return = 0
+            light_color_temp_found = False
 
-            current_node_attribute = "Light_Colour_Temp_" + node_id
+            current_node_attribute = "Light_Color_Temp_" + node_id
 
             if len(HSC.products.light) > 0:
                 for current_node_index in range(0, len(HSC.products.light)):
@@ -1818,35 +1818,35 @@ class Pyhiveapi:
                     if ("state" in HSC.products.light[node_index] and
                                 "colourTemperature" in
                                 HSC.products.light[node_index]["state"]):
-                        light_colour_temp_tmp = (HSC.products.light[node_index]
+                        light_color_temp_tmp = (HSC.products.light[node_index]
                                                 ["state"]["colourTemperature"])
-                        light_colour_temp_found = True
+                        light_color_temp_found = True
 
-            if light_colour_temp_found:
-                NODE_ATTRIBS[current_node_attribute] = light_colour_temp_tmp
-                light_colour_temp_return = round(
-                    (1 / light_colour_temp_tmp) * 1000000)
+            if light_color_temp_found:
+                NODE_ATTRIBS[current_node_attribute] = light_color_temp_tmp
+                light_color_temp_return = round(
+                    (1 / light_color_temp_tmp) * 1000000)
             else:
                 if current_node_attribute in NODE_ATTRIBS:
-                    light_colour_temp_return = NODE_ATTRIBS.get(
+                    light_color_temp_return = NODE_ATTRIBS.get(
                         current_node_attribute)
                 else:
-                    light_colour_temp_return = 0
+                    light_color_temp_return = 0
 
-            return light_colour_temp_return
+            return light_color_temp_return
 
         def get_color(self,node_id):
-            """Get colour"""
+            """Get color"""
             node_index = -1
 
-            light_colour_hue_tmp = 0
-            light_colour_saturation_tmp = 0
-            light_colour_value_tmp = 0
+            light_color_hue_tmp = 0
+            light_color_saturation_tmp = 0
+            light_color_value_tmp = 0
             rgb = 0
-            light_colour_return = 0
-            light_colour_found = False
+            light_color_return = 0
+            light_color_found = False
 
-            current_node_attribute = "Light_Colour_" + node_id
+            current_node_attribute = "Light_Color_" + node_id
 
             if len(HSC.products.light) > 0:
                 for current_node_index in range(0, len(HSC.products.light)):
@@ -1857,26 +1857,26 @@ class Pyhiveapi:
                             break
 
                 if node_index != -1:
-                    light_colour_hue_tmp = (HSC.products.light[node_index]["state"]["hue"])
-                    light_colour_saturation_tmp = (HSC.products.light[node_index]["state"]["saturation"])
-                    light_colour_value_tmp = (HSC.products.light[node_index]["state"]["value"])
-                    light_colour_found = True
+                    light_color_hue_tmp = (HSC.products.light[node_index]["state"]["hue"])
+                    light_color_saturation_tmp = (HSC.products.light[node_index]["state"]["saturation"])
+                    light_color_value_tmp = (HSC.products.light[node_index]["state"]["value"])
+                    light_color_found = True
 
-            if light_colour_found:
-                h = light_colour_hue_tmp / 360
-                s = light_colour_saturation_tmp / 100
-                v = light_colour_value_tmp / 100
+            if light_color_found:
+                h = light_color_hue_tmp / 360
+                s = light_color_saturation_tmp / 100
+                v = light_color_value_tmp / 100
                 rgb = tuple(int(i * 255) for i in colorsys.hsv_to_rgb(h, s, v))
                 NODE_ATTRIBS[current_node_attribute] = rgb
-                light_colour_return = rgb
+                light_color_return = rgb
             else:
                 if current_node_attribute in NODE_ATTRIBS:
-                    light_colour_return = NODE_ATTRIBS.get(
+                    light_color_return = NODE_ATTRIBS.get(
                         current_node_attribute)
                 else:
-                    light_colour_return = 0
+                    light_color_return = 0
 
-            return light_colour_return
+            return light_color_return
 
         def turn_off(self, node_id):
             """Set light to turn off."""
@@ -1994,7 +1994,7 @@ class Pyhiveapi:
 
             return set_mode_success
 
-        def set_color_temp(self, node_id, nodedevicetype, new_colour_temp):
+        def set_color_temp(self, node_id, nodedevicetype, new_color_temp):
             """Set light to turn on."""
             Pyhiveapi.check_hive_api_logon(self)
 
@@ -2013,9 +2013,9 @@ class Pyhiveapi:
                                 break
                     if node_index != -1:
                         if nodedevicetype == "tuneablelight":
-                            json_string_content = '{"colourTemperature": ' + str(new_colour_temp) + '}'
+                            json_string_content = '{"colourTemperature": ' + str(new_color_temp) + '}'
                         else:
-                            json_string_content = '{"colourMode": "WHITE", "colourTemperature": ' + str(new_colour_temp) + '}'
+                            json_string_content = '{"colourMode": "WHITE", "colourTemperature": ' + str(new_color_temp) + '}'
                         hive_api_url = (HIVE_API.urls.nodes
                                         + '/' + HSC.products.light[node_index][
                                             "type"]
@@ -2034,7 +2034,7 @@ class Pyhiveapi:
 
             return set_mode_success
 
-        def set_color(self, node_id, new_colour):
+        def set_color(self, node_id, new_color):
             """Set light to turn on."""
             Pyhiveapi.check_hive_api_logon(self)
 
@@ -2055,9 +2055,9 @@ class Pyhiveapi:
                                 node_index = cni
                                 break
                     if node_index != -1:
-                        new_hue = new_colour[0]
-                        new_saturation = new_colour[1]
-                        new_value = new_colour[2]
+                        new_hue = new_color[0]
+                        new_saturation = new_color[1]
+                        new_value = new_color[2]
                         json_string_content = '{"colourMode": "COLOUR", "hue": ' + str(
                             new_hue) + ', "saturation": ' + str(
                             new_saturation) + ', "value": ' + str(
