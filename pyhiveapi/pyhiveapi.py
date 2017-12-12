@@ -1707,7 +1707,7 @@ class Pyhiveapi:
 
             return light_brightness_return
 
-        def get_min_colour_temp(self, node_id):
+        def get_min_color_temp(self, node_id):
             """Get light minimum colour temperature."""
             node_index = -1
 
@@ -1752,7 +1752,7 @@ class Pyhiveapi:
 
             return light_min_colour_temp_return
 
-        def get_max_colour_temp(self, node_id):
+        def get_max_color_temp(self, node_id):
             """Get light maximum colour temperature."""
             node_index = -1
 
@@ -1796,7 +1796,7 @@ class Pyhiveapi:
 
             return light_max_colour_temp_return
 
-        def get_colour_temp(self, node_id    ):
+        def get_color_temp(self, node_id):
             """Get light current colour temperature."""
             node_index = -1
 
@@ -1835,7 +1835,7 @@ class Pyhiveapi:
 
             return light_colour_temp_return
 
-        def get_colour(self,node_id):
+        def get_color(self,node_id):
             """Get colour"""
             node_index = -1
 
@@ -1994,7 +1994,7 @@ class Pyhiveapi:
 
             return set_mode_success
 
-        def set_colour_temp(self, node_id, nodedevicetype, new_colour_temp):
+        def set_color_temp(self, node_id, nodedevicetype, new_colour_temp):
             """Set light to turn on."""
             Pyhiveapi.check_hive_api_logon(self)
 
@@ -2034,7 +2034,7 @@ class Pyhiveapi:
 
             return set_mode_success
 
-        def set_colour(self, node_id, new_colour):
+        def set_color(self, node_id, new_colour):
             """Set light to turn on."""
             Pyhiveapi.check_hive_api_logon(self)
 
