@@ -1917,9 +1917,18 @@ class Pyhiveapi:
 
             return set_mode_success
 
-        def turn_on(self, node_id):
+        def turn_on(self, node_id, nodedevicetype, new_brightness,
+                    new_color_temp, new_color):
             """Set light to turn on."""
-            Pyhiveapi.check_hive_api_logon(self)
+            Pyhiveapi.check_hive_api_logon(self, )
+
+            if new_brightness is not None:
+                Pyhiveapi.Light.set_brightness(self, node_id, new_brightness)
+            if new_color_temp is not None:
+                Pyhiveapi.Light.set_color_temp(self, node_id, nodedevicetype,
+                                               new_color_temp)
+            if new_color is not None:
+                Pyhiveapi.Light.set_color(self, node_id, new_color)
 
             node_index = -1
 
