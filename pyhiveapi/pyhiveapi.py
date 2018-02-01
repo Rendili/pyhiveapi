@@ -3,9 +3,10 @@ from datetime import datetime
 from datetime import timedelta
 import requests
 import colorsys
+import os
 
 HIVE_NODE_UPDATE_INTERVAL_DEFAULT = 120
-HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT = 60  #### Update to 900 or 600
+HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT = 600
 MINUTES_BETWEEN_LOGONS = 15
 
 NODE_ATTRIBS = {"Header": "HeaderText"}
@@ -55,6 +56,28 @@ class HiveWeather:
     temperature = HiveTemperature()
 
 
+class Logging:
+    """Initiate Logging Class."""
+
+    output_folder = ""
+    output_file = ""
+    file_all = ""
+    file_core = ""
+    file_heating = ""
+    file_hotwater = ""
+    file_light = ""
+    file_switch = ""
+    file_sensor = ""
+    enabled = False
+    all = False
+    core = False
+    heating = False
+    hotwater = False
+    light = False
+    switch = False
+    sensor = False
+
+
 class HiveSession:
     """Initiate Hive Session Class."""
 
@@ -71,11 +94,11 @@ class HiveSession:
     products = HiveProducts()
     weather = HiveWeather()
     data = HivePlatformData()
+    logging = Logging()
 #    holiday_mode = Hive_HolidayMode()
     update_node_interval_seconds = HIVE_NODE_UPDATE_INTERVAL_DEFAULT
     update_weather_interval_seconds = HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT
     last_update = datetime(2017, 1, 1, 12, 0, 0)
-    logging = False
     file = False
 
 
@@ -122,7 +145,7 @@ class Pyhiveapi:
 
         HIVE_API.urls.global_login = "https://beekeeper.hivehome.com/1.0/global/login"
         HIVE_API.urls.base = ""
-        HIVE_API.urls.weather = "https://weather-prod.bgchprod.info/weather"
+        HIVE_API.urls.weather = "https://weather.prod.bgchprod.info/weather"
         HIVE_API.urls.holiday_mode = "/holiday-mode"
         HIVE_API.urls.devices = "/devices"
         HIVE_API.urls.products = "/products"
@@ -134,6 +157,14 @@ class Pyhiveapi:
         HIVE_API.headers.content_type_value = "application/json"
         HIVE_API.headers.session_id_key = "authorization"
         HIVE_API.headers.session_id_value = None
+
+        HSC.logging.file_all = "pyhiveapi.logging.all"
+        HSC.logging.file_core = "pyhiveapi.logging.core"
+        HSC.logging.file_heating = "pyhiveapi.logging.heating"
+        HSC.logging.file_hotwater = "pyhiveapi.logging.hotwater"
+        HSC.logging.file_light = "pyhiveapi.logging.light"
+        HSC.logging.file_switch = "pyhiveapi.logging.switch"
+        HSC.logging.file_sensor = "pyhiveapi.logging.sensor"
 
 
     def hive_api_json_call(self, request_type, request_url, json_string_content, absolute_request_url):
@@ -201,6 +232,9 @@ class Pyhiveapi:
 
     def hive_api_logon(self):
         """Log in to the Hive API and get the Session ID."""
+        if HSC.logging.all or HSC.logging.core:
+            Pyhiveapi.logger("hive_api_logon")
+
         login_details_found = True
         HSC.session_id = None
 
@@ -272,6 +306,9 @@ class Pyhiveapi:
 
     def check_hive_api_logon(self):
         """Check if currently logged in with a valid Session ID."""
+        if HSC.logging.all or HSC.logging.core:
+            Pyhiveapi.logger("check_hive_api_logon")
+
         current_time = datetime.now()
         l_logon_secs = (current_time - HSC.session_logon_datetime).total_seconds()
         l_logon_mins = int(round(l_logon_secs / 60))
@@ -283,25 +320,35 @@ class Pyhiveapi:
             HSC.session_id = "Test"
 
 
-
     def update_data(self, node_id):
         """Get latest data for Hive nodes - rate limiting."""
         nodes_updated = False
         current_time = datetime.now()
-        last_update_secs = (current_time - HSC.last_update).total_seconds()
-        if last_update_secs >= HSC.update_node_interval_seconds:
+
+        nodes_last_update_secs = (current_time - HSC.last_update).total_seconds()
+        if nodes_last_update_secs >= HSC.update_node_interval_seconds:
             nodes_updated = Pyhiveapi.hive_api_get_nodes(self, node_id)
+
+        weather_last_update_secs = (current_time - HSC.weather.last_update).total_seconds()
+        if weather_last_update_secs >= HSC.update_weather_interval_seconds:
+            nodes_updated = Pyhiveapi.hive_api_get_weather(self)
+
         return nodes_updated
 
 
     def hive_api_get_nodes_nl(self):
         """Get latest data for Hive nodes - not rate limiting."""
+        if HSC.logging.all or HSC.logging.core:
+            Pyhiveapi.logger("hive_api_get_nodes_nl")
         Pyhiveapi.hive_api_get_nodes(self, "NoID")
 
 
     def hive_api_get_nodes(self, node_id):
         """Get latest data for Hive nodes."""
         get_nodes_successful = True
+
+        if HSC.logging.all or HSC.logging.core:
+            Pyhiveapi.logger("hive_api_get_nodes : NodeID = " + node_id)
 
         Pyhiveapi.check_hive_api_logon(self)
 
@@ -425,47 +472,47 @@ class Pyhiveapi:
 
     def hive_api_get_weather(self):
         """Get latest weather data from Hive."""
+        if HSC.logging.all or HSC.logging.core:
+            Pyhiveapi.logger("hive_api_get_weather")
+
         get_weather_successful = True
 
         current_time = datetime.now()
-        last_update_secs = (current_time - HSC.weather.last_update).total_seconds()
-        if last_update_secs >= HSC.update_weather_interval_seconds:
-            Pyhiveapi.check_hive_api_logon(self)
 
-            if HSC.session_id is not None:
+        Pyhiveapi.check_hive_api_logon(self)
+
+        if HSC.session_id is not None:
+            try_finished = False
+            try:
+                api_resp_d = {}
+                api_resp_p = None
+                weather_url = HIVE_API.urls.weather + "?postcode=" + HSC.postcode + "&country=" + HSC.countrycode
+                weather_url = weather_url.replace(" ", "%20")
+                api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", weather_url, "", True)
+                api_resp_p = api_resp_d['parsed']
+                if "weather" in api_resp_p:
+                    if "icon" in api_resp_p["weather"]:
+                        HSC.weather.icon = api_resp_p["weather"]["icon"]
+                    if "description" in api_resp_p["weather"]:
+                        HSC.weather.description = api_resp_p["weather"]["icon"]
+                    if "temperature" in api_resp_p["weather"]:
+                        if "unit" in api_resp_p["weather"]["temperature"]:
+                            HSC.weather.temperature.unit = api_resp_p["weather"]["temperature"]["unit"]
+                        if "unit" in api_resp_p["weather"]["temperature"]:
+                            HSC.weather.temperature.value = api_resp_p["weather"]["temperature"]["value"]
+                    HSC.weather.nodeid = "HiveWeather"
+                else:
+                    get_weather_successful = False
+
+                HSC.weather.last_update = current_time
+                try_finished = True
+            except (IOError, RuntimeError, ZeroDivisionError):
                 try_finished = False
-                try:
-                    api_resp_d = {}
-                    api_resp_p = None
-                    weather_url = HIVE_API.urls.weather + "?postcode=" + HSC.postcode + "&country=" + HSC.countrycode
-                    weather_url = weather_url.replace(" ", "%20")
-
-                    api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", weather_url, "", True)
-                    api_resp_p = api_resp_d['parsed']
-
-                    if "weather" in api_resp_p:
-                        if "icon" in api_resp_p["weather"]:
-                            HSC.weather.icon = api_resp_p["weather"]["icon"]
-                        if "description" in api_resp_p["weather"]:
-                            HSC.weather.description = api_resp_p["weather"]["icon"]
-                        if "temperature" in api_resp_p["weather"]:
-                            if "unit" in api_resp_p["weather"]["temperature"]:
-                                HSC.weather.temperature.unit = api_resp_p["weather"]["temperature"]["unit"]
-                            if "unit" in api_resp_p["weather"]["temperature"]:
-                                HSC.weather.temperature.value = api_resp_p["weather"]["temperature"]["value"]
-                        HSC.weather.nodeid = "HiveWeather"
-                    else:
-                        get_weather_successful = False
-
-                    HSC.weather.last_update = current_time
-                    try_finished = True
-                except (IOError, RuntimeError, ZeroDivisionError):
+            finally:
+                if not try_finished:
                     try_finished = False
-                finally:
-                    if not try_finished:
-                        try_finished = False
-            else:
-                get_weather_successful = False
+        else:
+            get_weather_successful = False
 
         return get_weather_successful
 
@@ -548,6 +595,42 @@ class Pyhiveapi:
         HSC.username = username
         HSC.password = password
 
+        HSC.logging.output_folder = os.path.expanduser('~') + "/pyhiveapi"
+        HSC.logging.output_file = HSC.logging.output_folder + "/pyhiveapi.log"
+
+        try:
+            if os.path.isfile(HSC.logging.output_file):
+                os.remove(HSC.logging.output_file)
+
+            if os.path.isdir(HSC.logging.output_folder):
+                if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_all):
+                    HSC.logging.all = True
+                    HSC.logging.enabled = True
+                if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_core):
+                    HSC.logging.core = True
+                    HSC.logging.enabled = True
+                if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_heating):
+                    HSC.logging.heating = True
+                    HSC.logging.enabled = True
+                if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_hotwater):
+                    HSC.logging.hotwater = True
+                    HSC.logging.enabled = True
+                if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_light):
+                    HSC.logging.light = True
+                    HSC.logging.enabled = True
+                if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_sensor):
+                    HSC.logging.sensor = True
+                    HSC.logging.enabled = True
+                if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_switch):
+                    HSC.logging.switch = True
+                    HSC.logging.enabled = True
+        except:
+            HSC.logging.all = False
+            HSC.logging.enabled = False
+
+        if HSC.logging.all or HSC.logging.core:
+            Pyhiveapi.logger("pyhiveapi initialising")
+
         if mins_between_updates <= 0:
             mins_between_updates = 2
 
@@ -560,7 +643,7 @@ class Pyhiveapi:
             if HSC.session_id is not None:
                 HSC.update_node_interval_seconds = hive_node_update_interval
                 Pyhiveapi.hive_api_get_nodes_nl(self)
-#                Pyhiveapi.hive_api_get_weather(self)
+                Pyhiveapi.hive_api_get_weather(self)
 
 
         device_list_all = {}
@@ -638,14 +721,17 @@ class Pyhiveapi:
                         hive_sensor_device_type = product["type"]
                         device_list_binary_sensor.append({'HA_DeviceType': 'Hive_Device_Binary_Sensor', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": hive_sensor_device_type})
 
-#        if HSC.weather.nodeid == "HiveWeather":
-#        device_list_sensor.append({'HA_DeviceType': 'Weather_OutsideTemperature', 'Hive_NodeID': HSC.weather.nodeid, 'Hive_NodeName': "Hive Weather"})
+        if HSC.weather.nodeid == "HiveWeather":
+            device_list_sensor.append({'HA_DeviceType': 'Hive_OutsideTemperature', 'Hive_NodeID': HSC.weather.nodeid, 'Hive_NodeName': "Hive Weather", "Hive_DeviceType": "Weather"})
 
         device_list_all['device_list_sensor'] = device_list_sensor
         device_list_all['device_list_binary_sensor'] = device_list_binary_sensor
         device_list_all['device_list_climate'] = device_list_climate
         device_list_all['device_list_light'] = device_list_light
         device_list_all['device_list_plug'] = device_list_plug
+
+        if HSC.logging.all or HSC.logging.core:
+            Pyhiveapi.logger("pyhiveapi initialised")
 
         return device_list_all
 
@@ -772,6 +858,17 @@ class Pyhiveapi:
                 get_nodes_successful = False
 
         return get_nodes_successful
+
+
+    def logger(new_message):
+        """Output new log entry if logging is turned on."""
+        if HSC.logging.enabled:
+            try:
+                log_file = open(HSC.logging.output_file, "a") 
+                log_file.write(datetime.now().strftime("%d-%b-%Y %H:%M:%S") + " : " + new_message + "\n") 
+                log_file.close
+            except:
+                log_file = None
 
 
     class Heating():
