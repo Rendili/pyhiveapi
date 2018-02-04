@@ -2322,7 +2322,7 @@ class Pyhiveapi:
         """Hive Switches."""
         def get_state(self, node_id):
             """Get smart plug current state."""
-            result = Pyhiveapi.Attributes.online_offline(node_id)
+            result = Pyhiveapi.Attributes.online_offline(self, node_id)
 
             node_index = -1
 
@@ -2491,17 +2491,17 @@ class Pyhiveapi:
 
         def state_attributes(self, node_id, nodedevicetype):
             """Get HA State Attributes"""
-            state_attributes = []
+            state_attributes = {}
 
             available = Pyhiveapi.Attributes.online_offline(self, node_id)
-            state_attributes.append({"availability": available})
+            state_attributes.update({"availability": available})
             battery = Pyhiveapi.Attributes.battery_level(self, node_id,
                                                          nodedevicetype)
             if battery != 'UNKNOWN':
-                state_attributes.append({"battery_level": battery})
+                state_attributes.update({"battery_level": battery})
             mode = Pyhiveapi.Attributes.get_mode(self, node_id)
             if mode != 'UNKNOWN':
-                state_attributes.append({"mode": mode})
+                state_attributes.update({"mode": mode})
 
             return state_attributes
 
