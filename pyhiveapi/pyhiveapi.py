@@ -2504,7 +2504,7 @@ class Pyhiveapi:
             state_attributes.update({"Availability": available})
             battery = Pyhiveapi.Attributes.battery_level(self, node_id)
             if battery != 'UNKNOWN':
-                state_attributes.update({"Battery Level": battery + "%"})
+                state_attributes.update({"Battery Level": str(battery) + "%"})
             mode = Pyhiveapi.Attributes.get_mode(self, node_id)
             if mode != 'UNKNOWN':
                 state_attributes.update({"Mode": mode})
