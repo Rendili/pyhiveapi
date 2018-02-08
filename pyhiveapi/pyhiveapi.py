@@ -1156,7 +1156,6 @@ class Pyhiveapi:
 
         def get_state(self, node_id):
             """Get heating current state."""
-            result = Pyhiveapi.Attributes.online_offline(self, node_id)
 
             heating_state_return = "OFF"
             heating_state_tmp = "OFF"
@@ -1183,9 +1182,7 @@ class Pyhiveapi:
                     heating_state_tmp = "OFF"
                     heating_state_found = True
 
-            if result == "Offline":
-                heating_state_return = "OFF"
-            elif heating_state_found:
+            if heating_state_found:
                 NODE_ATTRIBS[current_node_attribute] = heating_state_tmp
                 heating_state_return = heating_state_tmp
             else:
