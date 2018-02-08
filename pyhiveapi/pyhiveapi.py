@@ -501,10 +501,9 @@ class Pyhiveapi:
                     api_resp_p = api_resp_d['parsed']
 
                     if str(api_resp_o) == "<Response [200]>":
-                        if 'inMotion' in api_resp_p[0]:
+                        sensor["props"]["motion"]["status"] = False
+                        if len(api_resp_p[0]) > 0 and 'inMotion' in api_resp_p[0]:
                             sensor["props"]["motion"]["status"] = True
-                        else:
-                            sensor["props"]["motion"]["status"] = False
 
         return get_nodes_successful
 
@@ -2505,13 +2504,13 @@ class Pyhiveapi:
             state_attributes = {}
 
             available = Pyhiveapi.Attributes.online_offline(self, node_id)
-            state_attributes.update({"availability": available})
+            state_attributes.update({"Availability": available})
             battery = Pyhiveapi.Attributes.battery_level(self, node_id)
             if battery != 'UNKNOWN':
-                state_attributes.update({"battery_level": battery})
+                state_attributes.update({"Battery Level": battery + "%"})
             mode = Pyhiveapi.Attributes.get_mode(self, node_id)
             if mode != 'UNKNOWN':
-                state_attributes.update({"mode": mode})
+                state_attributes.update({"Mode": mode})
 
             return state_attributes
 
