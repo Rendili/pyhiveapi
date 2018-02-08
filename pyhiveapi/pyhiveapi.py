@@ -502,7 +502,7 @@ class Pyhiveapi:
 
                     if str(api_resp_o) == "<Response [200]>":
                         sensor["props"]["motion"]["status"] = False
-                        if len(api_resp_p[0]) > 0 and 'inMotion' in api_resp_p[0]:
+                        if len(api_resp_p) > 0 and 'inMotion' in api_resp_p[0]:
                             sensor["props"]["motion"]["status"] = True
 
         return get_nodes_successful
