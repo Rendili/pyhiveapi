@@ -476,8 +476,8 @@ class Pyhiveapi:
             get_nodes_successful = False
 
         if get_nodes_successful:
+            HSC.last_update = datetime.now()
             now = datetime.now()
-            HSC.last_update = now
 
             start_date = str(now.day) + '.' + str(now.month) + '.' \
                          + str(now.year) + ' 00:00:00'
@@ -1781,6 +1781,7 @@ class Pyhiveapi:
         def get_state(self, node_id):
             """Get light current state."""
             result = Pyhiveapi.Attributes.online_offline(self, node_id)
+            print(result)
             node_index = -1
 
             light_state_return = "UNKNOWN"
