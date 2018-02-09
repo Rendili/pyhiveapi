@@ -1781,7 +1781,6 @@ class Pyhiveapi:
         def get_state(self, node_id):
             """Get light current state."""
             result = Pyhiveapi.Attributes.online_offline(self, node_id)
-            print(result)
             node_index = -1
 
             light_state_return = "UNKNOWN"
