@@ -1805,7 +1805,7 @@ class Pyhiveapi:
                                            ["state"]["status"])
                         light_state_found = True
 
-            if result == "Offline":
+            if result == "offline":
                 light_state_return = "OFF"
             elif light_state_found:
                 NODE_ATTRIBS[current_node_attribute] = light_state_tmp
@@ -2286,6 +2286,7 @@ class Pyhiveapi:
 
         def get_state(self, node_id, node_device_type):
             """Get sensor state."""
+            result = Pyhiveapi.Attributes.online_offline(self, node_id)
             node_index = -1
 
             start_date = ''
@@ -2314,7 +2315,9 @@ class Pyhiveapi:
                             node_index]["props"]["motion"]["status"])
                         sensor_found = True
 
-            if sensor_found:
+            if result == 'offline':
+                sensor_state_return = False
+            elif sensor_found:
                 NODE_ATTRIBS[current_node_attribute] = sensor_state_tmp
                 sensor_state_return = sensor_state_tmp
             else:
@@ -2330,7 +2333,6 @@ class Pyhiveapi:
         def get_state(self, node_id):
             """Get smart plug current state."""
             result = Pyhiveapi.Attributes.online_offline(self, node_id)
-
             node_index = -1
 
             smartplug_state_tmp = "UNKNOWN"
@@ -2354,7 +2356,7 @@ class Pyhiveapi:
                                                ["state"]["status"])
                         smartplug_state_found = True
 
-            if result == "Offline":
+            if result == "offline":
                 smartplug_state_return = "OFF"
             elif smartplug_state_found:
                 NODE_ATTRIBS[current_node_attribute] = smartplug_state_tmp
@@ -2501,13 +2503,13 @@ class Pyhiveapi:
             state_attributes = {}
 
             available = Pyhiveapi.Attributes.online_offline(self, node_id)
-            state_attributes.update({"Availability": available})
+            state_attributes.update({"availability": available})
             battery = Pyhiveapi.Attributes.battery_level(self, node_id)
             if battery != 'UNKNOWN':
-                state_attributes.update({"Battery Level": str(battery) + "%"})
+                state_attributes.update({"battery_level": str(battery) + "%"})
             mode = Pyhiveapi.Attributes.get_mode(self, node_id)
             if mode != 'UNKNOWN':
-                state_attributes.update({"Mode": mode})
+                state_attributes.update({"mode": mode})
 
             return state_attributes
 
@@ -2516,7 +2518,7 @@ class Pyhiveapi:
             node_index = -1
 
             hive_device_availibility_tmp = ""
-            hive_device_availibility_return = "Offline"
+            hive_device_availibility_return = "offline"
             hive_device_availibility_found = False
 
             current_node_attribute = "Device_Availability_" + node_id
@@ -2539,15 +2541,15 @@ class Pyhiveapi:
                 NODE_ATTRIBS[
                     current_node_attribute] = hive_device_availibility_tmp
                 if hive_device_availibility_tmp == True:
-                    hive_device_availibility_return = 'Online'
+                    hive_device_availibility_return = 'online'
                 elif hive_device_availibility_tmp == False:
-                    hive_device_availibility_return = 'Offline'
+                    hive_device_availibility_return = 'offline'
             else:
                 if current_node_attribute in NODE_ATTRIBS:
                     hive_device_availibility_return = NODE_ATTRIBS.get(
                         current_node_attribute)
                 else:
-                    hive_device_availibility_return = "Offline"
+                    hive_device_availibility_return = "offline"
 
             return hive_device_availibility_return
 
