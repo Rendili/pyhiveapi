@@ -377,6 +377,13 @@ class Pyhiveapi:
                 api_resp_p = None
                 api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.devices, "", False)
 
+                if HSC.logging.all or HSC.logging.core:
+                    api_resp = api_resp_d['original']
+                    if str(api_resp) == "<Response [200]>":
+                        Pyhiveapi.logger("Devices API call sucessfull : " + api_resp)
+                    else:
+                        Pyhiveapi.logger("Devices API call failed : " + api_resp)
+
                 api_resp_p = api_resp_d['parsed']
 
                 for a_device in api_resp_p:
@@ -410,6 +417,13 @@ class Pyhiveapi:
                 api_resp_d = {}
                 api_resp_p = None
                 api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.products, "", False)
+
+                if HSC.logging.all or HSC.logging.core:
+                    api_resp = api_resp_d['original']
+                    if str(api_resp) == "<Response [200]>":
+                        Pyhiveapi.logger("Products API call sucessfull : " + api_resp)
+                    else:
+                        Pyhiveapi.logger("Products API call failed : " + api_resp)
 
                 api_resp_p = api_resp_d['parsed']
 
