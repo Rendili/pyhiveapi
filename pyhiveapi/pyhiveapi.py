@@ -143,7 +143,6 @@ HIVE_API = HiveAPIDetails()
 HSC = HiveSession()
 
 
-# noinspection PyPep8
 class Pyhiveapi:
     """Pyhiveapi Class"""
 
@@ -939,12 +938,8 @@ class Pyhiveapi:
         epochtime = int(time.mktime(time.strptime(date_time, pattern)))
         return epochtime
 
-    class Heating(Pyhiveapi):
+    class Heating():
         """Hive Switches."""
-
-        def __init__(self):
-            """Initialise the base variable values."""
-            Pyhiveapi.__init__(self)
 
         def min_temperature(self, node_id):
             """Get heating minimum target temperature."""
@@ -1769,16 +1764,12 @@ class Pyhiveapi:
 
             return set_boost_success
 
-    class Light(Pyhiveapi):
+    class Light():
         """Hive Lights."""
-
-        def __init__(self):
-            """Initialise the base variable values."""
-            Pyhiveapi.__init__(self)
 
         def get_state(self, node_id):
             """Get light current state."""
-            result = Pyhiveapi.Attributes.online_offline(Attributes, node_id)
+            result = Pyhiveapi.Attributes.online_offline(self, node_id)
             node_index = -1
 
             light_state_return = "UNKNOWN"
@@ -2433,7 +2424,6 @@ class Pyhiveapi:
             """Get smart plug current power usage."""
             if HSC.logging.all or HSC.logging.switch:
                 Pyhiveapi.logger("Getting power usage for: " + node_id)
-            result = Pyhiveapi.Attributes.online_offline(self, node_id)
             node_index = -1
 
             current_power_tmp = 0
