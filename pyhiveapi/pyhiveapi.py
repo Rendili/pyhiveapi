@@ -2396,7 +2396,7 @@ class Pyhiveapi:
             if HSC.logging.all or HSC.logging.sensor:
                 Pyhiveapi.logger("State for " + HSC.products.sensors[node_index]["type"] +
                                  " - " + HSC.products.sensors[node_index]["state"]["name"] +
-                                 " is : " + sensor_state_return)
+                                 " is : " + str(sensor_state_return))
 
             return sensor_state_return
 
@@ -2739,6 +2739,6 @@ class Pyhiveapi:
             if HSC.logging.all or HSC.logging.attribute:
                 Pyhiveapi.logger("Battery level for device " +
                                  data[node_index]["state"]["name"] +
-                                 " is : " + battery_level_return + "%")
+                                 " is : " + str(battery_level_return) + "%")
 
             return battery_level_return
