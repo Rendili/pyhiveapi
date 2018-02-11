@@ -353,7 +353,7 @@ class Pyhiveapi:
         if HSC.logging.all or HSC.logging.core:
             Pyhiveapi.logger("hive_api_get_nodes : NodeID = " + node_id)
 
-        Pyhiveapi.check_hive_api_logon()
+        Pyhiveapi.check_hive_api_logon(self)
 
         if HSC.session_id is not None:
             tmp_devices_all = []
@@ -1446,9 +1446,6 @@ class Pyhiveapi:
     class Hotwater():
         """Hive Hotwater."""
 
-        def __init__(self):
-            """Initialise the base variable values."""
-
         def get_mode(self, node_id):
             """Get hot water current mode."""
             node_index = -1
@@ -1769,6 +1766,8 @@ class Pyhiveapi:
 
         def get_state(self, node_id):
             """Get light current state."""
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Getting state of light : " + node_id)
             result = Pyhiveapi.Attributes.online_offline(self, node_id)
             node_index = -1
 
@@ -1811,10 +1810,17 @@ class Pyhiveapi:
             if light_state_return == "ON":
                 light_state_return_b = True
 
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("State of light "  +
+                                 HSC.products.light[node_index]["state"]["name"] +
+                                 " is : " + light_state_return)
+
             return light_state_return_b
 
         def get_brightness(self, node_id):
             """Get light current brightness."""
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Getting brightness of light : " + node_id)
             node_index = -1
 
             tmp_brightness_return = 0
@@ -1849,14 +1855,22 @@ class Pyhiveapi:
                     tmp_brightness_return = NODE_ATTRIBS.get(
                         current_node_attribute)
                     light_brightness_return = (
-                    (tmp_brightness_return / 100) * 255)
+                    (int(tmp_brightness_return) / 100) * 255)
                 else:
                     light_brightness_return = 0
+
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Brightness of light "  +
+                                 HSC.products.light[node_index]["state"]["name"] +
+                                 " is : " + str(light_brightness_return))
 
             return light_brightness_return
 
         def get_min_color_temp(self, node_id):
             """Get light minimum color temperature."""
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Getting min colour temperature of light : " +
+                                 node_id)
             node_index = -1
 
             light_min_color_temp_tmp = 0
@@ -1898,10 +1912,18 @@ class Pyhiveapi:
                 else:
                     light_min_color_temp_return = 0
 
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Min Colour temperature of light "  +
+                                 HSC.products.light[node_index]["state"]["name"] +
+                                 " is : " + str(light_min_color_temp_return))
+
             return light_min_color_temp_return
 
         def get_max_color_temp(self, node_id):
             """Get light maximum color temperature."""
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Getting max colour temperature of light : " +
+                                 node_id)
             node_index = -1
 
             light_max_color_temp_tmp = 0
@@ -1942,10 +1964,18 @@ class Pyhiveapi:
                 else:
                     light_max_color_temp_return = 0
 
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Max Colour temperature of light "  +
+                                 HSC.products.light[node_index]["state"]["name"] +
+                                 " is : " + str(light_max_color_temp_return))
+
             return light_max_color_temp_return
 
         def get_color_temp(self, node_id):
             """Get light current color temperature."""
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Getting colour temperature of light : " +
+                                 node_id)
             node_index = -1
 
             light_color_temp_tmp = 0
@@ -1981,10 +2011,17 @@ class Pyhiveapi:
                 else:
                     light_color_temp_return = 0
 
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Colour temperature of light "  +
+                                 HSC.products.light[node_index]["state"]["name"] +
+                                 " is : " + str(light_color_temp_return))
+
             return light_color_temp_return
 
         def get_color(self, node_id):
             """Get color"""
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Getting colour of light : " + node_id)
             node_index = -1
 
             light_color_hue_tmp = 0
@@ -2023,6 +2060,10 @@ class Pyhiveapi:
                         current_node_attribute)
                 else:
                     light_color_return = 0
+
+            if HSC.logging.all or HSC.logging.light:
+                Pyhiveapi.logger("Colour of light " + HSC.products.light[node_index]["state"]["name"] +
+                                 " is : " + str(light_color_return))
 
             return light_color_return
 
@@ -2065,7 +2106,7 @@ class Pyhiveapi:
                             Pyhiveapi.hive_api_get_nodes(self, node_id)
                             set_mode_success = True
                             if HSC.logging.all or HSC.logging.light:
-                                Pyhiveapi.logger("Light " + HSC.products.plug[node_index]["state"]["name"] +
+                                Pyhiveapi.logger("Light " + HSC.products.light[node_index]["state"]["name"] +
                                                  " has been sucessfully switched off")
 
             return set_mode_success
@@ -2074,8 +2115,8 @@ class Pyhiveapi:
                     new_color_temp, new_color):
             """Set light to turn on."""
             if HSC.logging.all or HSC.logging.light:
-                Pyhiveapi.logger("Turning on light: " + node_id)
-            Pyhiveapi.check_hive_api_logon(self, )
+                Pyhiveapi.logger("Turning on light : " + node_id)
+            Pyhiveapi.check_hive_api_logon(self)
 
             if new_brightness is not None:
                 Pyhiveapi.Light.set_brightness(self, node_id, new_brightness)
@@ -2116,7 +2157,7 @@ class Pyhiveapi:
                         Pyhiveapi.hive_api_get_nodes(self, node_id)
                         set_mode_success = True
                         if HSC.logging.all or HSC.logging.light:
-                            Pyhiveapi.logger("Light : " + HSC.products.plug[node_index]["state"]["name"] +
+                            Pyhiveapi.logger("Light " + HSC.products.light[node_index]["state"]["name"] +
                                              " has been sucessfully switched on")
 
             return set_mode_success
@@ -2162,7 +2203,7 @@ class Pyhiveapi:
                         set_mode_success = True
                         if HSC.logging.all or HSC.logging.light:
                             Pyhiveapi.logger("Sucessfully set the brightness " +
-                                             HSC.products.sensors[node_index]["state"]["name"] +
+                                             HSC.products.light[node_index]["state"]["name"] +
                                              " to : " + str(new_brightness))
 
             return set_mode_success
@@ -2171,7 +2212,7 @@ class Pyhiveapi:
             """Set light to turn on."""
             if HSC.logging.all or HSC.logging.light:
                 Pyhiveapi.logger("Setting colour temperature of : " + node_id)
-            Pyhiveapi.check_hive_api_logon()
+            Pyhiveapi.check_hive_api_logon(self)
 
             node_index = -1
 
@@ -2227,7 +2268,7 @@ class Pyhiveapi:
                         set_mode_success = True
                         if HSC.logging.all or HSC.logging.light:
                             Pyhiveapi.logger("Sucessfully set the colour temperature for " +
-                                             HSC.products.sensors[node_index]["state"]["name"] +
+                                             HSC.products.light[node_index]["state"]["name"] +
                                              " to : " + str(new_color_temp))
 
             return set_mode_success
@@ -2236,7 +2277,7 @@ class Pyhiveapi:
             """Set light to turn on."""
             if HSC.logging.all or HSC.logging.light:
                 Pyhiveapi.logger("Setting colour of : " + node_id)
-            Pyhiveapi.check_hive_api_logon()
+            Pyhiveapi.check_hive_api_logon(self)
 
             node_index = -1
 
@@ -2279,18 +2320,15 @@ class Pyhiveapi:
                         set_mode_success = True
                         if HSC.logging.all or HSC.logging.light:
                             Pyhiveapi.logger("Sucessfully set the colour for " +
-                                             HSC.products.sensors[node_index]["state"]["name"] +
-                                             "to: {hue: " + str(new_hue) + ', ' +
-                                             '"saturation": ' + str(new_saturation) +
+                                             HSC.products.light[node_index]["state"]["name"] +
+                                             " to : {hue: " + str(new_hue) +
+                                             ', "saturation": ' + str(new_saturation) +
                                              ', "value": ' + str(new_value) + '}')
 
                     return set_mode_success
 
     class Sensor():
         """Hive Sensors."""
-
-        def __init__(self):
-            """Initialise the base variable values."""
 
         def hub_online_status(self, node_id):
             """Get the online status of the Hive hub."""
@@ -2365,13 +2403,10 @@ class Pyhiveapi:
     class Switch():
         """Hive Switches."""
 
-        def __init__(self):
-            """Initialise the base variable values."""
-
         def get_state(self, node_id):
             """Get smart plug current state."""
             if HSC.logging.all or HSC.logging.switch:
-                Pyhiveapi.logger("Getting switch state for: " + node_id)
+                Pyhiveapi.logger("Getting fstate for switch : " + node_id)
             result = Pyhiveapi.Attributes.online_offline(self, node_id)
             node_index = -1
 
@@ -2414,7 +2449,7 @@ class Pyhiveapi:
                 smartplug_state_return_b = True
 
             if HSC.logging.all or HSC.logging.switch:
-                Pyhiveapi.logger("State of device " +
+                Pyhiveapi.logger("State of switch " +
                                  HSC.products.plug[node_index]["state"]["name"] +
                                  " is : " + smartplug_state_return)
 
@@ -2458,17 +2493,17 @@ class Pyhiveapi:
                     current_power_return = 0
 
             if HSC.logging.all or HSC.logging.switch:
-                Pyhiveapi.logger("For device: " +
+                Pyhiveapi.logger("For switch " +
                                  HSC.products.plug[node_index]["state"]["name"] +
-                                 "power usage is: " + str(current_power_return))
+                                 " power usage is : " + str(current_power_return))
 
             return current_power_return
 
         def turn_on(self, node_id):
             """Set smart plug to turn on."""
             if HSC.logging.all or HSC.logging.switch:
-                Pyhiveapi.logger("Turning on switch: " + node_id)
-            Pyhiveapi.check_hive_api_logon()
+                Pyhiveapi.logger("Turning on switch : " + node_id)
+            Pyhiveapi.check_hive_api_logon(self)
 
             node_index = -1
 
@@ -2502,7 +2537,7 @@ class Pyhiveapi:
                             Pyhiveapi.hive_api_get_nodes(self, node_id)
                             set_mode_success = True
                             if HSC.logging.all or HSC.logging.switch:
-                                Pyhiveapi.logger("Device : " + HSC.products.plug[node_index]["state"]["name"] +
+                                Pyhiveapi.logger("Switch " + HSC.products.plug[node_index]["state"]["name"] +
                                                  " has been sucessfully switched on")
 
             return set_mode_success
@@ -2510,8 +2545,8 @@ class Pyhiveapi:
         def turn_off(self, node_id):
             """Set smart plug to turn off."""
             if HSC.logging.all or HSC.logging.switch:
-                Pyhiveapi.logger("Turning off switch: " + node_id)
-            Pyhiveapi.check_hive_api_logon()
+                Pyhiveapi.logger("Turning off switch : " + node_id)
+            Pyhiveapi.check_hive_api_logon(self)
 
             node_index = -1
 
@@ -2545,7 +2580,7 @@ class Pyhiveapi:
                             Pyhiveapi.hive_api_get_nodes(node_id=node_id)
                             set_mode_success = True
                             if HSC.logging.all or HSC.logging.switch:
-                                Pyhiveapi.logger("Device : " + HSC.products.plug[node_index]["state"]["name"] +
+                                Pyhiveapi.logger("Swicth " + HSC.products.plug[node_index]["state"]["name"] +
                                                  " has been sucessfully switched off")
 
             return set_mode_success
@@ -2553,18 +2588,12 @@ class Pyhiveapi:
     class Weather():
         """Hive Weather."""
 
-        def __init__(self):
-            """Initialise the base variable values."""
-
         def temperature(self):
             """Get Hive Weather temperature."""
             return HSC.weather.temperature.value
 
     class Attributes():
         """Device Attributes Weather."""
-
-        def __init__(self):
-            """Initialise the base variable values."""
 
         def state_attributes(self, node_id):
             """Get HA State Attributes"""
@@ -2587,7 +2616,8 @@ class Pyhiveapi:
         def online_offline(self, node_id):
             """Check if device is online"""
             if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Checking device availability for: " + node_id)
+                Pyhiveapi.logger("Checking device availability for : " +
+                                 node_id)
             node_index = -1
 
             hive_device_availibility_tmp = ""
@@ -2634,7 +2664,7 @@ class Pyhiveapi:
         def get_mode(self, node_id):
             """Get sensor mode."""
             if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Getting device mode for: " + node_id)
+                Pyhiveapi.logger("Checking device mode for : " + node_id)
             node_index = -1
 
             hive_device_mode_tmp = ""
@@ -2675,7 +2705,7 @@ class Pyhiveapi:
         def battery_level(self, node_id):
             """Get device battery level."""
             if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Getting battery level for: " + node_id)
+                Pyhiveapi.logger("Checking battery level for : " + node_id)
             node_index = -1
 
             battery_level_return = 0
