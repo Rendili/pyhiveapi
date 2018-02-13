@@ -356,20 +356,20 @@ class Pyhiveapi:
         Pyhiveapi.check_hive_api_logon(self)
 
         if HSC.session_id is not None:
-            tmp_devices_all = []
             tmp_devices_hub = []
             tmp_devices_thermostat = []
             tmp_devices_boiler_module = []
             tmp_devices_plug = []
             tmp_devices_light = []
             tmp_devices_sensors = []
+            HSC.devices.id_list = {}
 
-            tmp_products_all = []
             tmp_products_heating = []
             tmp_products_hotwater = []
             tmp_products_light = []
             tmp_products_plug = []
             tmp_products_sensors = []
+            HSC.products.id_list = {}
 
             try_finished = False
             try:
@@ -387,7 +387,6 @@ class Pyhiveapi:
                 api_resp_p = api_resp_d['parsed']
 
                 for a_device in api_resp_p:
-                    tmp_devices_all.append(a_device)
                     if "type" in a_device:
                         if a_device["type"] == "hub":
                             tmp_devices_hub.append(a_device)
@@ -428,7 +427,6 @@ class Pyhiveapi:
                 api_resp_p = api_resp_d['parsed']
 
                 for a_product in api_resp_p:
-                    tmp_products_all.append(a_product)
                     if "type" in a_product:
                         if a_product["type"] == "heating":
                             tmp_products_heating.append(a_product)
@@ -452,33 +450,51 @@ class Pyhiveapi:
 
             try_finished = False
             try:
-                if len(tmp_devices_all) > 0:
-                    HSC.devices.all = tmp_devices_all
                 if len(tmp_devices_hub) > 0:
                     HSC.devices.hub = tmp_devices_hub
+                    for node in HSC.devices.hub:
+                        HSC.devices.id_list.update({node["id"]: HSC.devices.hub})
                 if len(tmp_devices_thermostat) > 0:
                     HSC.devices.thermostat = tmp_devices_thermostat
+                    for node in HSC.devices.thermostat:
+                        HSC.devices.id_list.update({node["id"]: HSC.devices.thermostat})
                 if len(tmp_devices_boiler_module) > 0:
                     HSC.devices.boiler_module = tmp_devices_boiler_module
+                    for node in HSC.devices.boiler_module:
+                        HSC.devices.id_list.update({node["id"]: HSC.devices.boiler_module})
                 if len(tmp_devices_plug) > 0:
                     HSC.devices.plug = tmp_devices_plug
+                    for node in HSC.devices.plug:
+                        HSC.devices.id_list.update({node["id"]: HSC.devices.plug})
                 if len(tmp_devices_light) > 0:
                     HSC.devices.light = tmp_devices_light
+                    for node in HSC.devices.light:
+                        HSC.devices.id_list.update({node["id"]: HSC.devices.light})
                 if len(tmp_devices_sensors) > 0:
                     HSC.devices.sensors = tmp_devices_sensors
+                    for node in HSC.devices.sensors:
+                        HSC.devices.id_list.update({node["id"]: HSC.devices.sensors})
 
-                if len(tmp_products_all) > 0:
-                    HSC.products.all = tmp_products_all
                 if len(tmp_products_heating) > 0:
                     HSC.products.heating = tmp_products_heating
+                    for node in HSC.products.heating:
+                        HSC.products.id_list.update({node["id"]: HSC.products.heating})
                 if len(tmp_products_hotwater) > 0:
                     HSC.products.hotwater = tmp_products_hotwater
+                    for node in HSC.products.hotwater:
+                        HSC.products.id_list.update({node["id"]: HSC.products.hotwater})
                 if len(tmp_products_plug) > 0:
                     HSC.products.plug = tmp_products_plug
+                    for node in HSC.products.plug:
+                        HSC.products.id_list.update({node["id"]: HSC.products.plug})
                 if len(tmp_products_light) > 0:
                     HSC.products.light = tmp_products_light
+                    for node in HSC.products.light:
+                        HSC.products.id_list.update({node["id"]: HSC.products.light})
                 if len(tmp_products_sensors) > 0:
                     HSC.products.sensors = tmp_products_sensors
+                    for node in HSC.products.sensors:
+                        HSC.products.id_list.update({node["id"]: HSC.products.sensors})
 
                 try_finished = True
             except (IOError, RuntimeError, ZeroDivisionError):
@@ -705,7 +721,6 @@ class Pyhiveapi:
 
         if len(HSC.devices.hub) > 0:
             for a_device in HSC.devices.hub:
-                HSC.devices.id_list.update({a_device["id"]: HSC.devices.hub})
                 if "id" in a_device and "state" in a_device and "name" in a_device["state"]:
                     device_list_sensor.append({'HA_DeviceType': 'Hub_OnlineStatus', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': a_device["state"]["name"], "Hive_DeviceType": "Hub"})
 
@@ -713,8 +728,6 @@ class Pyhiveapi:
             for product in HSC.products.heating:
                 for device in HSC.devices.thermostat:
                     if product["parent"] == device["props"]["zone"]:
-                        HSC.products.id_list.update({product["id"]: HSC.products.heating})
-                        HSC.devices.id_list.update({device["id"]: HSC.devices.thermostat})
                         if "id" in product and "state" in product and "name" in product["state"]:
                             node_name = product["state"]["name"]
                             if len(HSC.products.heating) == 1:
@@ -728,7 +741,6 @@ class Pyhiveapi:
 
         if len(HSC.products.hotwater) > 0:
             for product in HSC.products.hotwater:
-                HSC.products.id_list.update({product['id']: HSC.products.hotwater})
                 if "id" in product and "state" in product and "name" in product["state"]:
                     node_name = product["state"]["name"]
                     if len(HSC.products.hotwater) == 1:
@@ -741,7 +753,6 @@ class Pyhiveapi:
         if len(HSC.devices.thermostat) > 0 or len(HSC.devices.sensors) > 0:
             all_devices = HSC.devices.thermostat + HSC.devices.sensors
             for a_device in all_devices:
-                HSC.devices.id_list.update({a_device["id"]: HSC.devices.thermostat + HSC.devices.sensors})
                 if "id" in a_device and "state" in a_device and "name" in a_device["state"]:
                     node_name = a_device["state"]["name"]
                     if a_device["type"] == "thermostatui" and len(HSC.devices.thermostat) == 1:
@@ -752,8 +763,6 @@ class Pyhiveapi:
 
         if len(HSC.products.light) > 0:
             for product in HSC.products.light:
-                HSC.products.id_list.update({product['id']: HSC.products.light})
-                HSC.devices.id_list.update({product['id']: HSC.devices.light})
                 if "id" in product and "state" in product and "name" in product["state"]:
                     if "type" in product:
                         light_device_type = product["type"]
@@ -762,8 +771,6 @@ class Pyhiveapi:
 
         if len(HSC.products.plug) > 0:
             for product in HSC.products.plug:
-                HSC.products.id_list.update({product['id']: HSC.products.plug})
-                HSC.devices.id_list.update({product['id']: HSC.devices.plug})
                 if "id" in product and "state" in product and "name" in product["state"]:
                     if "type" in product:
                         plug_device_type = product["type"]
@@ -772,7 +779,6 @@ class Pyhiveapi:
 
         if len(HSC.products.sensors) > 0:
             for product in HSC.products.sensors:
-                HSC.products.id_list.update({product['id']: HSC.products.sensors})
                 if "id" in product and "state" in product and "name" in product["state"]:
                     if "type" in product:
                         hive_sensor_device_type = product["type"]
@@ -885,33 +891,59 @@ class Pyhiveapi:
 
         try_finished = False
         try:
-            if len(tmp_devices_all) > 0:
-                HSC.devices.all = tmp_devices_all
             if len(tmp_devices_hub) > 0:
                 HSC.devices.hub = tmp_devices_hub
+                for node in HSC.devices.hub:
+                    HSC.devices.id_list.update({node["id"]: HSC.devices.hub})
             if len(tmp_devices_thermostat) > 0:
                 HSC.devices.thermostat = tmp_devices_thermostat
+                for node in HSC.devices.thermostat:
+                    HSC.devices.id_list.update(
+                        {node["id"]: HSC.devices.thermostat})
             if len(tmp_devices_boiler_module) > 0:
                 HSC.devices.boiler_module = tmp_devices_boiler_module
+                for node in HSC.devices.boiler_module:
+                    HSC.devices.id_list.update(
+                        {node["id"]: HSC.devices.boiler_module})
             if len(tmp_devices_plug) > 0:
                 HSC.devices.plug = tmp_devices_plug
+                for node in HSC.devices.plug:
+                    HSC.devices.id_list.update({node["id"]: HSC.devices.plug})
             if len(tmp_devices_light) > 0:
                 HSC.devices.light = tmp_devices_light
+                for node in HSC.devices.light:
+                    HSC.devices.id_list.update({node["id"]: HSC.devices.light})
             if len(tmp_devices_sensors) > 0:
                 HSC.devices.sensors = tmp_devices_sensors
+                for node in HSC.devices.sensors:
+                    HSC.devices.id_list.update(
+                        {node["id"]: HSC.devices.sensors})
 
-            if len(tmp_products_all) > 0:
-                HSC.products.all = tmp_products_all
             if len(tmp_products_heating) > 0:
                 HSC.products.heating = tmp_products_heating
+                for node in HSC.products.heating:
+                    HSC.products.id_list.update(
+                        {node["id"]: HSC.products.heating})
             if len(tmp_products_hotwater) > 0:
                 HSC.products.hotwater = tmp_products_hotwater
+                for node in HSC.products.hotwater:
+                    HSC.products.id_list.update(
+                        {node["id"]: HSC.products.hotwater})
             if len(tmp_products_plug) > 0:
                 HSC.products.plug = tmp_products_plug
+                for node in HSC.products.plug:
+                    HSC.products.id_list.update(
+                        {node["id"]: HSC.products.plug})
             if len(tmp_products_light) > 0:
                 HSC.products.light = tmp_products_light
+                for node in HSC.products.light:
+                    HSC.products.id_list.update(
+                        {node["id"]: HSC.products.light})
             if len(tmp_products_sensors) > 0:
                 HSC.products.sensors = tmp_products_sensors
+                for node in HSC.products.sensors:
+                    HSC.products.id_list.update(
+                        {node["id"]: HSC.products.sensors})
 
             try_finished = True
         except (IOError, RuntimeError, ZeroDivisionError):
@@ -2406,7 +2438,7 @@ class Pyhiveapi:
         def get_state(self, node_id):
             """Get smart plug current state."""
             if HSC.logging.all or HSC.logging.switch:
-                Pyhiveapi.logger("Getting fstate for switch : " + node_id)
+                Pyhiveapi.logger("Getting state for switch : " + node_id)
             result = Pyhiveapi.Attributes.online_offline(self, node_id)
             node_index = -1
 
@@ -2696,9 +2728,12 @@ class Pyhiveapi:
                 hive_device_mode_return = "UNKNOWN"
 
             if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Mode for device " +
-                                 data[node_index]["state"]["name"] +
-                                 " is : " + hive_device_mode_return)
+                if hive_device_mode_return != "UNKNOWN":
+                    Pyhiveapi.logger("Mode for device " +
+                                     data[node_index]["state"]["name"] +
+                                     " is : " + hive_device_mode_return)
+                else:
+                    Pyhiveapi.logger("Device does not have mode info : " + node_id)
 
             return hive_device_mode_return
 
@@ -2737,8 +2772,11 @@ class Pyhiveapi:
                 battery_level_return = 'UNKNOWN'
 
             if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Battery level for device " +
-                                 data[node_index]["state"]["name"] +
-                                 " is : " + str(battery_level_return) + "%")
+                if battery_level_return != 'UNKNOWN':
+                    Pyhiveapi.logger("Battery level for device " +
+                                     data[node_index]["state"]["name"] +
+                                     " is : " + str(battery_level_return) + "%")
+                else:
+                    Pyhiveapi.logger("Device does not have battery info : " + node_id)
 
             return battery_level_return
