@@ -531,9 +531,8 @@ class Pyhiveapi:
                     api_resp_p = api_resp_d['parsed']
 
                     if str(api_resp_o) == "<Response [200]>":
-                        sensor["props"]["motion"]["status"] = False
                         if len(api_resp_p) > 0 and 'inMotion' in api_resp_p[0]:
-                            sensor["props"]["motion"]["status"] = True
+                            sensor["props"]["motion"]["status"] = api_resp_p[0]['inMotion']
 
         return get_nodes_successful
 
@@ -2609,7 +2608,7 @@ class Pyhiveapi:
                         api_resp = api_resp_d['original']
 
                         if str(api_resp) == "<Response [200]>":
-                            Pyhiveapi.hive_api_get_nodes(node_id=node_id)
+                            Pyhiveapi.hive_api_get_nodes(self, node_id)
                             set_mode_success = True
                             if HSC.logging.all or HSC.logging.switch:
                                 Pyhiveapi.logger("Swicth " + HSC.products.plug[node_index]["state"]["name"] +
