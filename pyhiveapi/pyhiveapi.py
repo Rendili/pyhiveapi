@@ -2231,7 +2231,7 @@ class Pyhiveapi:
                         api_resp = api_resp_d['original']
 
                     if str(api_resp) == "<Response [200]>":
-                        Pyhiveapi.hive_api_get_nodes(node_id)
+                        Pyhiveapi.hive_api_get_nodes(self, node_id)
                         set_mode_success = True
                         if HSC.logging.all or HSC.logging.light:
                             Pyhiveapi.logger("Sucessfully set the brightness " +
@@ -2653,7 +2653,7 @@ class Pyhiveapi:
             node_index = -1
 
             hive_device_availibility_tmp = ""
-            hive_device_availibility_return = "offline"
+            hive_device_availibility_return = "UNKNOWN"
             hive_device_availibility_found = False
 
             current_node_attribute = "Device_Availability_" + node_id
@@ -2684,12 +2684,15 @@ class Pyhiveapi:
                     hive_device_availibility_return = NODE_ATTRIBS.get(
                         current_node_attribute)
                 else:
-                    hive_device_availibility_return = "offline"
+                    hive_device_availibility_return = "UNKNOWN"
 
             if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Availability of device " +
-                                 data[node_index]["state"]["name"] +
-                                 " is : " + hive_device_availibility_return)
+                if hive_device_mode_return != "UNKNOWN":
+                    Pyhiveapi.logger("Availability of device " +
+                                     data[node_index]["state"]["name"] +
+                                     " is : " + hive_device_availibility_return)
+            else:
+                Pyhiveapi.logger("Device does not have availability info : " + node_id)
 
             return hive_device_availibility_return
 
