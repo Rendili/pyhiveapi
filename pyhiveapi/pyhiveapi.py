@@ -2691,8 +2691,8 @@ class Pyhiveapi:
                     Pyhiveapi.logger("Availability of device " +
                                      data[node_index]["state"]["name"] +
                                      " is : " + hive_device_availibility_return)
-            else:
-                Pyhiveapi.logger("Device does not have availability info : " + node_id)
+                else:
+                    Pyhiveapi.logger("Device does not have availability info : " + node_id)
 
             return hive_device_availibility_return
 
