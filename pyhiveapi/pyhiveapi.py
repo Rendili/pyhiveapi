@@ -2687,7 +2687,7 @@ class Pyhiveapi:
                     hive_device_availibility_return = "UNKNOWN"
 
             if HSC.logging.all or HSC.logging.attribute:
-                if hive_device_mode_return != "UNKNOWN":
+                if hive_device_availibility_return != "UNKNOWN":
                     Pyhiveapi.logger("Availability of device " +
                                      data[node_index]["state"]["name"] +
                                      " is : " + hive_device_availibility_return)
