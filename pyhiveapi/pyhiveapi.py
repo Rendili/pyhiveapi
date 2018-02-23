@@ -2,6 +2,7 @@
 import operator
 from datetime import datetime
 from datetime import timedelta
+import threading
 import time
 import requests
 import colorsys
@@ -67,6 +68,7 @@ class Logging:
     output_file = ""
     file_all = ""
     file_core = ""
+    file_http = ""
     file_heating = ""
     file_hotwater = ""
     file_light = ""
@@ -76,6 +78,7 @@ class Logging:
     enabled = False
     all = False
     core = False
+    http = False
     heating = False
     hotwater = False
     light = False
@@ -148,6 +151,7 @@ class Pyhiveapi:
 
     def __init__(self):
         """Initialise the base variable values."""
+        self.lock = threading.Lock()
 
         HIVE_API.platform_name = ""
 
@@ -168,6 +172,7 @@ class Pyhiveapi:
 
         HSC.logging.file_all = "pyhiveapi.logging.all"
         HSC.logging.file_core = "pyhiveapi.logging.core"
+        HSC.logging.file_http = "pyhiveapi.logging.http"
         HSC.logging.file_heating = "pyhiveapi.logging.heating"
         HSC.logging.file_hotwater = "pyhiveapi.logging.hotwater"
         HSC.logging.file_light = "pyhiveapi.logging.light"
@@ -327,16 +332,19 @@ class Pyhiveapi:
 
     def update_data(self, node_id):
         """Get latest data for Hive nodes - rate limiting."""
-        nodes_updated = False
-        current_time = datetime.now()
+        self.lock.acquire()
+        try:
+            nodes_updated = False
+            current_time = datetime.now()
+            nodes_last_update_secs = (current_time - HSC.last_update).total_seconds()
+            if nodes_last_update_secs >= HSC.update_node_interval_seconds:
+                nodes_updated = Pyhiveapi.hive_api_get_nodes(self, node_id)
 
-        nodes_last_update_secs = (current_time - HSC.last_update).total_seconds()
-        if nodes_last_update_secs >= HSC.update_node_interval_seconds:
-            nodes_updated = Pyhiveapi.hive_api_get_nodes(self, node_id)
-
-        weather_last_update_secs = (current_time - HSC.weather.last_update).total_seconds()
-        if weather_last_update_secs >= HSC.update_weather_interval_seconds:
-            nodes_updated = Pyhiveapi.hive_api_get_weather(self)
+            weather_last_update_secs = (current_time - HSC.weather.last_update).total_seconds()
+            if weather_last_update_secs >= HSC.update_weather_interval_seconds:
+                nodes_updated = Pyhiveapi.hive_api_get_weather(self)
+        finally:
+            self.lock.release()
 
         return nodes_updated
 
@@ -377,7 +385,7 @@ class Pyhiveapi:
                 api_resp_p = None
                 api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.devices, "", False)
 
-                if HSC.logging.all or HSC.logging.core:
+                if HSC.logging.all or HSC.logging.core or HSC.logging.http:
                     api_resp = str(api_resp_d['original'])
                     if api_resp == "<Response [200]>":
                         Pyhiveapi.logger("Devices API call successful : " + api_resp)
@@ -417,7 +425,7 @@ class Pyhiveapi:
                 api_resp_p = None
                 api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.products, "", False)
 
-                if HSC.logging.all or HSC.logging.core:
+                if HSC.logging.all or HSC.logging.core or HSC.logging.http:
                     api_resp = str(api_resp_d['original'])
                     if api_resp == "<Response [200]>":
                         Pyhiveapi.logger("Products API call successful : " + api_resp)
@@ -533,6 +541,14 @@ class Pyhiveapi:
                     if str(api_resp_o) == "<Response [200]>":
                         if len(api_resp_p) > 0 and 'inMotion' in api_resp_p[0]:
                             sensor["props"]["motion"]["status"] = api_resp_p[0]['inMotion']
+                        if HSC.logging.all or HSC.logging.core or HSC.logging.http:
+                            api_resp = str(api_resp_d['original'])
+                            if api_resp == "<Response [200]>":
+                                Pyhiveapi.logger(
+                                    "Sensor " + sensor["name"] + " - " + "HTTP call successful : " + api_resp)
+                            else:
+                                Pyhiveapi.logger(
+                                    "Sensor " + sensor["name"] + " - " + "HTTP call failed : " + api_resp)
 
         return get_nodes_successful
 
@@ -671,6 +687,9 @@ class Pyhiveapi:
                     HSC.logging.enabled = True
                 if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_core):
                     HSC.logging.core = True
+                    HSC.logging.enabled = True
+                if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_http):
+                    HSC.logging.http = True
                     HSC.logging.enabled = True
                 if os.path.isfile(HSC.logging.output_folder + "/" + HSC.logging.file_heating):
                     HSC.logging.heating = True
