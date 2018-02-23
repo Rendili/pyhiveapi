@@ -545,10 +545,10 @@ class Pyhiveapi:
                             api_resp = str(api_resp_d['original'])
                             if api_resp == "<Response [200]>":
                                 Pyhiveapi.logger(
-                                    "Sensor " + sensor["name"] + " - " + "HTTP call successful : " + api_resp)
+                                    "Sensor " + sensor["state"]["name"] + " - " + "HTTP call successful : " + api_resp)
                             else:
                                 Pyhiveapi.logger(
-                                    "Sensor " + sensor["name"] + " - " + "HTTP call failed : " + api_resp)
+                                    "Sensor " + sensor["state"]["name"] + " - " + "HTTP call failed : " + api_resp)
 
         return get_nodes_successful
 
