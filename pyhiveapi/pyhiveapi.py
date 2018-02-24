@@ -778,7 +778,7 @@ class Pyhiveapi:
                     if "type" in a_device:
                         hive_device_type = a_device["type"]
                         device_list_sensor.append({'HA_DeviceType': 'Hive_Device_BatteryLevel', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": hive_device_type})
-                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Availability', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': node_name + "Availability", "Hive_DeviceType": hive_device_type})
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Availability', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': str(node_name) + "Availability", "Hive_DeviceType": hive_device_type})
 
 
         if len(HSC.products.light) > 0:
