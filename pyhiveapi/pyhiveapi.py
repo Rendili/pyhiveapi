@@ -778,6 +778,8 @@ class Pyhiveapi:
                     if "type" in a_device:
                         hive_device_type = a_device["type"]
                         device_list_sensor.append({'HA_DeviceType': 'Hive_Device_BatteryLevel', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": hive_device_type})
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Availability', 'Hive_NodeID': a_device["id"], 'Hive_NodeName': node_name + "Availability", "Hive_DeviceType": hive_device_type})
+
 
         if len(HSC.products.light) > 0:
             for product in HSC.products.light:
@@ -786,6 +788,8 @@ class Pyhiveapi:
                         light_device_type = product["type"]
                         device_list_light.append({'HA_DeviceType': 'Hive_Device_Light', 'Hive_Light_DeviceType': light_device_type, 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": "Light"})
                         device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Light_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": light_device_type})
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Light_Availability', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"] + "Availability", "Hive_DeviceType": light_device_type})
+
 
         if len(HSC.products.plug) > 0:
             for product in HSC.products.plug:
@@ -794,6 +798,8 @@ class Pyhiveapi:
                         plug_device_type = product["type"]
                         device_list_plug.append({'HA_DeviceType': 'Hive_Device_Plug', 'Hive_Plug_DeviceType': plug_device_type, 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": "Switch"})
                         device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": plug_device_type})
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Availability', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"] + "Availability", "Hive_DeviceType": plug_device_type})
+
 
         if len(HSC.products.sensors) > 0:
             for product in HSC.products.sensors:
