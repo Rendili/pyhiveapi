@@ -798,7 +798,7 @@ class Pyhiveapi:
                         plug_device_type = product["type"]
                         device_list_plug.append({'HA_DeviceType': 'Hive_Device_Plug', 'Hive_Plug_DeviceType': plug_device_type, 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": "Switch"})
                         device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": plug_device_type})
-                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Availability', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"] + " Availability", "Hive_DeviceType": plug_device_type})
+                        device_list_sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Availability', 'Hive_NodeID': product["id"], 'Hive_NodeName': product["state"]["name"], "Hive_DeviceType": plug_device_type})
 
 
         if len(HSC.products.sensors) > 0:
