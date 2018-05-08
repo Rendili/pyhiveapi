@@ -2,10 +2,14 @@
 from .pyhiveapi import Pyhiveapi
 
 
-class Light():
+class Light(Pyhiveapi):
         """Hive Lights."""
 
-        def get_state(self, node_id):
+    def __init__(self):
+        “””Initialise.”””
+        Pyhiveapi.__init__(self)
+
+    def get_state(self, node_id):
             """Get light current state."""
             if HSC.logging.all or HSC.logging.light:
                 Pyhiveapi.logger("Getting state of light : " + node_id)
