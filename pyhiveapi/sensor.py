@@ -1,6 +1,6 @@
 
 
-from .pyhiveapi import Pyhiveapi
+from .api import Hive
 
 
 

@@ -2,8 +2,8 @@
 from pyhiveapi import Pyhiveapi
 import json
 
-HiveAPI = Pyhiveapi()
-HiveDevice = Pyhiveapi.Light()
+p = Pyhiveapi()
+file = {}
 
 print('Using File')
 devices = (input("Enter path for the devices file : ") or None)
@@ -12,6 +12,7 @@ if devices != None:
     devices_t = JSON_File.read()
     JSON_File.close()
     devices = json.loads(devices_t)
+    file.update({'devices': {'parsed': devices}})
 
 products = (input("Enter path for the products file : ") or None)
 if products != None:
@@ -19,13 +20,14 @@ if products != None:
     products_t = JSON_File.read()
     JSON_File.close()
     products = json.loads(products_t)
+    file.update({'products': {'parsed': products}})
 print()
 
+result = p.initialise_api(None, None, 1, file, False)
 for a_product in products:
     print(a_product["type"] + " : " + a_product["id"])
 print()
 node_id = input("Enter Node ID : " )
 nodetype = input("Enter Node type : " )
-result = HiveAPI.test_use_file(devices, products)
-info = HiveDevice.set_color_temp(node_id, nodetype, new_color_temp=370)
+info = p.light.get_state(node_id)
 print(info)

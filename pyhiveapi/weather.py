@@ -1,13 +1,10 @@
+"""Weather.py"""
+from .data import Data as Dt
 
 
-from .pyhiveapi import Pyhiveapi
-
-
-
-
-class Weather():
+class Weather:
         """Hive Weather."""
-
-        def temperature(self):
+        @staticmethod
+        def temperature():
             """Get Hive Weather temperature."""
-            return HSC.weather.temperature.value
+            return Dt.w_temperature_value

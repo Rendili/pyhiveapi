@@ -1,4 +1,4 @@
-from .pyhiveapi import Pyhiveapi
+from .api import Hive
 
 class Hotwater():
         """Hive Hotwater."""
@@ -156,7 +156,8 @@ class Hotwater():
                                             "schedule" in
                                             HSC.products.hotwater[node_index]
                                             ["state"]):
-                                        snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.hotwater[node_index]["state"]["schedule"])
+                                        snan = Pyhiveapi.p_get_schedule_now_next_later(
+                                            HSC.products.hotwater[node_index]["state"]["schedule"])
                                         if 'now' in snan:
                                             if ('value' in snan["now"] and
                                                     'status' in snan["now"]["value"]):
@@ -194,7 +195,8 @@ class Hotwater():
                                 break
 
                 if node_index != -1:
-                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.hotwater[node_index]["state"]["schedule"])
+                    snan = Pyhiveapi.p_get_schedule_now_next_later(
+                        HSC.products.hotwater[node_index]["state"]["schedule"])
                 else:
                     snan = None
             else:
@@ -230,7 +232,8 @@ class Hotwater():
 
                             if new_mode == "SCHEDULE" or new_mode == "ON" or new_mode == "OFF":
                                 hive_api_url = (HIVE_API.urls.nodes + "/hotwater/" + HSC.products.hotwater[node_index]["id"])
-                                api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+                                api_resp_d = Pyhiveapi.hive_api_json_call(
+                                    "POST", hive_api_url, json_string_content, False)
 
                                 api_resp = api_resp_d['original']
 
@@ -263,7 +266,7 @@ class Hotwater():
             if hotwater_node_found:
                 json_string_content = '{"mode": "BOOST", "boost": ' + str(length_minutes) + '}'
                 hive_api_url = (HIVE_API.urls.nodes + "/hotwater/" + node_id)
-                api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+                api_resp_d = Pyhiveapi.hive_api_json_call("POST", hive_api_url, json_string_content, False)
 
                 api_resp = api_resp_d['original']
 
@@ -308,7 +311,7 @@ class Hotwater():
 
                         json_string_content = '{' + send_previous_mode + '}'
                         hive_api_url = (HIVE_API.urls.nodes + "/hotwater/" + node_id)
-                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+                        api_resp_d = Pyhiveapi.hive_api_json_call("POST", hive_api_url, json_string_content, False)
 
                         api_resp = api_resp_d['original']
 

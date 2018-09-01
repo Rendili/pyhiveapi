@@ -1,5 +1,5 @@
 
-from .pyhiveapi import Pyhiveapi
+from .api import Hive
 
 
 
@@ -154,7 +154,8 @@ class Heating():
                                         heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["target"]
                                         heating_target_temp_found = True
                                 else:
-                                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.heating[node_index]["state"]["schedule"])
+                                    snan = Pyhiveapi.p_get_schedule_now_next_later(
+                                        HSC.products.heating[node_index]["state"]["schedule"])
                                     if 'now' in snan:
                                         if 'value' in snan["now"] and 'target' in snan["now"]["value"]:
                                             heating_target_temp_tmp = snan["now"]["value"]["target"]
@@ -348,7 +349,8 @@ class Heating():
                                 break
 
                 if node_index != -1:
-                    snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.heating[node_index]["state"]["schedule"])
+                    snan = Pyhiveapi.p_get_schedule_now_next_later(
+                        HSC.products.heating[node_index]["state"]["schedule"])
                 else:
                     snan = None
             else:
@@ -378,7 +380,7 @@ class Heating():
                             json_string_content = ('{"target":' + str(new_temperature) + '}')
 
                             hive_api_url = (HIVE_API.urls.nodes + "/heating/" + HSC.products.heating[node_index]["id"])
-                            api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+                            api_resp_d = Pyhiveapi.hive_api_json_call("POST", hive_api_url, json_string_content, False)
 
                             api_resp = api_resp_d['original']
 
@@ -416,7 +418,8 @@ class Heating():
 
                             if new_mode == "SCHEDULE" or new_mode == "MANUAL" or new_mode == "OFF":
                                 hive_api_url = (HIVE_API.urls.nodes + "/heating/" + HSC.products.heating[node_index]["id"])
-                                api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+                                api_resp_d = Pyhiveapi.hive_api_json_call(
+                                    "POST", hive_api_url, json_string_content, False)
 
                                 api_resp = api_resp_d['original']
 
@@ -449,7 +452,7 @@ class Heating():
             if heating_node_found:
                 json_string_content = '{"mode": "BOOST", "boost": ' + str(length_minutes) + ', "target": ' + str(target_temperature) + '}'
                 hive_api_url = (HIVE_API.urls.nodes + "/heating/" + node_id)
-                api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+                api_resp_d = Pyhiveapi.hive_api_json_call("POST", hive_api_url, json_string_content, False)
 
                 api_resp = api_resp_d['original']
 
@@ -498,7 +501,7 @@ class Heating():
 
                         json_string_content = '{' + send_previous_mode + send_previous_temperature + '}'
                         hive_api_url = (HIVE_API.urls.nodes + "/heating/" + node_id)
-                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
+                        api_resp_d = Pyhiveapi.hive_api_json_call("POST", hive_api_url, json_string_content, False)
 
                         api_resp = api_resp_d['original']
 

@@ -1,5 +1,5 @@
 
-from .pyhiveapi import Pyhiveapi
+from .api import Hive
 
 
 
@@ -132,10 +132,10 @@ class Switch():
                                         + HSC.products.plug[node_index]["type"]
                                         + '/'
                                         + HSC.products.plug[node_index]["id"])
-                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
-                                                        hive_api_url,
-                                                        json_string_content,
-                                                        False)
+                        api_resp_d = Pyhiveapi.hive_api_json_call("POST",
+                                                                  hive_api_url,
+                                                                  json_string_content,
+                                                                  False)
 
                         api_resp = api_resp_d['original']
 
@@ -175,10 +175,10 @@ class Switch():
                                         + HSC.products.plug[node_index]["type"]
                                         + '/'
                                         + HSC.products.plug[node_index]["id"])
-                        api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST",
-                                                        hive_api_url,
-                                                        json_string_content,
-                                                        False)
+                        api_resp_d = Pyhiveapi.hive_api_json_call("POST",
+                                                                  hive_api_url,
+                                                                  json_string_content,
+                                                                  False)
 
                         api_resp = api_resp_d['original']
 

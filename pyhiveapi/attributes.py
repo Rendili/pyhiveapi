@@ -1,166 +1,125 @@
+"""Attributes Class."""
+from .logging import Logger
+from .data import Data as Dt
 
-from .pyhiveapi import Pyhiveapi
 
-
-
-
-class Attributes():
+class Attributes:
         """Device Attributes Weather."""
+        def __init__(self):
+            self.log = Logger()
 
-        def state_attributes(self, node_id):
+        def state_attributes(self, node):
             """Get HA State Attributes"""
-            if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Getting state_attributes for: " + node_id)
+            self.log.log("attribute", "Getting state_attributes for: " + node)
 
             state_attributes = {}
 
-            available = Pyhiveapi.Attributes.online_offline(self, node_id)
+            available = self.online_offline(node)
             if available != 'UNKNOWN':
                 state_attributes.update({"availability": available})
-            battery = Pyhiveapi.Attributes.battery_level(self, node_id)
+            battery = self.battery_level(node)
             if battery != 'UNKNOWN':
                 state_attributes.update({"battery_level": str(battery) + "%"})
-            mode = Pyhiveapi.Attributes.get_mode(self, node_id)
+            mode = self.get_mode(node)
             if mode != 'UNKNOWN':
                 state_attributes.update({"mode": mode})
 
             return state_attributes
 
-        def online_offline(self, node_id):
+        def online_offline(self, node):
             """Check if device is online"""
-            if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Checking device availability for : " +
-                                 node_id)
-            node_index = -1
+            self.log.log("attribute", "Checking device availability for : "
+                         + node)
 
-            hive_device_availibility_tmp = ""
-            hive_device_availibility_return = "UNKNOWN"
-            hive_device_availibility_found = False
+            hive_data_tmp = ""
+            hive_data_return = "UNKNOWN"
+            cna = "Device_Availability_" + node
+            data = Dt.devices[node]
 
-            current_node_attribute = "Device_Availability_" + node_id
+            try:
+                hive_data_tmp = data["props"]["online"]
+                hive_data_found = True
+            except KeyError:
+                hive_data_found = False
 
-            if node_id in HSC.devices.id_list:
-                data = HSC.devices.id_list[node_id]
-                for current_node_index in range(0, len(data)):
-                    if "id" in data[current_node_index]:
-                        if data[current_node_index][
-                            "id"] == node_id:
-                            node_index = current_node_index
-                            break
-
-                if node_index != -1:
-                    hive_device_availibility_tmp = (
-                        data[node_index]["props"]["online"])
-                    hive_device_availibility_found = True
-
-            if hive_device_availibility_found:
-                NODE_ATTRIBS[
-                    current_node_attribute] = hive_device_availibility_tmp
-                if hive_device_availibility_tmp == True:
-                    hive_device_availibility_return = 'online'
-                elif hive_device_availibility_tmp == False:
-                    hive_device_availibility_return = 'offline'
+            if hive_data_found:
+                Dt.NODES[cna] = hive_data_tmp
+                if hive_data_tmp:
+                    hive_data_return = 'online'
+                elif not hive_data_tmp:
+                    hive_data_return = 'offline'
             else:
-                if current_node_attribute in NODE_ATTRIBS:
-                    hive_device_availibility_return = NODE_ATTRIBS.get(
-                        current_node_attribute)
+                if cna in Dt.NODES:
+                    hive_data_return = Dt.NODES.get(cna)
                 else:
-                    hive_device_availibility_return = "UNKNOWN"
+                    hive_data_return = "UNKNOWN"
 
-            if HSC.logging.all or HSC.logging.attribute:
-                if hive_device_availibility_return != "UNKNOWN":
-                    Pyhiveapi.logger("Availability of device " +
-                                     data[node_index]["state"]["name"] +
-                                     " is : " + hive_device_availibility_return)
-                else:
-                    Pyhiveapi.logger("Device does not have availability info : " + node_id)
+            if hive_data_return != "UNKNOWN":
+                self.log.log("attribute", "Availability of device "
+                             + data["state"]["name"] + " is : "
+                             + hive_data_return)
+            else:
+                self.log.log("attribute", "Device does not have "
+                             + "availability info : " + node)
 
-            return hive_device_availibility_return
+            return hive_data_return
 
-        def get_mode(self, node_id):
+        def get_mode(self, node):
             """Get sensor mode."""
-            if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Checking device mode for : " + node_id)
-            node_index = -1
+            self.log.log("attribute", "Checking device mode for : " + node)
 
-            hive_device_mode_tmp = ""
-            hive_device_mode_return = "UNKNOWN"
-            hive_device_mode_found = False
+            hive_data_tmp = ""
+            cna = "Device_Mode_" + node
+            data = Dt.products[node]
 
-            current_node_attribute = "Device_Mode_" + node_id
+            try:
+                hive_data_tmp = data["state"]["mode"]
+                hive_data_found = True
+            except KeyError:
+                hive_data_found = False
 
-            if node_id in HSC.products.id_list:
-                data = HSC.products.id_list[node_id]
-                for current_node_index in range(0, len(data)):
-                    if "id" in data[current_node_index]:
-                        if data[current_node_index][
-                            "id"] == node_id:
-                            node_index = current_node_index
-                            break
-
-                if node_index != -1:
-                    if ("state" in data[node_index] and
-                            "mode" in data[node_index]["state"]):
-                        hive_device_mode_tmp = (data[node_index]
-                        ["state"]["mode"])
-                        hive_device_mode_found = True
-
-            if hive_device_mode_found:
-                NODE_ATTRIBS[current_node_attribute] = hive_device_mode_tmp
-                hive_device_mode_return = hive_device_mode_tmp
+            if hive_data_found:
+                Dt.NODES[cna] = hive_data_tmp
+                hive_data_return = hive_data_tmp
             else:
-                hive_device_mode_return = "UNKNOWN"
+                hive_data_return = "UNKNOWN"
 
-            if HSC.logging.all or HSC.logging.attribute:
-                if hive_device_mode_return != "UNKNOWN":
-                    Pyhiveapi.logger("Mode for device " +
-                                     data[node_index]["state"]["name"] +
-                                     " is : " + hive_device_mode_return)
-                else:
-                    Pyhiveapi.logger("Device does not have mode info : " + node_id)
+            if hive_data_return != "UNKNOWN":
+                self.log.log("attribute", "Mode for device "
+                             + data["state"]["name"] + " is : "
+                             + hive_data_return)
+            else:
+                self.log.log("attribute", "Device does not have mode info : "
+                             + node)
 
-            return hive_device_mode_return
+            return hive_data_return
 
-        def battery_level(self, node_id):
+        def battery_level(self, node):
             """Get device battery level."""
-            if HSC.logging.all or HSC.logging.attribute:
-                Pyhiveapi.logger("Checking battery level for : " + node_id)
-            node_index = -1
+            self.log.log("attribute", "Checking battery level for : " + node)
 
-            battery_level_return = 0
-            battery_level_tmp = 0
-            battery_level_found = False
+            hive_data_tmp = 0
+            cna = "BatteryLevel_" + node
+            data = Dt.devices[node]
 
-            current_node_attribute = "BatteryLevel_" + node_id
+            try:
+                hive_data_tmp = data["props"]["battery"]
+                hive_data_found = True
+            except KeyError:
+                hive_data_found = False
 
-            if node_id in HSC.devices.id_list:
-                data = HSC.devices.id_list[node_id]
-                for current_node_index in range(0, len(data)):
-                    if "id" in data[current_node_index]:
-                        if data[current_node_index][
-                            "id"] == node_id:
-                            node_index = current_node_index
-                            break
-
-                if node_index != -1:
-                    if ("props" in data[node_index] and "battery" in
-                            data[node_index]["props"]):
-                        battery_level_tmp = (
-                            data[node_index]["props"]["battery"])
-                        battery_level_found = True
-
-            if battery_level_found:
-                NODE_ATTRIBS[current_node_attribute] = battery_level_tmp
-                battery_level_return = battery_level_tmp
+            if hive_data_found:
+                Dt.NODES[cna] = hive_data_tmp
+                hive_data_return = hive_data_tmp
             else:
-                battery_level_return = 'UNKNOWN'
+                hive_data_return = 'UNKNOWN'
 
-            if HSC.logging.all or HSC.logging.attribute:
-                if battery_level_return != 'UNKNOWN':
-                    Pyhiveapi.logger("Battery level for device " +
-                                     data[node_index]["state"]["name"] +
-                                     " is : " + str(battery_level_return) + "%")
-                else:
-                    Pyhiveapi.logger("Device does not have battery info : " + node_id)
+            if hive_data_return != 'UNKNOWN':
+                self.log.log("attribute", "Battery level for device "
+                             + data["state"]["name"] + " is : "
+                             + str(hive_data_return) + "%")
+            else:
+                self.log.log("attribute", "Device does not have battery info: "
+                             + node)
 
-            return battery_level_return
+            return hive_data_return
