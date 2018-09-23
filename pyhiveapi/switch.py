@@ -1,65 +1,43 @@
-
+"""Switch Class Code."""
 from .api import Hive
+from .attributes import Attributes
+from .data import Data
+from .logging import Logger
 
 
+class Switch:
+    """Hive Switch Class."""
 
+    def __init__(self):
+        """Initialise."""
+        self.hive = Hive()
+        self.log = Logger()
+        self.attr = Attributes()
+        self.type = "Light"
 
+    @staticmethod
+    def data_list():
+        return {"tmp": None, "end": False, "resp": False}
 
+    def get_state(self, n):
+        """Get light current state."""
+        self.log.log('switch', "Getting state for switch : " + Data.NAME[n])
+        dl = self.data_list()
+        dl.update({'end': (self.attr.online_offline(n))})
+        data = Data.products[n]
 
-class Switch():
-        """Hive Switches."""
+        if dl['end'] != 'offline':
+            try:
+                dl.update({'end': data["state"]["status"]})
+                Data.NODES["Smartplug_State_" + n] = dl['end']
+            except KeyError:
+                self.log.log('switch', "Failed to get state - " + Data.NAME[n])
 
-        def get_state(self, node_id):
-            """Get smart plug current state."""
-            if HSC.logging.all or HSC.logging.switch:
-                Pyhiveapi.logger("Getting state for switch : " + node_id)
-            result = Pyhiveapi.Attributes.online_offline(self, node_id)
-            node_index = -1
+        self.log.log('switch', "State of switch " + Data.NAME[n] + " is: "
+                     + dl['end'])
+        return Data.HIVETOHA[type].get(dl['end'],
+                                       Data.NODES.get("Smartplug_State_" + n))
 
-            smartplug_state_tmp = "UNKNOWN"
-            smartplug_state_return = "UNKNOWN"
-            smartplug_state_found = False
-
-            current_node_attribute = "Smartplug_State_" + node_id
-
-            if len(HSC.products.plug) > 0:
-                for current_node_index in range(0, len(HSC.products.plug)):
-                    if "id" in HSC.products.plug[current_node_index]:
-                        if HSC.products.plug[current_node_index]["id"] == node_id:
-                            node_index = current_node_index
-                            break
-
-                if node_index != -1:
-                    if ("state" in HSC.products.plug[
-                        node_index] and "status" in
-                        HSC.products.plug[node_index]["state"]):
-                        smartplug_state_tmp = (HSC.products.plug[node_index]
-                                               ["state"]["status"])
-                        smartplug_state_found = True
-
-            if result == "offline":
-                smartplug_state_return = "OFF"
-            elif smartplug_state_found:
-                NODE_ATTRIBS[current_node_attribute] = smartplug_state_tmp
-                smartplug_state_return = smartplug_state_tmp
-            else:
-                if current_node_attribute in NODE_ATTRIBS:
-                    smartplug_state_return = NODE_ATTRIBS.get(
-                        current_node_attribute)
-                else:
-                    smartplug_state_return = "UNKNOWN"
-
-            smartplug_state_return_b = False
-
-            if smartplug_state_return == "ON":
-                smartplug_state_return_b = True
-
-            if HSC.logging.all or HSC.logging.switch:
-                Pyhiveapi.logger("State of switch " +
-                                 HSC.products.plug[node_index]["state"]["name"] +
-                                 " is : " + smartplug_state_return)
-
-            return smartplug_state_return_b
 
         def get_power_usage(self, node_id):
             """Get smart plug current power usage."""

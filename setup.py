@@ -1,10 +1,8 @@
 from setuptools import setup, find_packages
-from codecs import open
-from os import path
 
 setup(
     name='pyhiveapi',
-    version='0.2.14',
+    version='0.2.14.dev1',
     description='A Python library to interface with the Hive API',
     long_description="A Python library to interface with the Hive API",
     url='https://github.com/Rendili/pyhiveapi',

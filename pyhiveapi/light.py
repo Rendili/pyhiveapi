@@ -1,384 +1,268 @@
 """Light Class Code."""
-
 import colorsys
+
 from .api import Hive
-from .logging import Logger
-from .data import Data as Dt
 from .attributes import Attributes
+from .data import Data
+from .logging import Logger
 
 
 class Light:
     """Home Assistant Hive Lights."""
-
-    type = "Light"
 
     def __init__(self):
         """Initialise."""
         self.hive = Hive()
         self.log = Logger()
         self.attr = Attributes()
-        self.tmp = None
-        self.result = False
-        self.resp = False
+        self.type = "Light"
+
+    @staticmethod
+    def data_list():
+        return {"tmp": None, "end": False, "resp": False}
 
     def get_state(self, n):
         """Get light current state."""
-        self.log.log('light', "Getting state of light: " + Dt.NAME[n])
-        self.__init__()
-        self.result = self.attr.online_offline(n)
-        data = Dt.products[n]
+        self.log.log('light', "Getting state of light: " + Data.NAME[n])
+        dl = self.data_list()
+        dl.update({"end": (self.attr.online_offline(n))})
+        data = Data.products[n]
 
-        if self.result != 'offline':
+        if dl['end'] != 'offline':
             try:
-                self.result = data["state"]["status"]
-                Dt.NODES["Light_State_" + n] = self.result
+                dl.update({"end": (data["state"]["status"])})
+                Data.NODES["Light_State_" + n] = dl['end']
             except KeyError:
-                pass
+                self.log.log('switch', "Failed to get state - " + Data.NAME[n])
 
-        self.log.log('light', "State of light " + Dt.NAME[n] + " is: "
-                     + self.result)
-        return Dt.HIVETOHA[type].get(self.result,
-                                     Dt.NODES.get("Light_State_" + n))
+        self.log.log('light', "State of light " + Data.NAME[n] + " is: "
+                     + dl['end'])
+        return Data.HIVETOHA[self.type].get(dl['end'],
+                                            Data.NODES.get("Light_State_" + n))
 
     def get_brightness(self, n):
         """Get light current brightness."""
-        self.log.log('Light', "Getting brightness of light: " + Dt.NAME[n])
-        self.__init__()
-        data = Dt.products[n]
+        self.log.log('Light', "Getting brightness of light: " + Data.NAME[n])
+        dl = self.data_list()
+        data = Data.products[n]
 
         try:
-            self.tmp = data["state"]["brightness"]
-            self.result = ((self.tmp / 100) * 255)
-            Dt.NODES["Light_Bright_" + n] = self.result
+            dl.update({"tmp": (data["state"]["brightness"])})
+            dl.update(dict(end=((dl['tmp'] / 100) * 255)))
+            Data.NODES["Light_Bright_" + n] = dl['end']
         except KeyError:
             pass
 
-        self.log.log("Light", "Brightness of light " + Dt.NAME[n] + " is: "
-                     + str(self.result))
+        self.log.log("Light", "Brightness of light " + Data.NAME[n] + " is: "
+                     + str(dl['end']))
 
-        return self.result if self.result is not None \
-            else Dt.NODES.get("Light_Bright_" + n)
+        return dl['end'] if dl['end'] is False \
+            else Data.NODES.get("Light_Bright_" + n)
 
     def get_min_color_temp(self, n):
         """Get light minimum color temperature."""
         self.log.log("Light", "Getting min colour temperature of light: "
-                     + Dt.NAME[n])
-        self.__init__()
-        data = Dt.products[n]
+                     + Data.NAME[n])
+        dl = self.data_list()
+        data = Data.products[n]
 
         try:
-            self.tmp = data["props"]["colourTemperature"]["max"]
-            self.result = round((1 / self.tmp) * 1000000)
-            Dt.NODES["Light_Min_CT_" + n] = self.result
+            dl.update({"tmp": (data["props"]["colourTemperature"]["max"])})
+            dl.update(dict(end=(round((1 / dl['tmp']) * 1000000))))
+            Data.NODES["Light_Min_CT_" + n] = dl['end']
         except KeyError:
             pass
 
-        self.log.log("Light", "Min Colour temperature of light " + Dt.NAME[n]
-                     + " is: " + str(self.result))
+        self.log.log("Light", "Min Colour temperature of light " + Data.NAME[n]
+                     + " is: " + str(dl['end']))
 
-        return self.result
+        return dl['end']
 
     def get_max_color_temp(self, n):
         """Get light maximum color temperature."""
         self.log.log("Light", "Getting max colour temperature of light: "
-                     + Dt.NAME[n])
-        self.__init__()
-        data = Dt.products[n]
+                     + Data.NAME[n])
+        dl = self.data_list()
+        data = Data.products[n]
 
         try:
-            self.tmp = data["props"]["colourTemperature"]["min"]
-            self.result = round((1 / self.tmp) * 1000000)
-            Dt.NODES["Light_Max_CT_" + n] = self.result
+            dl.update({"tmp": (data["props"]["colourTemperature"]["min"])})
+            dl.update(dict(end=(round((1 / dl['tmp']) * 1000000))))
+            Data.NODES["Light_Max_CT_" + n] = dl['end']
         except KeyError:
             pass
 
-        self.log.log("Light", "Max Colour temperature of light " + Dt.NAME[n]
-                     + " is: " + str(self.result))
+        self.log.log("Light", "Max Colour temperature of light " + Data.NAME[n]
+                     + " is: " + str(dl['end']))
 
-        return self.result
+        return dl['end']
 
     def get_color_temp(self, n):
         """Get light current color temperature."""
         self.log.log("Light", "Getting colour temperature of light: "
-                     + Dt.NAME[n])
-        self.__init__()
-        data = Dt.products[n]
+                     + Data.NAME[n])
+        dl = self.data_list()
+        data = Data.products[n]
 
         try:
-            self.tmp = data["state"]["colourTemperature"]
-            self.result = round((1 / self.tmp) * 1000000)
-            Dt.NODES["Light_CT_" + n] = self.result
+            dl.update({"tmp": (data["state"]["colourTemperature"])})
+            dl.update(dict(end=(round((1 / dl['tmp']) * 1000000))))
+            Data.NODES["Light_CT_" + n] = dl['end']
         except KeyError:
             pass
 
-        self.log.log("Light", "Colour temperature of light " + Dt.NAME[n]
-                     + " is: " + str(self.result))
+        self.log.log("Light", "Colour temperature of light " + Data.NAME[n]
+                     + " is: " + str(dl['end']))
 
-        return self.result if self.result is not None \
-            else Dt.NODES.get("Light_CT_" + n)
+        return dl['end'] if dl['end'] is False \
+            else Data.NODES.get("Light_CT_" + n)
 
     def get_color(self, n):
         """Get light current colour"""
-        self.log.log("Light", "Getting colour of light : " + Dt.NAME[n])
-        self.__init__()
-        data = Dt.products[n]
+        self.log.log("Light", "Getting colour of light : " + Data.NAME[n])
+        dl = self.data_list()
+        data = Data.products[n]
 
         try:
-            self.tmp = [
+            dl.update(dict(tmp=(
                 ((data["state"]["hue"]) / 360),
                 ((data["state"]["saturation"]) / 100),
-                ((data["state"]["value"]) / 100)]
-            self.result = tuple(int(i * 255) for i in colorsys.hsv_to_rgb(
-                self.tmp[0],
-                self.tmp[1],
-                self.tmp[2]))
-            Dt.NODES["Light_Color_" + n] = self.result
+                ((data["state"]["value"]) / 100))))
+            dl.update(
+                dict(end=(tuple(int(i * 255) for i in colorsys.hsv_to_rgb(
+                    dl['tmp'][0],
+                    dl['tmp'][1],
+                    dl['tmp'][2])))))
+            Data.NODES["Light_Color_" + n] = dl['end']
         except KeyError:
             pass
 
-        self.log.log("Light", "Colour of light " + Dt.NAME[n] + " is: "
-                     + str(self.result))
+        self.log.log("Light", "Colour of light " + Data.NAME[n] + " is: "
+                     + str(dl['end']))
 
-        return self.result if self.result is not None \
-            else Dt.NODES.get("Light_Color_" + n)
+        return dl['end'] if dl['end'] is False \
+            else Data.NODES.get("Light_Color_" + n)
 
     def turn_off(self, n):
         """Set light to turn off."""
         from .pyhiveapi import Pyhiveapi
-        self.log.log("Light", "Turning off light : " + Dt.NAME[n])
-        self.__init__()
+        self.log.log("Light", "Turning off light : " + Data.NAME[n])
+        dl = self.data_list()
         Pyhiveapi.check_hive_api_logon(Pyhiveapi())
-        data = Dt.products[n]
+        data = Data.products[n]
 
-        self.resp = self.hive.set_state(Dt.s_session_id, data['type'], n)
-        if str(self.resp['original']) == "<Response [200]>":
-            self.result = True
+        dl.update({'resp': (self.hive.set_state(Data.sess_id, data['type'],
+                                                n, "OFF"))})
+        if str(dl['resp']['original']) == "<Response [200]>":
+            dl.update({'end': True})
             Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
-            self.log.log("Light", "Light " + Dt.NAME[n]
-                         + " has been sucessfully switched off")
+            self.log.log("Light", "Light " + Data.NAME[n]
+                         + " has been successfully switched off")
         else:
-            self.log.log("Light", "Failed to switch off light: " + Dt.NAME[n])
+            self.log.log("Light", "Failed to switch off - " + Data.NAME[n])
 
-        return self.result
+        return dl['end']
 
-    def turn_on(self, node_id, nodedevicetype, new_brightness,
-                new_color_temp, new_color):
+    def turn_on(self, n, brightness, color_temp, color):
         """Set light to turn on."""
-        if HSC.logging.all or HSC.logging.light:
-            Pyhiveapi.logger("Turning on light : " + node_id)
-        Pyhiveapi.check_hive_api_logon(self)
+        from .pyhiveapi import Pyhiveapi
+        self.log.log("Light", "Turning on light : " + Data.NAME[n])
+        dl = self.data_list()
+        Pyhiveapi.check_hive_api_logon(Pyhiveapi())
+        data = Data.products[n]
 
-        if new_brightness is not None:
-            Pyhiveapi.Light.set_brightness(self, node_id, new_brightness)
-        if new_color_temp is not None:
-            Pyhiveapi.Light.set_color_temp(self, node_id, nodedevicetype,
-                                           new_color_temp)
-        if new_color is not None:
-            Pyhiveapi.Light.set_color(self, node_id, new_color)
+        if brightness is not None:
+            self.set_brightness(n, brightness)
+        if color_temp is not None:
+            self.set_color_temp(n, color_temp)
+        if color is not None:
+            self.set_color(n, color)
 
-        node_index = -1
+        dl.update({'resp': (self.hive.set_state(Data.sess_id, data['type'],
+                                                n, 'ON'))})
+        if str(dl['resp']['original']) == "<Response [200]>":
+            dl.update({'end': True})
+            Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
+            self.log.log("Light", "Light " + Data.NAME[n]
+                         + " has been successfully switched on")
+        else:
+            self.log.log("Light", "Failed to switch on light: " + Data.NAME[n])
 
-        set_mode_success = False
-        api_resp_d = {}
-        api_resp = ""
+        return dl['end']
 
-        if HSC.session_id is not None:
-            if len(HSC.products.light) > 0:
-                for cni in range(0, len(HSC.products.light)):
-                    if "id" in HSC.products.light[cni]:
-                        if HSC.products.light[cni]["id"] == node_id:
-                            node_index = cni
-                            break
-                if node_index != -1:
-                    json_string_content = '{"status": "ON"}'
-                    hive_api_url = (HIVE_API.urls.nodes
-                                    + '/' + HSC.products.light[node_index][
-                                        "type"]
-                                    + '/' + HSC.products.light[node_index][
-                                        "id"])
-                    api_resp_d = Pyhiveapi.hive_api_json_call("POST",
-                                                              hive_api_url,
-                                                              json_string_content,
-                                                              False)
+    def set_brightness(self, n, brightness):
+        """Set brightness of the light."""
+        from .pyhiveapi import Pyhiveapi
+        self.log.log("Light", "Setting brightness of : " + Data.NAME[n])
+        dl = self.data_list()
+        Pyhiveapi.check_hive_api_logon(Pyhiveapi())
+        data = Data.products[n]
 
-                    api_resp = api_resp_d['original']
+        dl.update({'resp': (self.hive.set_brightness(Data.sess_id,
+                                                     data['type'], n,
+                                                     brightness))})
+        if str(dl['resp']['original']) == "<Response [200]>":
+            dl['end'] = True
+            Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
+            self.log.log("Light", "successfully set the brightness of " +
+                         Data.NAME[n] + " to : " + str(brightness))
+        else:
+            self.log.log("Light", "Failed to set brightness for light: " +
+                         Data.NAME[n])
 
-                if str(api_resp) == "<Response [200]>":
-                    Pyhiveapi.hive_api_get_nodes(self, node_id)
-                    set_mode_success = True
-                    if HSC.logging.all or HSC.logging.light:
-                        Pyhiveapi.logger(
-                            "Light " + HSC.products.light[node_index]["state"][
-                                "name"] +
-                            " has been sucessfully switched on")
+        return dl['end']
 
-        return set_mode_success
-
-    def set_brightness(self, node_id, new_brightness):
+    def set_color_temp(self, n, color_temp):
         """Set light to turn on."""
-        if HSC.logging.all or HSC.logging.light:
-            Pyhiveapi.logger("Setting brightness of : " + node_id)
-        Pyhiveapi.check_hive_api_logon(self)
+        from .pyhiveapi import Pyhiveapi
+        self.log.log("Light", "Setting color temp of : " + Data.NAME[n])
+        dl = self.data_list()
+        Pyhiveapi.check_hive_api_logon(Pyhiveapi())
+        data = Data.products[n]
 
-        node_index = -1
+        if data['type'] == "tuneablelight":
+            dl.update({'resp': (self.hive.set_color_temp(Data.sess_id,
+                                                         data['type'], n,
+                                                         color_temp))})
+        else:
+            self.hive.set_color(Data.sess_id, data['type'], n,
+                                '48', '70', '96')
+            dl.update({'resp': (self.hive.set_color_temp(Data.sess_id,
+                                                         data['type'], n,
+                                                         color_temp))})
 
-        set_mode_success = False
-        api_resp_d = {}
-        api_resp = ""
+        if str(dl['resp']['original']) == "<Response [200]>":
+            dl.update({'end': True})
+            Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
+            self.log.log("Light", "successfully set the color temp of " +
+                         Data.NAME[n] + " to : " + str(color_temp))
+        else:
+            self.log.log("Light", "Failed to set color temp for light: " +
+                         Data.NAME[n])
 
-        if HSC.session_id is not None:
-            if len(HSC.products.light) > 0:
-                for cni in range(0, len(HSC.products.light)):
-                    if "id" in HSC.products.light[cni]:
-                        if HSC.products.light[cni]["id"] == node_id:
-                            node_index = cni
-                            break
-                if node_index != -1:
-                    json_string_content = \
-                        ('{"status": "ON", "brightness": '
-                         + str(new_brightness)
-                         + '}')
-                    hive_api_url = (HIVE_API.urls.nodes
-                                    + '/' + HSC.products.light[node_index][
-                                        "type"]
-                                    + '/' + HSC.products.light[node_index][
-                                        "id"])
-                    api_resp_d = Pyhiveapi.hive_api_json_call("POST",
-                                                              hive_api_url,
-                                                              json_string_content,
-                                                              False)
+        return dl['end']
 
-                    api_resp = api_resp_d['original']
-
-                if str(api_resp) == "<Response [200]>":
-                    Pyhiveapi.hive_api_get_nodes(self, node_id)
-                    set_mode_success = True
-                    if HSC.logging.all or HSC.logging.light:
-                        Pyhiveapi.logger("Sucessfully set the brightness " +
-                                         HSC.products.light[node_index][
-                                             "state"]["name"] +
-                                         " to : " + str(new_brightness))
-
-        return set_mode_success
-
-    def set_color_temp(self, node_id, nodedevicetype, new_color_temp):
+    def set_color(self, n, new_color):
         """Set light to turn on."""
-        if HSC.logging.all or HSC.logging.light:
-            Pyhiveapi.logger("Setting colour temperature of : " + node_id)
-        Pyhiveapi.check_hive_api_logon(self)
+        from .pyhiveapi import Pyhiveapi
+        self.log.log("Light", "Setting color of : " + Data.NAME[n])
+        dl = self.data_list()
+        Pyhiveapi.check_hive_api_logon(Pyhiveapi())
+        data = Data.products[n]
 
-        node_index = -1
+        dl.update({'resp': (self.hive.set_color(Data.sess_id, data['type'], n,
+                                                str(new_color[0]),
+                                                str(new_color[1]),
+                                                str(new_color[2])))})
+        if str(dl['resp']['original']) == "<Response [200]>":
+            dl.update({'end': True})
+            Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
+            self.log.log("Light", "successfully set the color for " +
+                         Data.NAME[n] + ' to : {hue: "' + str(new_color[0]) +
+                         ', "saturation": ' + str(new_color[1]) +
+                         ', "value": ' + str(new_color[2]) + '}')
+        else:
+            self.log.log("Light", "Failed to set color for light: " +
+                         Data.NAME[n])
 
-        set_mode_success = False
-        api_resp_d = {}
-        api_resp = ""
-
-        if HSC.session_id is not None:
-            if len(HSC.products.light) > 0:
-                for cni in range(0, len(HSC.products.light)):
-                    if "id" in HSC.products.light[cni]:
-                        if HSC.products.light[cni]["id"] == node_id:
-                            node_index = cni
-                            break
-                if node_index != -1:
-                    if nodedevicetype == "tuneablelight":
-                        json_string_content = '{"colourTemperature": ' + str(
-                            new_color_temp) + '}'
-                    else:
-                        json_string_content = '{"colourMode": "COLOUR", ' \
-                                              '"hue": "48", ' \
-                                              '"saturation": "70", ' \
-                                              '"value": "96"}'
-                        hive_api_url = (HIVE_API.urls.nodes
-                                        + '/' +
-                                        HSC.products.light[node_index][
-                                            "type"]
-                                        + '/' +
-                                        HSC.products.light[node_index][
-                                            "id"])
-                        api_resp_d = Pyhiveapi.hive_api_json_call("POST",
-                                                                  hive_api_url,
-                                                                  json_string_content,
-                                                                  False)
-
-                        json_string_content = '{"colourMode": "WHITE", "colourTemperature": ' + str(
-                            new_color_temp) + '}'
-                    hive_api_url = (HIVE_API.urls.nodes
-                                    + '/' + HSC.products.light[node_index][
-                                        "type"]
-                                    + '/' + HSC.products.light[node_index][
-                                        "id"])
-
-                    api_resp_d = Pyhiveapi.hive_api_json_call("POST",
-                                                              hive_api_url,
-                                                              json_string_content,
-                                                              False)
-
-                    api_resp = api_resp_d['original']
-
-                if str(api_resp) == "<Response [200]>":
-                    Pyhiveapi.hive_api_get_nodes(self, node_id)
-                    set_mode_success = True
-                    if HSC.logging.all or HSC.logging.light:
-                        Pyhiveapi.logger(
-                            "Sucessfully set the colour temperature for " +
-                            HSC.products.light[node_index]["state"]["name"] +
-                            " to : " + str(new_color_temp))
-
-        return set_mode_success
-
-    def set_color(self, node_id, new_color):
-        """Set light to turn on."""
-        if HSC.logging.all or HSC.logging.light:
-            Pyhiveapi.logger("Setting colour of : " + node_id)
-        Pyhiveapi.check_hive_api_logon(self)
-
-        node_index = -1
-
-        set_mode_success = False
-        api_resp_d = {}
-        api_resp = ""
-        new_hue = None
-        new_saturation = None
-        new_value = None
-
-        if HSC.session_id is not None:
-            if len(HSC.products.light) > 0:
-                for cni in range(0, len(HSC.products.light)):
-                    if "id" in HSC.products.light[cni]:
-                        if HSC.products.light[cni]["id"] == node_id:
-                            node_index = cni
-                            break
-                if node_index != -1:
-                    new_hue = new_color[0]
-                    new_saturation = new_color[1]
-                    new_value = new_color[2]
-                    json_string_content = '{"colourMode": "COLOUR", "hue": ' + str(
-                        new_hue) + ', "saturation": ' + str(
-                        new_saturation) + ', "value": ' + str(
-                        new_value) + '}'
-                    hive_api_url = (HIVE_API.urls.nodes
-                                    + '/' + HSC.products.light[node_index][
-                                        "type"]
-                                    + '/' + HSC.products.light[node_index][
-                                        "id"])
-                    api_resp_d = Pyhiveapi.hive_api_json_call("POST",
-                                                              hive_api_url,
-                                                              json_string_content,
-                                                              False)
-
-                    api_resp = api_resp_d['original']
-
-                if str(api_resp) == "<Response [200]>":
-                    Pyhiveapi.hive_api_get_nodes(self, node_id)
-                    set_mode_success = True
-                    if HSC.logging.all or HSC.logging.light:
-                        Pyhiveapi.logger("Sucessfully set the colour for " +
-                                         HSC.products.light[node_index][
-                                             "state"]["name"] +
-                                         " to : {hue: " + str(new_hue) +
-                                         ', "saturation": ' + str(
-                            new_saturation) +
-                                         ', "value": ' + str(new_value) + '}')
-
-                return set_mode_success
+        return dl['end']

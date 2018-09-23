@@ -2,21 +2,27 @@
 
 from datetime import datetime
 
-NODE_INTERVAL_DEFAULT = 120
-WEATHER_INTERVAL_DEFAULT = 600
+
 
 
 class Data:
     """Data class"""
 
+    NODE_INTERVAL_DEFAULT = 120
+    WEATHER_INTERVAL_DEFAULT = 600
+
     # API Data
+    MODE = []
+    BATTERY = []
     products = None
     devices = None
     NODES = {"Header": "HeaderText"}
-    HIVETOHA = {"Light":{"ON": True, "OFF": False, 'offline': False}}
+    HIVETOHA = {"Light": {"ON": True, "OFF": False, "offline": False},
+                "Switch": {"ON": True, "OFF": False, "offline": False},
+                "Attribute": {True: "online", False: "offline"}}
     NAME = {}
     types = {'hub': ['hub'],
-             'thermostat': ['thermostatui'],
+             'thermo': ['thermostatui'],
              'heating': ['heating'],
              'hotwater': ['hotwater'],
              'plug': ['activeplug'],
@@ -25,8 +31,8 @@ class Data:
              'sensor': ['motionsensor', 'contactsensor']}
 
     # Session Data
+    sess_id = ""
     s_platform_name = '',
-    s_session_id = ""
     s_logon_datetime = datetime(2017, 1, 1, 12, 0, 0)
     s_username = ""
     s_password = ""

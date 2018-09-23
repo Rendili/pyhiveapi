@@ -1,125 +1,81 @@
 """Attributes Class."""
+from .data import Data
 from .logging import Logger
-from .data import Data as Dt
 
 
 class Attributes:
-        """Device Attributes Weather."""
-        def __init__(self):
-            self.log = Logger()
+    """Device Attributes Weather."""
 
-        def state_attributes(self, node):
-            """Get HA State Attributes"""
-            self.log.log("attribute", "Getting state_attributes for: " + node)
+    def __init__(self):
+        self.log = Logger()
+        self.type = "Attribute"
 
-            state_attributes = {}
+    @staticmethod
+    def data_list():
+        return {"tmp": None, "end": False, "resp": False}
 
-            available = self.online_offline(node)
-            if available != 'UNKNOWN':
-                state_attributes.update({"availability": available})
-            battery = self.battery_level(node)
-            if battery != 'UNKNOWN':
-                state_attributes.update({"battery_level": str(battery) + "%"})
-            mode = self.get_mode(node)
-            if mode != 'UNKNOWN':
-                state_attributes.update({"mode": mode})
+    def state_attributes(self, n):
+        """Get HA State Attributes"""
+        self.log.log("attribute", "Getting state_attributes for: " + n)
+        state_attributes = {}
 
-            return state_attributes
+        state_attributes.update({"availability": (self.online_offline(n))})
+        if n in Data.BATTERY:
+            state_attributes.update({"battery_level": str(self.batt(n)) + "%"})
+        if n in Data.MODE:
+            state_attributes.update({"mode": (self.get_mode(n))})
 
-        def online_offline(self, node):
-            """Check if device is online"""
-            self.log.log("attribute", "Checking device availability for : "
-                         + node)
+        return state_attributes
 
-            hive_data_tmp = ""
-            hive_data_return = "UNKNOWN"
-            cna = "Device_Availability_" + node
-            data = Dt.devices[node]
+    def online_offline(self, n):
+        """Check if device is online"""
+        self.log.log("attribute", "Checking device availability for : "
+                     + Data.NAME[n])
+        dl = self.data_list()
+        data = Data.devices[n]
 
-            try:
-                hive_data_tmp = data["props"]["online"]
-                hive_data_found = True
-            except KeyError:
-                hive_data_found = False
+        try:
+            dl.update({"end": (data["props"]["online"])})
+            Data.NODES["Device_Availability_" + n] = dl['end']
+            self.log.log("attribute", "Availability of device "
+                         + Data.NAME[n] + " is : "
+                         + Data.HIVETOHA[type].get(dl['end']))
+        except KeyError:
+            self.log.log("attribute", "Device does not have "
+                         + "availability info : " + Data.NAME[n])
 
-            if hive_data_found:
-                Dt.NODES[cna] = hive_data_tmp
-                if hive_data_tmp:
-                    hive_data_return = 'online'
-                elif not hive_data_tmp:
-                    hive_data_return = 'offline'
-            else:
-                if cna in Dt.NODES:
-                    hive_data_return = Dt.NODES.get(cna)
-                else:
-                    hive_data_return = "UNKNOWN"
+        return Data.HIVETOHA[self.type].get(dl['end'], 'UNKNOWN')
 
-            if hive_data_return != "UNKNOWN":
-                self.log.log("attribute", "Availability of device "
-                             + data["state"]["name"] + " is : "
-                             + hive_data_return)
-            else:
-                self.log.log("attribute", "Device does not have "
-                             + "availability info : " + node)
+    def get_mode(self, n):
+        """Get sensor mode."""
+        self.log.log("attribute", "Checking device mode for : " +
+                     Data.NAME[n])
+        dl = self.data_list()
+        data = Data.products[n]
 
-            return hive_data_return
+        try:
+            dl.update({"end": (data["state"]["mode"])})
+            Data.NODES["Device_Mode_" + n] = dl['end']
+            self.log.log("attribute", "Mode for device "
+                         + Data.NAME[n] + " is : " + str(dl['end']))
+        except KeyError:
+            self.log.log("attribute", "Device does not have mode info : "
+                         + Data.NAME[n])
+        return dl['end']
 
-        def get_mode(self, node):
-            """Get sensor mode."""
-            self.log.log("attribute", "Checking device mode for : " + node)
+    def batt(self, n):
+        """Get device battery level."""
+        self.log.log("attribute", "Checking battery level for : " +
+                     Data.NAME[n])
+        dl = self.data_list()
+        data = Data.devices[n]
 
-            hive_data_tmp = ""
-            cna = "Device_Mode_" + node
-            data = Dt.products[node]
-
-            try:
-                hive_data_tmp = data["state"]["mode"]
-                hive_data_found = True
-            except KeyError:
-                hive_data_found = False
-
-            if hive_data_found:
-                Dt.NODES[cna] = hive_data_tmp
-                hive_data_return = hive_data_tmp
-            else:
-                hive_data_return = "UNKNOWN"
-
-            if hive_data_return != "UNKNOWN":
-                self.log.log("attribute", "Mode for device "
-                             + data["state"]["name"] + " is : "
-                             + hive_data_return)
-            else:
-                self.log.log("attribute", "Device does not have mode info : "
-                             + node)
-
-            return hive_data_return
-
-        def battery_level(self, node):
-            """Get device battery level."""
-            self.log.log("attribute", "Checking battery level for : " + node)
-
-            hive_data_tmp = 0
-            cna = "BatteryLevel_" + node
-            data = Dt.devices[node]
-
-            try:
-                hive_data_tmp = data["props"]["battery"]
-                hive_data_found = True
-            except KeyError:
-                hive_data_found = False
-
-            if hive_data_found:
-                Dt.NODES[cna] = hive_data_tmp
-                hive_data_return = hive_data_tmp
-            else:
-                hive_data_return = 'UNKNOWN'
-
-            if hive_data_return != 'UNKNOWN':
-                self.log.log("attribute", "Battery level for device "
-                             + data["state"]["name"] + " is : "
-                             + str(hive_data_return) + "%")
-            else:
-                self.log.log("attribute", "Device does not have battery info: "
-                             + node)
-
-            return hive_data_return
+        try:
+            dl.update({"end": (data["props"]["battery"])})
+            Data.NODES["BatteryLevel_" + n] = dl['end']
+            self.log.log("attribute", "Battery level for device "
+                         + Data.NAME[n] + " is : " + str(dl['end']))
+        except KeyError:
+            self.log.log("attribute", "Could not get battery level for : "
+                         + Data.NAME[n])
+        return dl['end']

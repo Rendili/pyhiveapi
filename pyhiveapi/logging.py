@@ -1,8 +1,9 @@
 """Logger.py"""
 
-from .data import Data as Dt
-from datetime import datetime
 import os
+from datetime import datetime
+
+from .data import Data
 
 
 class Logger:
@@ -14,21 +15,23 @@ class Logger:
     @staticmethod
     def check_logging(new_session):
         """Check Logging Active"""
-        Dt.l_o_folder = os.path.expanduser('~') + "/pyhiveapi"
-        Dt.l_o_file = Dt.l_o_folder + "/pyhiveapi.log"
+        Data.l_o_folder = os.path.expanduser('~') + "/.homeassistant/pyhiveapi"
+        Data.l_o_file = Data.l_o_folder + "/pyhiveapi.log"
         try:
-            if new_session and os.path.isfile(Dt.l_o_file):
-                os.remove(Dt.l_o_file)
+            if new_session and os.path.isfile(Data.l_o_file):
+                os.remove(Data.l_o_file)
 
-            if os.path.isdir(Dt.l_o_folder):
-                for a in Dt.l_files:
-                    t = Dt.l_o_folder + "/" + Dt.l_files[a]
+            if os.path.isdir(Data.l_o_folder):
+                for a in Data.l_files:
+                    t = Data.l_o_folder + "/" + Data.l_files[a]
                     if os.path.isfile(t):
-                        Dt.l_values.update({a: True})
-                        Dt.l_values.update({'enabled': True})
+                        Data.l_values.update({a: True})
+                        Data.l_values.update({'enabled': True})
+            elif not os.path.isdir(Data.l_o_folder):
+                Data.l_values = {}
         except FileNotFoundError:
-            Dt.l_values.update({'all': False})
-            Dt.l_values.update({'enabled': False})
+            Data.l_values.update({'all': False})
+            Data.l_values.update({'enabled': False})
 
     @staticmethod
     def log(log_type, new_message):
@@ -37,20 +40,24 @@ class Logger:
         if '_' in log_type:
             x = log_type.split("_")
             for i in x:
-                if i in Dt.l_values:
-                    f = i
-                    break
-        else:
-            f = log_type
+                if i in Data.l_values or 'all' in Data.l_values:
+                    if Data.l_values['enabled']:
+                        f = True
+                        break
+        elif log_type in Data.l_values or 'all' in Data.l_values:
+            if Data.l_values['enabled']:
+                f = True
 
-        if f in Dt.l_values and Dt.l_values['enabled']:
+        if f:
             try:
-                l_file = open(Dt.l_o_file, "a")
+                l_file = open(Data.l_o_file, "a")
                 l_file.write(datetime.now().strftime("%d-%b-%Y %H:%M:%S")
                              + " : " + new_message + "\n")
                 l_file.close()
             except FileNotFoundError:
                 pass
+        else:
+            pass
 
     @staticmethod
     def error():

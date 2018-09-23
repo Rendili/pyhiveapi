@@ -91,35 +91,72 @@ class Hive:
                                     data=jsc, timeout=self.timeout)
             self.json_return.update({'original': str(response)})
             self.json_return.update({'parsed': response.json()})
-        except (IOError, RuntimeError, ZeroDivisionError):
+        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
             self.error()
 
         return self.json_return
 
-    def set_state(self, session_id, type, id):
+    def set_state(self, session_id, n_type, n_id, command):
         self.headers.update({'authorization': session_id})
-        jsc = '{"status": "OFF"}'
-        url = self.urls['base'] + self.urls['nodes'].format(type, id)
+        jsc = '{{"status": "{0}"}}'.format(str(command))
+        url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
         try:
             response = requests.post(url=url, headers=self.headers,
                                      data=jsc, timeout=self.timeout)
             self.json_return.update({'original': str(response)})
             self.json_return.update({'parsed': response.json()})
-        except (IOError, RuntimeError, ZeroDivisionError):
+        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
             self.error()
 
         return self.json_return
 
-
-
-    def set_brightness(self, session_id):
+    def set_brightness(self, session_id, n_type, n_id, brightness):
         self.headers.update({'authorization': session_id})
+        jsc = '{{"status": "ON", "brightness": {0}}}'.format(brightness)
+        url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
+        try:
+            response = requests.post(url=url, headers=self.headers,
+                                     data=jsc, timeout=self.timeout)
+            self.json_return.update({'original': str(response)})
+            self.json_return.update({'parsed': response.json()})
+        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
+            self.error()
 
-    def set_colour_temp(self, session_id):
-        self.headers.update({'authorization': session_id})
+        return self.json_return
 
-    def set_colour(self, session_id):
+    def set_color_temp(self, session_id, n_type, n_id, color_temp):
         self.headers.update({'authorization': session_id})
+        if n_type == "tuneablelight":
+            jsc = '{{"colourTemperature": "{0}"}}'.format(color_temp)
+        else:
+            jsc = '{"colourMode": "WHITE", "colourTemperature": ' \
+                  + '"0}"}'.format(color_temp)
+        url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
+        try:
+            response = requests.post(url=url, headers=self.headers,
+                                     data=jsc, timeout=self.timeout)
+            self.json_return.update({'original': str(response)})
+            self.json_return.update({'parsed': response.json()})
+        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
+            self.error()
+
+        return self.json_return
+
+    def set_color(self, session_id, n_type, n_id, hue, sat, val):
+        self.headers.update({'authorization': session_id})
+        jsc = '{{"colourMode": "COLOUR", "hue": "{0}", "saturation": "{1}", ' \
+              + '"value": "{2}"}}'.format(hue, sat, val)
+
+        url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
+        try:
+            response = requests.post(url=url, headers=self.headers,
+                                     data=jsc, timeout=self.timeout)
+            self.json_return.update({'original': str(response)})
+            self.json_return.update({'parsed': response.json()})
+        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
+            self.error()
+
+        return self.json_return
 
     def error(self):
         self.json_return.update({'original': "Error parsing JSON data"})
