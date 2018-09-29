@@ -40,7 +40,9 @@ class Attributes:
             self.log.log("attribute", "Availability of device "
                          + Data.NAME[n] + " is : "
                          + Data.HIVETOHA[type].get(dl['end']))
-        except KeyError:
+            raise KeyError
+        except KeyError as ex:
+            self.log.log("attribute", "EXCEPTION OCCURED" + str(ex))
             self.log.log("attribute", "Device does not have "
                          + "availability info : " + Data.NAME[n])
 
@@ -59,6 +61,7 @@ class Attributes:
             self.log.log("attribute", "Mode for device "
                          + Data.NAME[n] + " is : " + str(dl['end']))
         except KeyError:
+            self.log.log("attribute", "EXCEPTION OCCURED")
             self.log.log("attribute", "Device does not have mode info : "
                          + Data.NAME[n])
         return dl['end']
@@ -76,6 +79,7 @@ class Attributes:
             self.log.log("attribute", "Battery level for device "
                          + Data.NAME[n] + " is : " + str(dl['end']))
         except KeyError:
+            self.log.log("attribute", "EXCEPTION OCCURED")
             self.log.log("attribute", "Could not get battery level for : "
                          + Data.NAME[n])
         return dl['end']

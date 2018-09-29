@@ -27,7 +27,7 @@ class Logger:
                     if os.path.isfile(t):
                         Data.l_values.update({a: True})
                         Data.l_values.update({'enabled': True})
-            elif not os.path.isdir(Data.l_o_folder):
+            else:
                 Data.l_values = {}
         except FileNotFoundError:
             Data.l_values.update({'all': False})
