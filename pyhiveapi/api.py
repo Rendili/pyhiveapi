@@ -160,4 +160,4 @@ class Hive:
 
     def error(self):
         self.json_return.update({'original': "Error parsing JSON data"})
-        self.json_return.update({'original': "Error parsing JSON data"})
+        self.json_return.update({'parsed': "Error parsing JSON data"})
