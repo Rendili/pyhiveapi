@@ -6,15 +6,8 @@ from datetime import datetime
 from datetime import timedelta
 
 from .api import Hive
-from .attributes import Attributes
 from .data import Data
-from .heating import Heating
-from .hotwater import Hotwater
-from .light import Light
 from .logging import Logger
-from .sensor import Sensor
-from .switch import Switch
-from .weather import Weather
 
 MINUTES_BETWEEN_LOGONS = 15
 
@@ -26,13 +19,6 @@ class Pyhiveapi:
         """Initialise the base variable values."""
         self.lock = threading.Lock()
         self.api = Hive()
-        self.attibutes = Attributes()
-        self.heating = Heating()
-        self.hotwater = Hotwater()
-        self.light = Light()
-        self.sensor = Sensor()
-        self.switch = Switch()
-        self.weather = Weather()
         self.log = Logger()
 
     def hive_api_logon(self):
