@@ -1,5 +1,5 @@
-from .api import Hive
-from .pyhiveapi import Pyhiveapi
+from .hive_api import Hive
+from .hive_session import Pyhiveapi
 from .heating import Heating
 from .hotwater import Hotwater
 from .light import Light
@@ -7,5 +7,5 @@ from .logging import Logger
 from .switch import Switch
 from .sensor import Sensor
 from .weather import Weather
-from .attributes import Attributes
-from .data import Data
+from .device_attributes import Attributes
+from .hive_data import Data

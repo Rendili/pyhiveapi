@@ -1,7 +1,7 @@
 """Switch Class Code."""
-from .api import Hive
+from .hive_api import Hive
 from .attributes import Attributes
-from .data import Data
+from .hive_data import Data
 from .logging import Logger
 
 
