@@ -7,7 +7,6 @@ from .hive_data import Data
 
 class Logger:
     """Custom Logging Code."""
-    
     def __init__(self):
         """Logger Initialisation"""
 
@@ -50,8 +49,8 @@ class Logger:
         if f:
             try:
                 l_file = open(Data.l_o_file, "a")
-                l_file.write(datetime.now().strftime("%d-%b-%Y %H:%M:%S")
-                             + " : " + new_message + "\n")
+                l_file.write(datetime.now().strftime("%d-%b-%Y %H:%M:%S") +
+                             " : " + new_message + "\n")
                 l_file.close()
             except FileNotFoundError:
                 pass
