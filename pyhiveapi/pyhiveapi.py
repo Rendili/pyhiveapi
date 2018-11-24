@@ -143,11 +143,11 @@ class Pyhiveapi:
 
                 api_resp = str(api_resp_d['original'])
                 if api_resp == "<Response [200]>":
-                    self.log.log('core_http', "Devices API call "
-                                 + "successful: " + api_resp)
+                    self.log.log('core_http', "Devices API call " +
+                                 "successful: " + api_resp)
                 else:
-                    self.log.log('core_http', "Devices API call "
-                                 + "failed : " + api_resp)
+                    self.log.log('core_http', "Devices API call " +
+                                 "failed : " + api_resp)
 
             api_resp_p = api_resp_d['parsed']
 
@@ -166,11 +166,11 @@ class Pyhiveapi:
             elif Data.sess_id is not None:
                 resp = self.api.get_products(Data.sess_id)
                 if resp['original'] == "<Response [200]>":
-                    self.log.log('core_http', "Products API "
-                                 + "successful: " + resp['original'])
+                    self.log.log('core_http', "Products API " +
+                                 "successful: " + resp['original'])
                 else:
-                    self.log.log('core_http', "Products API "
-                                 + "failed : " + resp['original'])
+                    self.log.log('core_http', "Products API " +
+                                 "failed : " + resp['original'])
 
             for a_product in resp['parsed']:
                 if 'id' in a_product:
@@ -183,14 +183,15 @@ class Pyhiveapi:
             get_nodes_successful = True
 
         if get_nodes_successful:
+            Data.data_present = 'Y'
             Data.s_last_update = datetime.now()
             now = datetime.now()
 
-            start_date = str(now.day) + '.' + str(now.month) + '.' \
-                         + str(now.year) + ' 00:00:00'
+            start_date = str(now.day) + '.' + str(now.month) + \
+                '.' + str(now.year) + ' 00:00:00'
             fromepoch = self.epochtime(start_date) * 1000
             end_date = str(now.day) + '.' + str(now.month) + '.' \
-                       + str(now.year) + ' 23:59:59'
+                + str(now.year) + ' 23:59:59'
             toepoch = self.epochtime(end_date) * 1000
             for sensor in Data.products:
                 if Data.products[sensor]["type"] == "motionsensor":
@@ -205,14 +206,14 @@ class Pyhiveapi:
                                 'inMotion']
 
                         self.log.log('core_http',
-                                     "Sensor " + p["state"]["name"]
-                                     + " - " + "HTTP call successful : "
-                                     + resp['original'])
+                                     "Sensor " + p["state"]["name"] +
+                                     " - " + "HTTP call successful : " +
+                                     resp['original'])
                     else:
-                        self.log.log('core_http', "Sensor "
-                                     + p["state"]["name"] + " - "
-                                     + "HTTP call failed : "
-                                     + resp['original'])
+                        self.log.log('core_http', "Sensor " +
+                                     p["state"]["name"] + " - " +
+                                     "HTTP call failed : " +
+                                     resp['original'])
         return get_nodes_successful
 
     def hive_api_get_weather(self):
@@ -255,9 +256,9 @@ class Pyhiveapi:
     def p_minutes_to_time(minutes_to_convert):
         """Convert minutes string to datetime."""
         hours_converted, minutes_converted = divmod(minutes_to_convert, 60)
-        converted_time = datetime.strptime(str(hours_converted)
-                                           + ":"
-                                           + str(minutes_converted),
+        converted_time = datetime.strptime(str(hours_converted) +
+                                           ":" +
+                                           str(minutes_converted),
                                            "%H:%M")
         converted_time_string = converted_time.strftime("%H:%M")
         return converted_time_string
@@ -294,9 +295,9 @@ class Pyhiveapi:
 
                 slot_date = datetime.now() + timedelta(days=day_index)
                 slot_time = self.p_minutes_to_time(current_slot_custom[
-                                                       "start"])
-                slot_time_date_s = (slot_date.strftime("%d-%m-%Y")
-                                    + " " + slot_time)
+                    "start"])
+                slot_time_date_s = (slot_date.strftime("%d-%m-%Y") +
+                                    " " + slot_time)
                 slot_time_date_dt = datetime.strptime(slot_time_date_s,
                                                       "%d-%m-%Y %H:%M")
                 if slot_time_date_dt <= date_time_now:
@@ -313,8 +314,8 @@ class Pyhiveapi:
         schedule_next = fsl_sorted[0]
         schedule_later = fsl_sorted[1]
 
-        schedule_now['Start_DateTime'] = (schedule_now['Start_DateTime']
-                                          - timedelta(days=7))
+        schedule_now['Start_DateTime'] = (schedule_now['Start_DateTime'] -
+                                          timedelta(days=7))
 
         schedule_now['End_DateTime'] = schedule_next['Start_DateTime']
         schedule_next['End_DateTime'] = schedule_later['Start_DateTime']
@@ -390,17 +391,17 @@ class Pyhiveapi:
                                                 'Hive_DeviceType': "Heating",
                                                 'Thermostat_NodeID': d["id"]})
                                 sensor.append({'HA_DeviceType':
-                                                   'Heating_CurrentTemperature',
+                                               'Heating_CurrentTemperature',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                                 sensor.append({'HA_DeviceType':
-                                                   'Heating_TargetTemperature',
+                                               'Heating_TargetTemperature',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                                 sensor.append({'HA_DeviceType':
-                                                   'Heating_State',
+                                               'Heating_State',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
@@ -409,13 +410,13 @@ class Pyhiveapi:
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                                 sensor.append({'HA_DeviceType':
-                                                   'Heating_Boost',
+                                               'Heating_Boost',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                             except KeyError:
-                                self.log.log('core', "Failed to get hive "
-                                             + "heating")
+                                self.log.log('core', "Failed to get hive " +
+                                             "heating")
 
         count = sum(1 for i in Data.products
                     if Data.products[i]['type'] == 'hotwater')
@@ -485,7 +486,7 @@ class Pyhiveapi:
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
                     sensor.append({'HA_DeviceType':
-                                       'Hive_Device_Light_Availability',
+                                   'Hive_Device_Light_Availability',
                                    'Hive_NodeID': p["id"],
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
@@ -508,7 +509,7 @@ class Pyhiveapi:
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
                     sensor.append({'HA_DeviceType':
-                                       'Hive_Device_Plug_Availability',
+                                   'Hive_Device_Plug_Availability',
                                    'Hive_NodeID': p["id"],
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
@@ -521,7 +522,7 @@ class Pyhiveapi:
                 try:
                     Data.NAME.update({p["id"]: p["state"]["name"]})
                     binary_sensor.append({'HA_DeviceType':
-                                              'Hive_Device_Binary_Sensor',
+                                          'Hive_Device_Binary_Sensor',
                                           'Hive_NodeID': p["id"],
                                           'Hive_NodeName': p["state"]["name"],
                                           "Hive_DeviceType": p["type"]})

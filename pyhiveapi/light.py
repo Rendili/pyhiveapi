@@ -1,15 +1,13 @@
 """Light Class Code."""
 import colorsys
-
 from .api import Hive
-from .attributes import Attributes
 from .data import Data
 from .logging import Logger
+from .attributes import Attributes
 
 
 class Light:
     """Home Assistant Hive Lights."""
-
     def __init__(self):
         """Initialise."""
         self.hive = Hive()
@@ -17,27 +15,20 @@ class Light:
         self.attr = Attributes()
         self.type = "Light"
 
-    @staticmethod
-    def data_list():
-        return {"tmp": None, "end": False, "resp": False}
-
     def get_state(self, n):
         """Get light current state."""
         self.log.log('light', "Getting state of light: " + Data.NAME[n])
-        dl = self.data_list()
-        dl.update({"end": (self.attr.online_offline(n))})
+        end = self.attr.online_offline(n)
         data = Data.products[n]
 
-        if dl['end'] != 'offline':
-            try:
-                dl.update({"end": (data["state"]["status"])})
-                Data.NODES["Light_State_" + n] = dl['end']
-            except KeyError:
-                self.log.log('switch', "Failed to get state - " + Data.NAME[n])
+        if end != 'offline' and Data.data_present == 'Y':
+            end = data["state"]["status"]
+            Data.NODES["Light_State_" + n] = end
+        else:
+            self.log.log('switch', "Failed to get state - " + Data.NAME[n])
 
-        self.log.log('light', "State of light " + Data.NAME[n] + " is: "
-                     + dl['end'])
-        return Data.HIVETOHA[self.type].get(dl['end'],
+        self.log.log('light', "State of light " + Data.NAME[n] + " is: " + end)
+        return Data.HIVETOHA[self.type].get(end,
                                             Data.NODES.get("Light_State_" + n))
 
     def get_brightness(self, n):
@@ -53,16 +44,16 @@ class Light:
         except KeyError:
             pass
 
-        self.log.log("Light", "Brightness of light " + Data.NAME[n] + " is: "
-                     + str(dl['end']))
+        self.log.log("Light", "Brightness of light " + Data.NAME[n] + " is: " +
+                     str(dl['end']))
 
         return dl['end'] if dl['end'] is False \
             else Data.NODES.get("Light_Bright_" + n)
 
     def get_min_color_temp(self, n):
         """Get light minimum color temperature."""
-        self.log.log("Light", "Getting min colour temperature of light: "
-                     + Data.NAME[n])
+        self.log.log("Light", "Getting min colour temperature of light: " +
+                     Data.NAME[n])
         dl = self.data_list()
         data = Data.products[n]
 
@@ -73,15 +64,16 @@ class Light:
         except KeyError:
             pass
 
-        self.log.log("Light", "Min Colour temperature of light " + Data.NAME[n]
-                     + " is: " + str(dl['end']))
+        self.log.log("Light", "Min Colour temperature of light " +
+                     Data.NAME[n] + " is: " + str(dl['end']))
 
         return dl['end']
 
     def get_max_color_temp(self, n):
         """Get light maximum color temperature."""
-        self.log.log("Light", "Getting max colour temperature of light: "
-                     + Data.NAME[n])
+        self.log.log("Light", "Getting max colour temperature of light: " +
+                     Data.NAME[n])
+
         dl = self.data_list()
         data = Data.products[n]
 
@@ -92,15 +84,15 @@ class Light:
         except KeyError:
             pass
 
-        self.log.log("Light", "Max Colour temperature of light " + Data.NAME[n]
-                     + " is: " + str(dl['end']))
+        self.log.log("Light", "Max Colour temperature of light " +
+                     Data.NAME[n] + " is: " + str(dl['end']))
 
         return dl['end']
 
     def get_color_temp(self, n):
         """Get light current color temperature."""
-        self.log.log("Light", "Getting colour temperature of light: "
-                     + Data.NAME[n])
+        self.log.log("Light", "Getting colour temperature of light: " +
+                     Data.NAME[n])
         dl = self.data_list()
         data = Data.products[n]
 
@@ -111,8 +103,8 @@ class Light:
         except KeyError:
             pass
 
-        self.log.log("Light", "Colour temperature of light " + Data.NAME[n]
-                     + " is: " + str(dl['end']))
+        self.log.log("Light", "Colour temperature of light " +
+                     Data.NAME[n] + " is: " + str(dl['end']))
 
         return dl['end'] if dl['end'] is False \
             else Data.NODES.get("Light_CT_" + n)
@@ -137,8 +129,8 @@ class Light:
         except KeyError:
             pass
 
-        self.log.log("Light", "Colour of light " + Data.NAME[n] + " is: "
-                     + str(dl['end']))
+        self.log.log("Light", "Colour of light " + Data.NAME[n] + " is: " +
+                     str(dl['end']))
 
         return dl['end'] if dl['end'] is False \
             else Data.NODES.get("Light_Color_" + n)
@@ -156,8 +148,8 @@ class Light:
         if str(dl['resp']['original']) == "<Response [200]>":
             dl.update({'end': True})
             Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
-            self.log.log("Light", "Light " + Data.NAME[n]
-                         + " has been successfully switched off")
+            self.log.log("Light", "Light " + Data.NAME[n] +
+                         " has been successfully switched off")
         else:
             self.log.log("Light", "Failed to switch off - " + Data.NAME[n])
 
@@ -183,8 +175,8 @@ class Light:
         if str(dl['resp']['original']) == "<Response [200]>":
             dl.update({'end': True})
             Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
-            self.log.log("Light", "Light " + Data.NAME[n]
-                         + " has been successfully switched on")
+            self.log.log("Light", "Light " + Data.NAME[n] +
+                         " has been successfully switched on")
         else:
             self.log.log("Light", "Failed to switch on light: " + Data.NAME[n])
 
