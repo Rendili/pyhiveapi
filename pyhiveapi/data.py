@@ -3,8 +3,6 @@
 from datetime import datetime
 
 
-
-
 class Data:
     """Data class"""
 
