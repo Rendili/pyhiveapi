@@ -1,12 +1,12 @@
-"""Switch Class Code."""
+"""Hive Switch Module."""
+from .custom_logging import Logger
+from .device_attributes import Attributes
 from .hive_api import Hive
-from .attributes import Attributes
 from .hive_data import Data
-from .logging import Logger
 
 
 class Switch:
-    """Hive Switch Class."""
+    """Hive Switch Code."""
     def __init__(self):
         """Initialise."""
         self.hive = Hive()
@@ -49,7 +49,7 @@ class Switch:
 
     def turn_on(self, n):
         """Set smart plug to turn on."""
-        from .pyhiveapi import Pyhiveapi
+        from .hive_session import Pyhiveapi
         self.log.log('switch', "Turning on switch : " + Data.NAME[n])
         resp = None
         end = False
@@ -70,7 +70,7 @@ class Switch:
 
     def turn_off(self, n):
         """Set smart plug to turn off."""
-        from .pyhiveapi import Pyhiveapi
+        from .hive_session import Pyhiveapi
         self.log.log('switch', "Turning off switch : " + Data.NAME[n])
         resp = None
         end = False

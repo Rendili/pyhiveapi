@@ -1,13 +1,12 @@
-"""Logger.py"""
+"""Custom Logging Module."""
 
 import os
 from datetime import datetime
-
-from .data import Data
+from .hive_data import Data
 
 
 class Logger:
-    """Logger Class."""
+    """Custom Logging Code."""
     
     def __init__(self):
         """Logger Initialisation"""

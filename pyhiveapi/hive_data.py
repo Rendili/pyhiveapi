@@ -1,10 +1,9 @@
-# Pyhiveapi Data
-
+"""Hive Data Module."""
 from datetime import datetime
 
 
 class Data:
-    """Data class"""
+    """Hive Data"""
 
     NODE_INTERVAL_DEFAULT = 120
     WEATHER_INTERVAL_DEFAULT = 600

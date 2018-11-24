@@ -1,19 +1,17 @@
-""" Pyhiveapi."""
+""" Hive Session Module."""
 import operator
 import threading
 import time
-from datetime import datetime
-from datetime import timedelta
-
-from .api import Hive
-from .data import Data
-from .logging import Logger
+from datetime import datetime, timedelta
+from .custom_logging import Logger
+from .hive_api import Hive
+from .hive_data import Data
 
 MINUTES_BETWEEN_LOGONS = 15
 
 
 class Pyhiveapi:
-    """api Class"""
+    """Hive Session Code"""
 
     def __init__(self):
         """Initialise the base variable values."""

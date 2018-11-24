@@ -1,10 +1,10 @@
-"""Attributes Class."""
-from .data import Data
-from .logging import Logger
+"""Hive Device Attribute Module."""
+from .custom_logging import Logger
+from .hive_data import Data
 
 
 class Attributes:
-    """Device Attributes Weather."""
+    """Device Attributes Code."""
 
     def __init__(self):
         self.log = Logger()

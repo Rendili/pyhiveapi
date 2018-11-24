@@ -1,9 +1,9 @@
-"""Hive APi."""
+"""Hive API Module."""
 import requests
 
 
 class Hive:
-    """Hive API Class."""
+    """Hive API Code."""
 
     def __init__(self):
         """Hive API initialisation."""

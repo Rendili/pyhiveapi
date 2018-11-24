@@ -1,13 +1,14 @@
-"""Light Class Code."""
+"""Hive Light Module."""
 import colorsys
-from .api import Hive
-from .data import Data
-from .logging import Logger
-from .attributes import Attributes
+
+from .custom_logging import Logger
+from .device_attributes import Attributes
+from .hive_api import Hive
+from .hive_data import Data
 
 
 class Light:
-    """Home Assistant Hive Lights."""
+    """Hive Light Code."""
     def __init__(self):
         """Initialise."""
         self.hive = Hive()
@@ -126,7 +127,7 @@ class Light:
 
     def turn_off(self, n):
         """Set light to turn off."""
-        from .pyhiveapi import Pyhiveapi
+        from .hive_session import Pyhiveapi
         self.log.log("Light", "Turning off light : " + Data.NAME[n])
         resp = None
         end = False
@@ -146,7 +147,7 @@ class Light:
 
     def turn_on(self, n, brightness, color_temp, color):
         """Set light to turn on."""
-        from .pyhiveapi import Pyhiveapi
+        from .hive_session import Pyhiveapi
         self.log.log("Light", "Turning on light : " + Data.NAME[n])
         resp = None
         end = False
@@ -173,7 +174,7 @@ class Light:
 
     def set_brightness(self, n, brightness):
         """Set brightness of the light."""
-        from .pyhiveapi import Pyhiveapi
+        from .hive_session import Pyhiveapi
         self.log.log("Light", "Setting brightness of : " + Data.NAME[n])
         resp = None
         end = False
@@ -195,7 +196,7 @@ class Light:
 
     def set_color_temp(self, n, color_temp):
         """Set light to turn on."""
-        from .pyhiveapi import Pyhiveapi
+        from .hive_session import Pyhiveapi
         self.log.log("Light", "Setting color temp of : " + Data.NAME[n])
         resp = None
         end = False
@@ -224,7 +225,7 @@ class Light:
 
     def set_color(self, n, new_color):
         """Set light to turn on."""
-        from .pyhiveapi import Pyhiveapi
+        from .hive_session import Pyhiveapi
         self.log.log("Light", "Setting color of : " + Data.NAME[n])
         resp = None
         end = False

@@ -1,7 +1,8 @@
-from .api import Hive
+""""Hive Hotwater Module. """
+from .hive_api import Hive
 
 class Hotwater():
-        """Hive Hotwater."""
+        """Hive Hotwater Code."""
 
         def get_mode(self, node_id):
             """Get hot water current mode."""

@@ -1,10 +1,8 @@
-
+"""Hive Heating Module."""
 from .api import Hive
 
-
-
 class Heating():
-        """Hive Switches."""
+        """Hive Heating Code."""
 
         def min_temperature(self, node_id):
             """Get heating minimum target temperature."""

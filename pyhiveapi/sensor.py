@@ -1,10 +1,9 @@
-
-
-from .api import Hive
+"""Hive Sensor Module."""
+from .hive_api import Hive
 
 
 class Sensor():
-    """Hive Sensors."""
+    """Hive Sensor Code."""
 
     def hub_online_status(self, node_id):
         """Get the online status of the Hive hub."""
