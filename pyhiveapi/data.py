@@ -8,7 +8,7 @@ class Data:
 
     NODE_INTERVAL_DEFAULT = 120
     WEATHER_INTERVAL_DEFAULT = 600
-    data_present = 'N'
+    data_present = False
 
     # API Data
     MODE = []
