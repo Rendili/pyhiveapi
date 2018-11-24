@@ -12,3 +12,4 @@ __pycache__/
 .tox
 .cache
 .vscode/settings.json
+.idea
