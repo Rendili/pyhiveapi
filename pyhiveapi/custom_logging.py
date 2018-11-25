@@ -1,5 +1,4 @@
 """Custom Logging Module."""
-
 import os
 from datetime import datetime
 from .hive_data import Data
@@ -7,6 +6,7 @@ from .hive_data import Data
 
 class Logger:
     """Custom Logging Code."""
+
     def __init__(self):
         """Logger Initialisation"""
 
@@ -15,6 +15,7 @@ class Logger:
         """Check Logging Active"""
         Data.l_o_folder = os.path.expanduser('~') + "/.homeassistant/pyhiveapi"
         Data.l_o_file = Data.l_o_folder + "/pyhiveapi.log"
+        count = 0
         try:
             if new_session and os.path.isfile(Data.l_o_file):
                 os.remove(Data.l_o_file)
@@ -25,11 +26,12 @@ class Logger:
                     if os.path.isfile(t):
                         Data.l_values.update({a: True})
                         Data.l_values.update({'enabled': True})
-            else:
-                Data.l_values = {}
+                    elif os.path.isfile(t) is False:
+                        count += 1
+                        if count == len(Data.l_files):
+                            Data.l_values = {}
         except FileNotFoundError:
-            Data.l_values.update({'all': False})
-            Data.l_values.update({'enabled': False})
+            Data.l_values = {}
 
     @staticmethod
     def log(log_type, new_message):
