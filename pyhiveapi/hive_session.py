@@ -3,9 +3,9 @@ import operator
 import threading
 import time
 from datetime import datetime, timedelta
-from .custom_logging import Logger
-from .hive_api import Hive
-from .hive_data import Data
+from pyhiveapi.custom_logging import Logger
+from pyhiveapi.hive_api import Hive
+from pyhiveapi.hive_data import Data
 
 MINUTES_BETWEEN_LOGONS = 15
 

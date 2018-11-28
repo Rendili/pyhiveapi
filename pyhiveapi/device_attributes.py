@@ -1,6 +1,6 @@
 """Hive Device Attribute Module."""
-from .custom_logging import Logger
-from .hive_data import Data
+from pyhiveapi.custom_logging import Logger
+from pyhiveapi.hive_data import Data
 
 
 class Attributes:

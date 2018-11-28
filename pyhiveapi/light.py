@@ -1,10 +1,10 @@
 """Hive Light Module."""
 import colorsys
 
-from .custom_logging import Logger
-from .device_attributes import Attributes
-from .hive_api import Hive
-from .hive_data import Data
+from pyhiveapi.custom_logging import Logger
+from pyhiveapi.device_attributes import Attributes
+from pyhiveapi.hive_api import Hive
+from pyhiveapi.hive_data import Data
 
 
 class Light:

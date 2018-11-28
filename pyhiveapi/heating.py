@@ -1,5 +1,5 @@
 """Hive Heating Module."""
-from .api import Hive
+from pyhiveapi.hive_api import Hive
 
 class Heating():
         """Hive Heating Code."""
