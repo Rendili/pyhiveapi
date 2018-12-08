@@ -33,4 +33,5 @@ class Sensor():
             self.log.log('sensor', "Failed to get state for " + Data.NAME[n])
 
         return Data.HIVETOHA[self.type].get(end,
-                                            Data.NODES.get("Sensor_State_" + n))
+                                            Data.NODES.get(
+                                                "Sensor_State_" + n))
