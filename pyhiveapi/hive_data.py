@@ -13,16 +13,23 @@ class Data:
     BATTERY = []
     products = None
     devices = None
+    actions = None
     NODES = {"Header": "HeaderText"}
-    HIVETOHA = {"Attribute": {True: "online", False: "offline"},
+    HIVETOHA = {"Attribute": {"Status": {True: "Online", False: "Offline"},
+                              "Smoke": {True: "Alarm Detected", False:
+                                        "Nothing Detected"},
+                              "Dog": {True: "Dog Bark Detected", False:
+                                      "Nothing Detected"},
+                              "Glass": {True: "Broken Glass Detected", False:
+                                        "Nothing Detected"}},
                 "Hub": {True: "Online", False: "Offline"},
                 "Light": {"ON": True, "OFF": False, "offline": False},
                 "Sensor": {"OPEN": True, "CLOSED": False, True: True,
-                           False: False, "offline": False},
+                                         False: False, "offline": False},
                 "Switch": {"ON": True, "OFF": False, "offline": False}
                 }
     NAME = {}
-    types = {'hub': ['hub'],
+    types = {'hub': ['hub', 'sense'],
              'thermo': ['thermostatui'],
              'heating': ['heating'],
              'hotwater': ['hotwater'],

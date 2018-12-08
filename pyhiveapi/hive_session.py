@@ -160,7 +160,7 @@ class Pyhiveapi:
         try:
             resp = None
             if Data.s_file:
-                resp = file['devices']
+                resp = file['products']
             elif Data.sess_id is not None:
                 resp = self.api.get_products(Data.sess_id)
                 if resp['original'] == "<Response [200]>":
@@ -177,11 +177,31 @@ class Pyhiveapi:
         except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
             try_finished_products = False
 
-        if try_finished_devices and try_finished_products:
-            get_nodes_successful = True
+        try:
+            resp = None
+            if Data.s_file:
+                resp = file['actions']
+            elif Data.sess_id is not None:
+                resp = self.api.get_actions(Data.sess_id)
+                if resp['original'] == "<Response [200]>":
+                    self.log.log('core_http', "Actions API " +
+                                 "successful: " + resp['original'])
+                else:
+                    self.log.log('core_http', "Actions API " +
+                                 "failed : " + resp['original'])
 
-        if get_nodes_successful:
+            for a_action in resp['parsed']:
+                if 'id' in a_action:
+                    Data.actions.update({a_action['id']: a_action})
+            try_finished_actions = True
+        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
+            try_finished_actions = False
+
+        if try_finished_devices and try_finished_products \
+                and try_finished_actions:
+            get_nodes_successful = True
             Data.s_last_update = datetime.now()
+
         return get_nodes_successful
 
     def hive_api_get_weather(self):
@@ -324,7 +344,7 @@ class Pyhiveapi:
         binary_sensor = []
         climate = []
         light = []
-        plug = []
+        switch = []
 
         for a_device in Data.devices:
             if Data.devices[a_device]["type"] in Data.types['hub']:
@@ -334,6 +354,29 @@ class Pyhiveapi:
                     sensor.append({'HA_DeviceType': 'Hub_OnlineStatus',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"],
+                                   "Hive_DeviceType": "Hub"})
+                except KeyError:
+                    self.log.log('core', "Failed to get hive hubs")
+
+        for a_product in Data.products:
+            if Data.products[a_product]["type"] in Data.types['hub']:
+                d = Data.products[a_product]
+                try:
+                    Data.NAME.update({d["id"]: d["state"]["name"]})
+                    sensor.append({'HA_DeviceType': 'Hub_SMOKE_CO',
+                                   'Hive_NodeID': d["id"],
+                                   'Hive_NodeName': d["state"]["name"] +
+                                   " Smoke Detection",
+                                   "Hive_DeviceType": "Hub"})
+                    sensor.append({'HA_DeviceType': 'Hub_DOG_BARK',
+                                   'Hive_NodeID': d["id"],
+                                   'Hive_NodeName': d["state"]["name"] +
+                                   " Dog Bark Detection",
+                                   "Hive_DeviceType": "Hub"})
+                    sensor.append({'HA_DeviceType': 'Hub_GLASS_BREAK',
+                                   'Hive_NodeID': d["id"],
+                                   'Hive_NodeName': d["state"]["name"] +
+                                   " Glass Break Detection",
                                    "Hive_DeviceType": "Hub"})
                 except KeyError:
                     self.log.log('core', "Failed to get hive hubs")
@@ -467,11 +510,11 @@ class Pyhiveapi:
                 Data.MODE.append(p["id"])
                 try:
                     Data.NAME.update({p["id"]: p["state"]["name"]})
-                    plug.append({'HA_DeviceType': 'Hive_Device_Plug',
-                                 'Hive_Plug_DeviceType': p["type"],
-                                 'Hive_NodeID': p["id"],
-                                 'Hive_NodeName': p["state"]["name"],
-                                 "Hive_DeviceType": "Switch"})
+                    switch.append({'HA_DeviceType': 'Hive_Device_Plug',
+                                   'Hive_Switch_DeviceType': p["type"],
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': p["state"]["name"],
+                                   "Hive_DeviceType": "Switch"})
                     sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Mode',
                                    'Hive_NodeID': p["id"],
                                    'Hive_NodeName': p["state"]["name"],
@@ -481,6 +524,18 @@ class Pyhiveapi:
                                    'Hive_NodeID': p["id"],
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
+                except KeyError:
+                    self.log.log('core', "Failed to get hive plugs")
+
+        for action in Data.actions:
+                a = Data.actions[action]
+                try:
+                    Data.NAME.update({a["id"]: a["name"]})
+                    switch.append({'HA_DeviceType': 'Hive_Action',
+                                   'Hive_Switch_DeviceType': "Action",
+                                   'Hive_NodeID': a["id"],
+                                   'Hive_NodeName': a["name"],
+                                   "Hive_DeviceType": "Action"})
                 except KeyError:
                     self.log.log('core', "Failed to get hive plugs")
 
@@ -507,7 +562,7 @@ class Pyhiveapi:
         device_all['device_list_binary_sensor'] = binary_sensor
         device_all['device_list_climate'] = climate
         device_all['device_list_light'] = light
-        device_all['device_list_plug'] = plug
+        device_all['device_list_plug'] = switch
 
         self.log.log('core', "api initialised")
 

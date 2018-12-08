@@ -1,6 +1,7 @@
 """"Hive Hotwater Module. """
 from pyhiveapi.hive_api import Hive
 
+
 class Hotwater():
         """Hive Hotwater Code."""
 

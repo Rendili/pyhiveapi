@@ -14,6 +14,7 @@ class Hive:
             'holiday_mode': "/holiday-mode",
             'devices': "/devices",
             'products': "/products",
+            'actions': "/actions",
             'nodes': "/nodes/{0}/{1}"
         }
         self.headers = {'content-type': 'application/json',
@@ -65,11 +66,25 @@ class Hive:
 
         return self.json_return
 
+    def get_actions(self, session_id):
+        self.headers.update({'authorization': session_id})
+        url = self.urls['base'] + self.urls['actions']
+        try:
+            jsc = None
+            response = requests.get(url=url, headers=self.headers,
+                                    data=jsc, timeout=self.timeout)
+            self.json_return.update({'original': str(response)})
+            self.json_return.update({'parsed': response.json()})
+        except (IOError, RuntimeError, ZeroDivisionError):
+            self.error()
+
+        return self.json_return
+
     def motion_sensor(self, session_id, sensor, fromepoch, toepoch):
         self.headers.update({'authorization': session_id})
-        url = (self.urls['base'] + self.urls['products'] + '/'
-               + sensor["type"] + '/' + sensor["id"]
-               + '/events?from=' + str(fromepoch) + '&to=' + str(toepoch))
+        url = (self.urls['base'] + self.urls['products'] + '/' +
+               sensor["type"] + '/' + sensor["id"] +
+               '/events?from=' + str(fromepoch) + '&to=' + str(toepoch))
         try:
             jsc = None
             response = requests.get(url=url, headers=self.headers,
