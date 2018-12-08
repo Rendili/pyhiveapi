@@ -69,6 +69,7 @@ class Data:
     l_o_folder = ""
     l_o_file = ""
     l_files = {'all': "logging.all",
+               'action': 'logging.aciton',
                'core': "logging.core",
                'http': "logging.http",
                'heating': "logging.heating",

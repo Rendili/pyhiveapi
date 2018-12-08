@@ -27,8 +27,8 @@ class Sensor():
             elif data["type"] == "motionsensor":
                 end = data["props"]["motion"]["status"]
             Data.NODES["Sensor_State_" + n] = end
-            self.log.log('sensor', "State for " + data["props"]["status"] +
-                         " - " + data["state"]["name"] + " is : " + str(end))
+            self.log.log('sensor', "State for " + Data.NAME[n] +
+                         " is : " + str(end))
         else:
             self.log.log('sensor', "Failed to get state for " + Data.NAME[n])
 
