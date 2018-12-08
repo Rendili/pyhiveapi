@@ -10,7 +10,7 @@ from pyhiveapi.hive_data import Data
 MINUTES_BETWEEN_LOGONS = 15
 
 
-class Pyhiveapi:
+class Session:
     """Hive Session Code"""
 
     def __init__(self):
