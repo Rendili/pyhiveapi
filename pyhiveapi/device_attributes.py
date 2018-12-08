@@ -29,7 +29,7 @@ class Attributes:
                      Data.NAME[n])
         end = 'offline'
 
-        if Data.data_present:
+        if n in Data.devices:
             data = Data.devices[n]
             end = data["props"]["online"]
             Data.NODES["Device_Availability_" + n] = end
@@ -48,7 +48,7 @@ class Attributes:
                      Data.NAME[n])
         end = None
 
-        if Data.data_present:
+        if n in Data.products:
             data = Data.products[n]
             end = data["state"]["mode"]
             Data.NODES["Device_Mode_" + n] = end
@@ -65,7 +65,7 @@ class Attributes:
                      Data.NAME[n])
         end = None
 
-        if Data.data_present:
+        if n in Data.devices:
             data = Data.devices[n]
             end = data["props"]["battery"]
             Data.NODES["BatteryLevel_" + n] = end

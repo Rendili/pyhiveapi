@@ -7,7 +7,6 @@ class Data:
 
     NODE_INTERVAL_DEFAULT = 120
     WEATHER_INTERVAL_DEFAULT = 600
-    data_present = False
 
     # API Data
     MODE = []
@@ -15,9 +14,13 @@ class Data:
     products = None
     devices = None
     NODES = {"Header": "HeaderText"}
-    HIVETOHA = {"Light": {"ON": True, "OFF": False, "offline": False},
-                "Switch": {"ON": True, "OFF": False, "offline": False},
-                "Attribute": {True: "online", False: "offline"}}
+    HIVETOHA = {"Attribute": {True: "online", False: "offline"},
+                "Hub": {True: "Online", False: "Offline"},
+                "Light": {"ON": True, "OFF": False, "offline": False},
+                "Sensor": {"OPEN": True, "CLOSED": False, True: True,
+                           False: False, "offline": False},
+                "Switch": {"ON": True, "OFF": False, "offline": False}
+                }
     NAME = {}
     types = {'hub': ['hub'],
              'thermo': ['thermostatui'],

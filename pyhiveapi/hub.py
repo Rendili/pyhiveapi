@@ -1,26 +1,34 @@
 """Hive Hub Module."""
 from pyhiveapi.hive_api import Hive
 from pyhiveapi.hive_data import Data
+from pyhiveapi.custom_logging import Logger
+from pyhiveapi.device_attributes import Attributes
 
 
 class Hub:
     """ Hive Hub Code. """
 
-    def hub_online_status(self, node_id):
+    def __init__(self):
+        """Initialise."""
+        self.hive = Hive()
+        self.log = Logger()
+        self.attr = Attributes()
+        self.type = "Hub"
+
+    def hub_online_status(self, n):
         """Get the online status of the Hive hub."""
-        if HSC.logging.all or HSC.logging.sensor:
-            Pyhiveapi.logger("Getting Hive hub status: " + node_id)
-        return_status = "Offline"
+        self.log.log('sensor', "Getting Hive hub status: " +
+                     Data.NAME[n])
+        tmp = None
+        end = None
 
-        for a_hub in HSC.devices.hub:
-            if "id" in a_hub:
-                if a_hub["id"] == node_id:
-                    if "props" in a_hub and "online" in a_hub["props"]:
-                        if a_hub["props"]["online"]:
-                            return_status = "Online"
-                        else:
-                            return_status = "Offline"
-        if HSC.logging.all or HSC.logging.sensor:
-            Pyhiveapi.logger("Hive hub status is : " + return_status)
+        if n in Data.devices:
+            data = Data.devices[n]
+            tmp = data["props"]["online"]
+            end = Data.HIVETOHA[self.type][tmp]
+            Data.NODES["Sensor_State_" + n] = end
+            self.log.log('sensor', "Hive hub status is : " + end)
+        else:
+            self.log.log('sensor', "Failed to get state: " + Data.NAME[n])
 
-        return return_status
+        return end if end is None else Data.NODES.get("Sensor_State_" + n)

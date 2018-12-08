@@ -181,7 +181,6 @@ class Pyhiveapi:
             get_nodes_successful = True
 
         if get_nodes_successful:
-            Data.data_present = True
             Data.s_last_update = datetime.now()
         return get_nodes_successful
 

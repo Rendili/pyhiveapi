@@ -21,7 +21,7 @@ class Light:
         self.log.log('light', "Getting state of light: " + Data.NAME[n])
         end = self.attr.online_offline(n)
 
-        if end != 'offline' and Data.data_present:
+        if end != 'offline' and n in Data.products:
             data = Data.products[n]
             end = data["state"]["status"]
             Data.NODES["Light_State_" + n] = end
@@ -38,7 +38,7 @@ class Light:
         tmp = None
         end = False
 
-        if Data.data_present:
+        if n in Data.products:
             data = Data.products[n]
             tmp = data["state"]["brightness"]
             end = ((tmp / 100) * 255)
@@ -55,7 +55,7 @@ class Light:
         tmp = None
         end = None
 
-        if Data.data_present:
+        if n in Data.products:
             data = Data.products[n]
             tmp = data["props"]["colourTemperature"]["max"]
             end = round((1 / tmp) * 1000000)
@@ -73,7 +73,7 @@ class Light:
         tmp = 0
         end = None
 
-        if Data.data_present:
+        if n in Data.products:
             data = Data.products[n]
             tmp = data["props"]["colourTemperature"]["min"]
             end = round((1 / tmp) * 1000000)
@@ -91,7 +91,7 @@ class Light:
         tmp = 0
         end = None
 
-        if Data.data_present:
+        if n in Data.products:
             data = Data.products[n]
             tmp = data["state"]["colourTemperature"]
             end = round((1 / tmp) * 1000000)
@@ -108,7 +108,7 @@ class Light:
         tmp = []
         end = None
 
-        if Data.data_present:
+        if n in Data.products:
             data = Data.products[n]
             tmp = dict(
                 ((data["state"]["hue"]) / 360),

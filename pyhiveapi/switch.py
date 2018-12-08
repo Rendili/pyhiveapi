@@ -20,7 +20,7 @@ class Switch:
         end = self.attr.online_offline(n)
         data = Data.products[n]
 
-        if end != 'offline' and Data.data_present:
+        if end != 'offline' and n in Data.products:
             end = data["state"]["status"]
             Data.NODES["Switch_State" + n] = end
         else:
@@ -37,7 +37,7 @@ class Switch:
         self.log.log('switch', "Getting power usage for: " + Data.NAME[n])
         end = None
 
-        if Data.data_present:
+        if n in Data.products:
             data = Data.products[n]
             end = data["props"]["powerConsumption"]
             Data.NODES["Switch_State" + n] = end
