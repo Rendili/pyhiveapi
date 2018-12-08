@@ -49,17 +49,17 @@ class Plug:
 
     def turn_on(self, n):
         """Set smart plug to turn on."""
-        from .hive_session import Pyhiveapi
+        from .hive_session import Session
         self.log.log('switch', "Turning on switch : " + Data.NAME[n])
         resp = None
         end = False
-        Pyhiveapi.check_hive_api_logon(Pyhiveapi())
+        Session.check_hive_api_logon(Session())
         data = Data.products[n]
 
         resp = self.hive.set_state(Data.sess_id, data['type'], n, 'ON')
         if str(resp['original']) == "<Response [200]>":
             end = True
-            Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
+            Session.hive_api_get_nodes(Session(), n, False)
             self.log.log("switch", "Switch  " + Data.NAME[n] +
                          " has been successfully switched on")
         else:
@@ -70,17 +70,17 @@ class Plug:
 
     def turn_off(self, n):
         """Set smart plug to turn off."""
-        from .hive_session import Pyhiveapi
+        from .hive_session import Session
         self.log.log('switch', "Turning off switch : " + Data.NAME[n])
         resp = None
         end = False
-        Pyhiveapi.check_hive_api_logon(Pyhiveapi())
+        Session.check_hive_api_logon(Session())
         data = Data.products[n]
 
         resp = self.hive.set_state(Data.sess_id, data['type'], n, 'OFF')
         if str(resp['original']) == "<Response [200]>":
             end = True
-            Pyhiveapi.hive_api_get_nodes(Pyhiveapi(), n, False)
+            Session.hive_api_get_nodes(Session(), n, False)
             self.log.log("switch", "Switch  " + Data.NAME[n] +
                          " has been successfully switched off")
         else:
