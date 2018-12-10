@@ -2797,10 +2797,10 @@ class Pyhiveapi:
                 NODE_ATTRIBS[current_node_attribute] = battery_level_tmp
                 battery_level_return = battery_level_tmp
             else:
-                battery_level_return = 'UNKNOWN'
+                battery_level_return = None
 
             if HSC.logging.all or HSC.logging.attribute:
-                if battery_level_return != 'UNKNOWN':
+                if battery_level_return is not None:
                     Pyhiveapi.logger("Battery level for device " +
                                      data[node_index]["state"]["name"] +
                                      " is : " + str(battery_level_return) + "%")
