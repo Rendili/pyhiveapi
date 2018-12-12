@@ -1103,7 +1103,7 @@ class Pyhiveapi:
             else:
                 current_temp_return = 0
 
-            return current_temp_return
+            return round(float(current_temp_return),1)
 
         def minmax_temperatures(self, node_id):
             """Min/Max Temp"""
@@ -1167,7 +1167,7 @@ class Pyhiveapi:
                 else:
                     heating_target_temp_return = 0
 
-            return heating_target_temp_return
+            return round(float(heating_target_temp_return),1)
 
         def get_mode(self, node_id):
             """Get heating current mode."""
@@ -2646,7 +2646,7 @@ class Pyhiveapi:
 
         def temperature(self):
             """Get Hive Weather temperature."""
-            return HSC.weather.temperature.value
+            return round(float(HSC.weather.temperature.value),1)
 
     class Attributes():
         """Device Attributes Weather."""
@@ -2701,9 +2701,9 @@ class Pyhiveapi:
                 NODE_ATTRIBS[
                     current_node_attribute] = hive_device_availibility_tmp
                 if hive_device_availibility_tmp == True:
-                    hive_device_availibility_return = 'online'
+                    hive_device_availibility_return = 'Online'
                 elif hive_device_availibility_tmp == False:
-                    hive_device_availibility_return = 'offline'
+                    hive_device_availibility_return = 'Offline'
             else:
                 if current_node_attribute in NODE_ATTRIBS:
                     hive_device_availibility_return = NODE_ATTRIBS.get(
