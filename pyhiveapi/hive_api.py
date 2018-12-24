@@ -113,8 +113,12 @@ class Hive:
 
     def set_state(self, session_id, n_type, n_id, command):
         self.headers.update({'authorization': session_id})
-        jsc = '{{"status": "{0}"}}'.format(str(command))
-        url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
+        if n_type == "action":
+            jsc = command
+            self.urls['base'] + self.urls['actions'] + "/" + n_id
+        else:
+            jsc = '{{"status": "{0}"}}'.format(str(command))
+            url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
         try:
             response = requests.post(url=url, headers=self.headers,
                                      data=jsc, timeout=self.timeout)
@@ -174,5 +178,5 @@ class Hive:
         return self.json_return
 
     def error(self):
-        self.json_return.update({'original': "Error parsing JSON data"})
-        self.json_return.update({'parsed': "Error parsing JSON data"})
+        self.json_return.update({'original': "Error getting JSON data"})
+        self.json_return.update({'parsed': "Error getting JSON data"})

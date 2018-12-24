@@ -41,7 +41,7 @@ class Action:
         data = Data.actions[n]
 
         data.update({"enabled": "true"})
-        resp = self.hive.set_state(Data.sess_id, data['type'], n, data)
+        resp = self.hive.set_state(Data.sess_id, "action", n, data)
         if str(resp['original']) == "<Response [200]>":
             end = True
             Session.hive_api_get_nodes(Session(), n, False)

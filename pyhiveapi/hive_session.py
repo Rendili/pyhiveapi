@@ -116,8 +116,9 @@ class Session:
 
         return updated
 
-    def hive_api_get_nodes_nl(self, file):
+    def hive_api_get_nodes_nl(self, **kwargs):
         """Get latest data for Hive nodes - not rate limiting."""
+        file = kwargs.get('file', False)
         if file:
             Data.s_file = True
 
@@ -315,12 +316,13 @@ class Session:
 
         return schedule_now_and_next
 
-    def initialise_api(self, username, password, interval, file, session):
+    def initialise_api(self, username, password, interval, **kwargs):
         """Setup the Hive platform."""
-        self.log.check_logging(session)
+        self.log.check_logging(kwargs.get('session', False))
         Data.s_username = username
         Data.s_password = password
         self.log.log('core', "api initialising")
+        file = kwargs.get('file', None)
 
         if interval < 30:
             interval = Data.NODE_INTERVAL_DEFAULT
@@ -333,7 +335,7 @@ class Session:
             self.hive_api_logon()
             if Data.sess_id is not None:
                 Data.s_interval_seconds = interval
-                self.hive_api_get_nodes_nl(file)
+                self.hive_api_get_nodes_nl()
                 self.hive_api_get_weather()
 
         if Data.devices is None or Data.products is None:

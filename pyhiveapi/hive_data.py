@@ -15,17 +15,17 @@ class Data:
     devices = None
     actions = None
     NODES = {"Header": "HeaderText"}
-    HIVETOHA = {"Attribute": {"Status": {True: "Online", False: "Offline"},
-                              "Smoke": {True: "Alarm Detected", False:
-                                        "Nothing Detected"},
-                              "Dog": {True: "Dog Bark Detected", False:
-                                      "Nothing Detected"},
-                              "Glass": {True: "Broken Glass Detected", False:
-                                        "Nothing Detected"}},
-                "Hub": {True: "Online", False: "Offline"},
+    HIVETOHA = {"Attribute": {True: "Online", False: "Offline"},
+                "Hub": {"Status": {True: "Online", False: "Offline"},
+                        "Smoke": {True: "Smoke Alarm Detected", False:
+                                  "Nothing Detected"},
+                        "Dog": {True: "Dog Bark Detected", False:
+                                "Nothing Detected"},
+                        "Glass": {True: "Broken Glass Detected", False:
+                                  "Nothing Detected"}},
                 "Light": {"ON": True, "OFF": False, "offline": False},
                 "Sensor": {"OPEN": True, "CLOSED": False, True: True,
-                                         False: False, "offline": False},
+                           False: False, "offline": False},
                 "Switch": {"ON": True, "OFF": False, "offline": False}
                 }
     NAME = {}
