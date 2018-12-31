@@ -9,6 +9,7 @@ from pyhiveapi.hive_data import Data
 
 class Light:
     """Hive Light Code."""
+
     def __init__(self):
         """Initialise."""
         self.hive = Hive()
@@ -19,94 +20,94 @@ class Light:
     def get_state(self, n):
         """Get light current state."""
         self.log.log('light', "Getting state of light: " + Data.NAME[n])
-        end = self.attr.online_offline(n)
+        state = self.attr.online_offline(n)
 
-        if end != 'offline' and n in Data.products:
+        if state != 'offline' and n in Data.products:
             data = Data.products[n]
-            end = data["state"]["status"]
-            Data.NODES["Light_State_" + n] = end
+            state = data["state"]["status"]
+            Data.NODES[n]['State'] = Data.HIVETOHA[self.type].get(state)
         else:
-            self.log.log('switch', "Failed to get state - " + Data.NAME[n])
+            self.log.log('light', "Failed to get state - " + Data.NAME[n])
 
-        self.log.log('light', "State of light " + Data.NAME[n] + " is: " + end)
-        return Data.HIVETOHA[self.type].get(end,
-                                            Data.NODES.get("Light_State_" + n))
+        self.log.log('light', "State of light " + Data.NAME[n] +
+                     " is " + state)
+        return Data.HIVETOHA[self.type].get(state, Data.NODES[n]['State'])
 
     def get_brightness(self, n):
         """Get light current brightness."""
-        self.log.log('Light', "Getting brightness of light: " + Data.NAME[n])
+        self.log.log('light', "Getting brightness of light: " + Data.NAME[n])
         tmp = None
-        end = False
+        state = False
 
         if n in Data.products:
             data = Data.products[n]
             tmp = data["state"]["brightness"]
-            end = ((tmp / 100) * 255)
-            Data.NODES["Light_Bright_" + n] = end
-            self.log.log("Light", "Brightness of light " + Data.NAME[n] +
-                         " is: " + str(end))
+            state = ((tmp / 100) * 255)
+            Data.NODES[n]["Brightness"] = state
+            self.log.log("light", "Brightness of light " + Data.NAME[n] +
+                         " is: " + str(state))
 
-        return end if end is False else Data.NODES.get("Light_Bright_" + n)
+        return state if state is False else Data.NODES[n].get("Brightness")
 
     def get_min_color_temp(self, n):
         """Get light minimum color temperature."""
-        self.log.log("Light", "Getting min colour temperature of light: " +
+        self.log.log("light", "Getting min colour temperature of light: " +
                      Data.NAME[n])
         tmp = None
-        end = None
+        state = None
 
         if n in Data.products:
             data = Data.products[n]
             tmp = data["props"]["colourTemperature"]["max"]
-            end = round((1 / tmp) * 1000000)
-            Data.NODES["Light_Min_CT_" + n] = end['end']
+            state = round((1 / tmp) * 1000000)
+            Data.NODES[n]["Min_CT"] = state
 
-        self.log.log("Light", "Min Colour temperature of light " +
-                     Data.NAME[n] + " is: " + str(end['end']))
+        self.log.log("light", "Min Colour temperature of light " +
+                     Data.NAME[n] + " is: " + str(state))
 
-        return end
+        return state
 
     def get_max_color_temp(self, n):
         """Get light maximum color temperature."""
-        self.log.log("Light", "Getting max colour temperature of light: " +
+        self.log.log("light", "Getting max colour temperature of light: " +
                      Data.NAME[n])
         tmp = 0
-        end = None
+        state = None
 
         if n in Data.products:
             data = Data.products[n]
             tmp = data["props"]["colourTemperature"]["min"]
-            end = round((1 / tmp) * 1000000)
-            Data.NODES["Light_Max_CT_" + n] = end
+            state = round((1 / tmp) * 1000000)
+            Data.NODES[n]["Max_CT"] = state
 
-        self.log.log("Light", "Max Colour temperature of light " +
-                     Data.NAME[n] + " is: " + str(end))
+        self.log.log("light", "Max Colour temperature of light " +
+                     Data.NAME[n] + " is: " + str(state))
 
-        return end
+        return state
 
     def get_color_temp(self, n):
         """Get light current color temperature."""
-        self.log.log("Light", "Getting colour temperature of light: " +
+        self.log.log("light", "Getting colour temperature of light: " +
                      Data.NAME[n])
         tmp = 0
-        end = None
+        state = None
 
         if n in Data.products:
             data = Data.products[n]
             tmp = data["state"]["colourTemperature"]
-            end = round((1 / tmp) * 1000000)
-            Data.NODES["Light_CT_" + n] = end
+            state = round((1 / tmp) * 1000000)
+            Data.NODES[n]["CT"] = state
 
-        self.log.log("Light", "Colour temperature of light " +
-                     Data.NAME[n] + " is: " + str(end))
+        self.log.log("light", "Colour temperature of light " +
+                     Data.NAME[n] + " is: " + str(state))
 
-        return end if end is None else Data.NODES.get("Light_CT_" + n)
+        return state if state is None else Data.NODES[n].get("CT")
 
     def get_color(self, n):
         """Get light current colour"""
-        self.log.log("Light", "Getting colour of light : " + Data.NAME[n])
+        self.log.log("light", "Getting colour of light : " + Data.NAME[n])
         tmp = []
-        end = None
+        state = None
 
         if n in Data.products:
             data = Data.products[n]
@@ -114,43 +115,43 @@ class Light:
                 ((data["state"]["hue"]) / 360),
                 ((data["state"]["saturation"]) / 100),
                 ((data["state"]["value"]) / 100))
-            end = tuple(int(i * 255) for i in colorsys.hsv_to_rgb(
-                    tmp[0],
-                    tmp[1],
-                    tmp[2]))
-            Data.NODES["Light_Color_" + n] = end
+            state = tuple(int(i * 255) for i in colorsys.hsv_to_rgb(
+                tmp[0],
+                tmp[1],
+                tmp[2]))
+            Data.NODES[n]["Color"] = state
 
-        self.log.log("Light", "Colour of light " + Data.NAME[n] + " is: " +
-                     str(end))
+        self.log.log("light", "Colour of light " + Data.NAME[n] + " is: " +
+                     str(state))
 
-        return end if end is None else Data.NODES.get("Light_Color_" + n)
+        return state if state is None else Data.NODES[n].get("Color")
 
     def turn_off(self, n):
         """Set light to turn off."""
         from .hive_session import Session
-        self.log.log("Light", "Turning off light : " + Data.NAME[n])
+        self.log.log("light", "Turning off light : " + Data.NAME[n])
         resp = None
-        end = False
+        state = False
         Session.check_hive_api_logon(Session())
         data = Data.products[n]
 
         resp = self.hive.set_state(Data.sess_id, data['type'], n, "OFF")
         if str(resp['original']) == "<Response [200]>":
-            end = True
+            state = True
             Session.hive_api_get_nodes(Session(), n, False)
-            self.log.log("Light", "Light " + Data.NAME[n] +
+            self.log.log("light", "Light " + Data.NAME[n] +
                          " has been successfully switched off")
         else:
-            self.log.log("Light", "Failed to switch off - " + Data.NAME[n])
+            self.log.log("light", "Failed to switch off - " + Data.NAME[n])
 
-        return end
+        return state
 
     def turn_on(self, n, brightness, color_temp, color):
         """Set light to turn on."""
         from .hive_session import Session
-        self.log.log("Light", "Turning on light : " + Data.NAME[n])
+        self.log.log("light", "Turning on light : " + Data.NAME[n])
         resp = None
-        end = False
+        state = False
         Session.check_hive_api_logon(Session())
         data = Data.products[n]
 
@@ -163,43 +164,43 @@ class Light:
 
         resp = self.hive.set_state(Data.sess_id, data['type'], n, 'ON')
         if str(resp['original']) == "<Response [200]>":
-            end = True
+            state = True
             Session.hive_api_get_nodes(Session(), n, False)
-            self.log.log("Light", "Light " + Data.NAME[n] +
+            self.log.log("light", "Light " + Data.NAME[n] +
                          " has been successfully switched on")
         else:
-            self.log.log("Light", "Failed to switch on light: " + Data.NAME[n])
+            self.log.log("light", "Failed to switch on light: " + Data.NAME[n])
 
-        return end
+        return state
 
     def set_brightness(self, n, brightness):
         """Set brightness of the light."""
         from .hive_session import Session
-        self.log.log("Light", "Setting brightness of : " + Data.NAME[n])
+        self.log.log("light", "Setting brightness of : " + Data.NAME[n])
         resp = None
-        end = False
+        state = False
         Session.check_hive_api_logon(Session())
         data = Data.products[n]
 
         resp = self.hive.set_brightness(
             Data.sess_id, data['type'], n, brightness)
         if str(resp['original']) == "<Response [200]>":
-            end = True
+            state = True
             Session.hive_api_get_nodes(Session(), n, False)
-            self.log.log("Light", "successfully set the brightness of " +
+            self.log.log("light", "successfully set the brightness of " +
                          Data.NAME[n] + " to : " + str(brightness))
         else:
-            self.log.log("Light", "Failed to set brightness for light: " +
+            self.log.log("light", "Failed to set brightness for light: " +
                          Data.NAME[n])
 
-        return end
+        return state
 
     def set_color_temp(self, n, color_temp):
         """Set light to turn on."""
         from .hive_session import Session
-        self.log.log("Light", "Setting color temp of : " + Data.NAME[n])
+        self.log.log("light", "Setting color temp of : " + Data.NAME[n])
         resp = None
-        end = False
+        state = False
         Session.check_hive_api_logon(Session())
         data = Data.products[n]
 
@@ -213,22 +214,22 @@ class Light:
                 Data.sess_id, data['type'], n, color_temp)
 
         if str(resp['original']) == "<Response [200]>":
-            end = True
+            state = True
             Session.hive_api_get_nodes(Session(), n, False)
-            self.log.log("Light", "successfully set the color temp of " +
+            self.log.log("light", "successfully set the color temp of " +
                          Data.NAME[n] + " to : " + str(color_temp))
         else:
-            self.log.log("Light", "Failed to set color temp for light: " +
+            self.log.log("light", "Failed to set color temp for light: " +
                          Data.NAME[n])
 
-        return end
+        return state
 
     def set_color(self, n, new_color):
         """Set light to turn on."""
         from .hive_session import Session
-        self.log.log("Light", "Setting color of : " + Data.NAME[n])
+        self.log.log("light", "Setting color of : " + Data.NAME[n])
         resp = None
-        end = False
+        state = False
         Session.check_hive_api_logon(Session())
         data = Data.products[n]
 
@@ -237,14 +238,14 @@ class Light:
                                    str(new_color[1]),
                                    str(new_color[2]))
         if str(resp['original']) == "<Response [200]>":
-            end = True
+            state = True
             Session.hive_api_get_nodes(Session(), n, False)
-            self.log.log("Light", "successfully set the color for " +
+            self.log.log("light", "successfully set the color for " +
                          Data.NAME[n] + ' to : {hue: "' + str(new_color[0]) +
                          ', "saturation": ' + str(new_color[1]) +
                          ', "value": ' + str(new_color[2]) + '}')
         else:
-            self.log.log("Light", "Failed to set color for light: " +
+            self.log.log("light", "Failed to set color for light: " +
                          Data.NAME[n])
 
-        return end
+        return state

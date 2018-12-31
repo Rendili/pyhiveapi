@@ -129,6 +129,25 @@ class Hive:
 
         return self.json_return
 
+    def set_mode(self, session_id, n_type, n_id, mode, **kwargs):
+        self.headers.update({'authorization': session_id})
+        if 'mins' in kwargs:
+            time = kwargs.get('mins', 30)
+            jsc = '{{"mode": "{0}", "boost": "{1}"}}'.format(str(mode),
+                                                             str(time))
+        else:
+            jsc = '{{"mode": "{0}"}}'.format(str(mode))
+        url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
+        try:
+            response = requests.post(url=url, headers=self.headers,
+                                     data=jsc, timeout=self.timeout)
+            self.json_return.update({'original': str(response)})
+            self.json_return.update({'parsed': response.json()})
+        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
+            self.error()
+
+        return self.json_return
+
     def set_brightness(self, session_id, n_type, n_id, brightness):
         self.headers.update({'authorization': session_id})
         jsc = '{{"status": "ON", "brightness": {0}}}'.format(brightness)

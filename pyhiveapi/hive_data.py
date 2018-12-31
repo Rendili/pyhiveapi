@@ -14,19 +14,21 @@ class Data:
     products = None
     devices = None
     actions = None
-    NODES = {"Header": "HeaderText"}
-    HIVETOHA = {"Attribute": {True: "Online", False: "Offline"},
-                "Hub": {"Status": {True: "Online", False: "Offline"},
-                        "Smoke": {True: "Smoke Alarm Detected", False:
+    NODES = {'Header': 'HeaderText'}
+    HIVETOHA = {'Attribute': {True: 'Online', False: 'Offline'},
+                'Boost': {None: 'OFF', 'offline': 'OFF'},
+                'Hotwater': {'MANUAL': 'ON', None: 'OFF'},
+                'Hub': {'Status': {True: 'Online', False: 'Offline'},
+                        'Smoke': {True: "Smoke Alarm Detected", False:
                                   "Nothing Detected"},
-                        "Dog": {True: "Dog Bark Detected", False:
+                        'Dog': {True: "Dog Bark Detected", False:
                                 "Nothing Detected"},
-                        "Glass": {True: "Broken Glass Detected", False:
+                        'Glass': {True: "Broken Glass Detected", False:
                                   "Nothing Detected"}},
-                "Light": {"ON": True, "OFF": False, "offline": False},
-                "Sensor": {"OPEN": True, "CLOSED": False, True: True,
-                           False: False, "offline": False},
-                "Switch": {"ON": True, "OFF": False, "offline": False}
+                'Light': {'ON': True, 'OFF': False, 'offline': False},
+                'Sensor': {'OPEN': True, 'CLOSED': False, True: True,
+                           False: False, 'offline': False},
+                'Switch': {'ON': True, 'OFF': False, 'offline': False}
                 }
     NAME = {}
     types = {'hub': ['hub', 'sense'],
@@ -39,43 +41,43 @@ class Data:
              'sensor': ['motionsensor', 'contactsensor']}
 
     # Session Data
-    sess_id = ""
+    sess_id = ''
     s_platform_name = '',
     s_logon_datetime = datetime(2017, 1, 1, 12, 0, 0)
-    s_username = ""
-    s_password = ""
-    s_postcode = ""
-    s_timezone = ""
-    s_countrycode = ""
-    s_locale = ""
-    s_temperature_unit = ""
+    s_username = ''
+    s_password = ''
+    s_postcode = ''
+    s_timezone = ''
+    s_countrycode = ''
+    s_locale = ''
+    s_temperature_unit = ''
     s_interval_seconds = NODE_INTERVAL_DEFAULT
     s_last_update = datetime(2017, 1, 1, 12, 0, 0)
     s_file = False
 
     # Weather data
     w_last_update = datetime(2017, 1, 1, 12, 0, 0)
-    w_nodeid = ""
-    w_icon = ""
-    w_description = ""
+    w_nodeid = ''
+    w_icon = ''
+    w_description = ''
     w_interval_seconds = WEATHER_INTERVAL_DEFAULT
-    w_temperature_unit = ""
+    w_temperature_unit = ''
     w_temperature_value = 0.00
 
     # Platform data
     p_minmax = {}
 
     # Logging data
-    l_o_folder = ""
-    l_o_file = ""
-    l_files = {'all': "logging.all",
+    l_o_folder = ''
+    l_o_file = ''
+    l_files = {'all': 'logging.all',
                'action': 'logging.aciton',
-               'core': "logging.core",
-               'http': "logging.http",
-               'heating': "logging.heating",
-               'hotwater':  "logging.hotwater",
-               'light': "logging.light",
-               'switch': "logging.switch",
-               'sensor': "logging.sensor",
-               'attribute': "logging.attribute"}
+               'core': 'logging.core',
+               'http': 'logging.http',
+               'heating': 'logging.heating',
+               'hotwater':  'logging.hotwater',
+               'light': 'logging.light',
+               'switch': 'logging.switch',
+               'sensor': 'logging.sensor',
+               'attribute': 'logging.attribute'}
     l_values = {}
