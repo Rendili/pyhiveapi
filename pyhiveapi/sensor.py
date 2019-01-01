@@ -14,24 +14,24 @@ class Sensor():
         self.attr = Attributes()
         self.type = "Sensor"
 
-    def get_state(self, n):
+    def get_state(self, id):
         """Get sensor state."""
         self.log.log('sensor', "Getting state of sensor: " +
-                     Data.NAME[n])
-        end = self.attr.online_offline(n)
+                     Data.NAME[id])
+        end = self.attr.online_offline(id)
 
-        if end != 'offline' and n in Data.products:
-            data = Data.products[n]
+        if end != 'offline' and id in Data.products:
+            data = Data.products[id]
             if data["type"] == "contactsensor":
                 end = data["props"]["status"]
             elif data["type"] == "motionsensor":
                 end = data["props"]["motion"]["status"]
-            Data.NODES["Sensor_State_" + n] = end
-            self.log.log('sensor', "State for " + Data.NAME[n] +
+            Data.NODES["Sensor_State_" + id] = end
+            self.log.log('sensor', "State for " + Data.NAME[id] +
                          " is : " + str(end))
         else:
-            self.log.log('sensor', "Failed to get state for " + Data.NAME[n])
+            self.log.log('sensor', "Failed to get state for " + Data.NAME[id])
 
         return Data.HIVETOHA[self.type].get(end,
                                             Data.NODES.get(
-                                                "Sensor_State_" + n))
+                                                "Sensor_State_" + id))
