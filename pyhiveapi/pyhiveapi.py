@@ -2662,7 +2662,7 @@ class Pyhiveapi:
             if available != 'UNKNOWN':
                 state_attributes.update({"availability": available})
             battery = Pyhiveapi.Attributes.battery_level(self, node_id)
-            if battery != 'UNKNOWN':
+            if battery is not None:
                 state_attributes.update({"battery_level": str(battery) + "%"})
             mode = Pyhiveapi.Attributes.get_mode(self, node_id)
             if mode != 'UNKNOWN':
