@@ -115,10 +115,22 @@ class Hive:
         self.headers.update({'authorization': session_id})
         jsc = '{{' + ','.join(('"' + i + '": ' '"' + t +
                                '" ' for i, t in kwargs.items())) + '}}'
-        if n_type == "action":
-            self.urls['base'] + self.urls['actions'] + "/" + n_id
-        else:
-            url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
+        url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
+        try:
+            response = requests.post(url=url, headers=self.headers,
+                                     data=jsc, timeout=self.timeout)
+            self.json_return.update({'original': str(response)})
+            self.json_return.update({'parsed': response.json()})
+        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
+            self.error()
+
+        return self.json_return
+
+    def set_action(self, session_id, n_id, data):
+        self.headers.update({'authorization': session_id})
+        jsc = data
+        url = self.urls['base'] + self.urls['actions'] + "/" + n_id
+
         try:
             response = requests.post(url=url, headers=self.headers,
                                      data=jsc, timeout=self.timeout)

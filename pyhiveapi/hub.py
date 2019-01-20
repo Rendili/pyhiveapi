@@ -15,70 +15,74 @@ class Hub:
         self.attr = Attributes()
         self.type = "Hub"
 
-    def hub_status(self, id):
+    def hub_status(self, n_id):
         """Get the online status of the Hive hub."""
         self.log.log('sensor', "Getting Hive hub status")
-        tmp = None
-        end = None
+        state = self.attr.online_offline(n_id)
+        final = None
 
-        if id in Data.devices:
-            data = Data.devices[id]
-            tmp = data["props"]["online"]
-            end = Data.HIVETOHA[self.type]["Status"][tmp]
-            Data.NODES["Sensor_State_" + id] = end
-            self.log.log('sensor', "Hive hub status is: " + end)
+        if n_id in Data.devices:
+            if state != 'offline':
+                data = Data.devices[n_id]
+                state = data["props"]["online"]
+            final = Data.HIVETOHA[self.type]["Status"].get(state, state)
+            Data.NODES[n_id]['State'] = final
+            self.log.log('sensor', "Hive hub status is: " + final)
         else:
             self.log.log('sensor', "Failed to get hive hub state")
 
-        return end if end is None else Data.NODES.get("Sensor_State_" + id)
+        return final if final is None else Data.NODES[n_id]['State']
 
-    def hub_smoke(self, id):
+    def hub_smoke(self, n_id):
         """Get the online status of the Hive hub."""
         self.log.log('sensor', "Getting Hive hub smoke detection status")
-        tmp = None
-        end = None
+        state = self.attr.online_offline(n_id)
+        final = None
 
-        if id in Data.products:
-            data = Data.products[id]
-            tmp = data["props"]["sensors"]["SMOKE_CO"]["active"]
-            end = Data.HIVETOHA[self.type]["Smoke"][tmp]
-            Data.NODES["Sensor_Smoke_" + id] = end
-            self.log.log('sensor', "Hive smoke detection status is : " + end)
+        if n_id in Data.products:
+            if state != 'offline':
+                data = Data.products[n_id]
+                state = data["props"]["sensors"]["SMOKE_CO"]["active"]
+            final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
+            Data.NODES[n_id]['Smoke'] = final
+            self.log.log('sensor', "Hive smoke detection status is : " + final)
         else:
             self.log.log('sensor', "Failed to get smoke detection status")
 
-        return end if end is None else Data.NODES.get("Sensor_Smoke_" + id)
+        return final if final is None else Data.NODES[n_id]['Smoke']
 
-    def hub_dog_bark(self, id):
+    def hub_dog_bark(self, n_id):
         """Get the online status of the Hive hub."""
         self.log.log('sensor', "Getting Hive hub barking detection status")
-        tmp = None
-        end = None
+        state = self.attr.online_offline(n_id)
+        final = None
 
-        if id in Data.products:
-            data = Data.products[id]
-            tmp = data["props"]["sensors"]["DOG_BARK"]["active"]
-            end = Data.HIVETOHA[self.type]["Dog"][tmp]
-            Data.NODES["Sensor_Dog_" + id] = end
-            self.log.log('sensor', "Hive barking detection status is : " + end)
+        if n_id in Data.products:
+            if state != 'offline':
+                data = Data.products[n_id]
+                state = data["props"]["sensors"]["DOG_BARK"]["active"]
+            final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
+            Data.NODES[n_id]['Dog'] = final
+            self.log.log('sensor', "Hive barking detection status is : " + final)
         else:
             self.log.log('sensor', "Failed to get barking detection status")
 
-        return end if end is None else Data.NODES.get("Sensor_Dog_" + id)
+        return final if final is None else Data.NODES[n_id]['Dog']
 
-    def hub_glass(self, id):
+    def hub_glass(self, n_id):
         """Get the glass detected status from the Hive hub."""
         self.log.log('sensor', "Getting Hive hub glass detection status")
-        tmp = None
-        end = None
+        state = self.attr.online_offline(n_id)
+        final = None
 
-        if id in Data.products:
-            data = Data.products[id]
-            tmp = data["props"]["sensors"]["GLASS_BREAK"]["active"]
-            end = Data.HIVETOHA[self.type]["Glass"][tmp]
-            Data.NODES["Sensor_Glass_" + id] = end
-            self.log.log('sensor', "Hive glass detection status is : " + end)
+        if n_id in Data.products:
+            if state != 'offline':
+                data = Data.products[n_id]
+                state = data["props"]["sensors"]["GLASS_BREAK"]["active"]
+            final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
+            Data.NODES[n_id]['Glass'] = final
+            self.log.log('sensor', "Hive glass detection status is : " + final)
         else:
             self.log.log('sensor', "Failed to get glass detection status")
 
-        return end if end is None else Data.NODES.get("Sensor_Glass_" + id)
+        return final if final is None else Data.NODES[n_id]['Glass']

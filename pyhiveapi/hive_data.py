@@ -19,13 +19,13 @@ class Data:
                 'Boost': {None: 'OFF', 'offline': 'OFF'},
                 'Heating': {'offline': 'OFF'},
                 'Hotwater': {'MANUAL': 'ON', None: 'OFF'},
-                'Hub': {'Status': {True: 'Online', False: 'Offline'},
+                'Hub': {'Status': {True: 'Online', False: 'Offline', 'offline': 'Offline'},
                         'Smoke': {True: "Smoke Alarm Detected", False:
-                                  "Nothing Detected"},
+                                  "Nothing Detected", 'offline': 'Offline'},
                         'Dog': {True: "Dog Bark Detected", False:
-                                "Nothing Detected"},
+                                "Nothing Detected", 'offline': 'Offline'},
                         'Glass': {True: "Broken Glass Detected", False:
-                                  "Nothing Detected"}},
+                                  "Nothing Detected", 'offline': 'Offline'}},
                 'Light': {'ON': True, 'OFF': False, 'offline': False},
                 'Sensor': {'OPEN': True, 'CLOSED': False, 'offline': False},
                 'Switch': {'ON': True, 'OFF': False, 'offline': False}
@@ -54,6 +54,7 @@ class Data:
     s_interval_seconds = NODE_INTERVAL_DEFAULT
     s_last_update = datetime(2017, 1, 1, 12, 0, 0)
     s_file = False
+    t_file = None
 
     # Weather data
     w_last_update = datetime(2017, 1, 1, 12, 0, 0)

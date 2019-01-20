@@ -97,7 +97,7 @@ class Session:
             if l_logon_mins >= MINUTES_BETWEEN_LOGONS or Data.sess_id is None:
                 self.hive_api_logon()
 
-    def update_data(self, node_id):
+    def update_data(self, n_id):
         """Get latest data for Hive nodes - rate limiting."""
         self.lock.acquire()
         self.log.check_logging(False)
@@ -106,7 +106,7 @@ class Session:
             ct = datetime.now()
             last_update_secs = (ct - Data.s_last_update).total_seconds()
             if last_update_secs >= Data.s_interval_seconds:
-                updated = self.hive_api_get_nodes(node_id, None)
+                updated = self.hive_api_get_nodes(n_id)
 
             w_last_update_secs = (ct - Data.w_last_update).total_seconds()
             if w_last_update_secs >= Data.w_interval_seconds:
@@ -121,20 +121,21 @@ class Session:
         file = kwargs.get('file', False)
         if file:
             Data.s_file = True
+            Data.t_file = file
 
         self.log.log('core', "hive_api_get_nodes_nl")
-        self.hive_api_get_nodes("NoID", file)
+        self.hive_api_get_nodes("NoID")
 
-    def hive_api_get_nodes(self, node_id, file):
+    def hive_api_get_nodes(self, n_id):
         """Get latest data for Hive nodes."""
         get_nodes_successful = False
         api_resp_d = None
-        self.log.log('core', "hive_api_get_nodes : NodeID = " + node_id)
+        self.log.log('core', "hive_api_get_nodes : NodeID = " + n_id)
 
         self.check_hive_api_logon()
         try:
             if Data.s_file:
-                api_resp_d = file['devices']
+                api_resp_d = Data.t_file['devices']
             elif Data.sess_id is not None:
                 Data.devices = {}
                 Data.products = {}
@@ -161,7 +162,7 @@ class Session:
         try:
             resp = None
             if Data.s_file:
-                resp = file['products']
+                resp = Data.t_file['products']
             elif Data.sess_id is not None:
                 resp = self.api.get_products(Data.sess_id)
                 if resp['original'] == "<Response [200]>":
@@ -181,7 +182,7 @@ class Session:
         try:
             resp = None
             if Data.s_file:
-                resp = file['actions']
+                resp = Data.t_file['actions']
             elif Data.sess_id is not None:
                 resp = self.api.get_actions(Data.sess_id)
                 if resp['original'] == "<Response [200]>":
@@ -322,13 +323,13 @@ class Session:
         Data.s_username = username
         Data.s_password = password
         self.log.log('core', "api initialising")
-        file = kwargs.get('file', None)
+        tmp_file = kwargs.get('file', None)
 
         if interval < 30:
             interval = Data.NODE_INTERVAL_DEFAULT
 
-        if file is not None:
-            self.hive_api_get_nodes_nl(file)
+        if tmp_file is not None:
+            self.hive_api_get_nodes_nl(file=tmp_file)
         elif Data.s_username is None or Data.s_password is None:
             return None
         else:
