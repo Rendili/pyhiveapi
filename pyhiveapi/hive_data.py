@@ -17,6 +17,7 @@ class Data:
     NODES = {'Header': 'HeaderText'}
     HIVETOHA = {'Attribute': {True: 'Online', False: 'Offline'},
                 'Boost': {None: 'OFF', 'offline': 'OFF'},
+                'Heating': {'offline': 'OFF'},
                 'Hotwater': {'MANUAL': 'ON', None: 'OFF'},
                 'Hub': {'Status': {True: 'Online', False: 'Offline'},
                         'Smoke': {True: "Smoke Alarm Detected", False:
@@ -26,8 +27,7 @@ class Data:
                         'Glass': {True: "Broken Glass Detected", False:
                                   "Nothing Detected"}},
                 'Light': {'ON': True, 'OFF': False, 'offline': False},
-                'Sensor': {'OPEN': True, 'CLOSED': False, True: True,
-                           False: False, 'offline': False},
+                'Sensor': {'OPEN': True, 'CLOSED': False, 'offline': False},
                 'Switch': {'ON': True, 'OFF': False, 'offline': False}
                 }
     NAME = {}

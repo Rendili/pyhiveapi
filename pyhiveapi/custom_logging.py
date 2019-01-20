@@ -52,7 +52,7 @@ class Logger:
             try:
                 l_file = open(Data.l_o_file, "a")
                 l_file.write(datetime.now().strftime("%d-%b-%Y %H:%M:%S") +
-                             " : " + new_message + "\n")
+                             " - " + log_type + " : " + new_message + "\n")
                 l_file.close()
             except FileNotFoundError:
                 pass

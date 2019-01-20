@@ -40,11 +40,11 @@ class Hotwater():
 
         if state != 'offline' and id in Data.products:
             data = Data.products[id]
-            state = Data.HIVETOHA[self.type].get((data["state"]["boost"]),
+            state = Data.HIVETOHA['Boost'].get((data["state"]["boost"]),
                                                  'ON')
             Data.NODES[id]['Boost'] = state
 
-        return Data.HIVETOHA[self.type].get(state, Data.NODES[id]['Boost'])
+        return Data.HIVETOHA['Boost'].get(state, Data.NODES[id]['Boost'])
 
     def get_boost_time(self, id):
         """Get hotwater boost time remaining."""
@@ -55,9 +55,9 @@ class Hotwater():
             if id in Data.products:
                 data = Data.products[id]
                 state = data["state"]["boost"]
-                Data.NODES[id]['Boost'] = state
+                Data.NODES[id]['Boost_Time'] = state
 
-        return state if state is None else Data.NODES[id].get('Boost')
+        return state if state is None else Data.NODES[id].get('Boost_Time')
 
     def get_state(self, id):
         """Get hot water current state."""
@@ -78,7 +78,7 @@ class Hotwater():
                     state = snan["now"]["value"]["status"]
             Data.NODES[id]['State'] = Data.HIVETOHA[self.type].get(state, state)
 
-        return state if state is None else Data.NODES[id].get('State')
+        return Data.HIVETOHA[self.type].get(state, Data.NODES[id]['State'])
 
     def get_schedule_now_next_later(self, id):
         """Hive get hotwater schedule now, next and later."""
@@ -87,11 +87,10 @@ class Hotwater():
         mode_current = self.get_mode(id)
         snan = None
 
-        if id in Data.products:
+        if id in Data.products and mode_current == "SCHEDULE":
             data = Data.products[id]
-            if mode_current == "SCHEDULE":
-                snan = Session.p_get_schedule_now_next_later(
-                    data["state"]["schedule"])
+            snan = Session.p_get_schedule_now_next_later(
+                data["state"]["schedule"])
 
         return snan
 
@@ -99,18 +98,20 @@ class Hotwater():
         """Set hot water mode."""
         from pyhiveapi.hive_session import Session
         Session.check_hive_api_logon(Session())
-        state = False
+        final = False
 
-        resp = self.hive.set_mode(Data.sess_id, 'hotwater', id, new_mode)
-        if str(resp['original']) == "<Response [200]>":
-            state = True
-            Session.hive_api_get_nodes(Session(), id, False)
-            self.log.log("hotwater", "Light " + Data.NAME[id] +
-                         " has been successfully switched on")
-        else:
-            self.log.log("hotwater", "Failed to set mode: " + Data.NAME[id])
+        if id in Data.products:
+            data = Data.products[id]
+            resp = self.hive.set_mode(Data.sess_id, data[type], id, new_mode)
+            if str(resp['original']) == "<Response [200]>":
+                final = True
+                Session.hive_api_get_nodes(Session(), id, False)
+                self.log.log("hotwater", "Howater has been " +
+                "successfully set to " + new_mode)
+            else:
+                self.log.log("hotwater", "Failed to set hotwater to " + new_mode)
 
-        return state
+        return final
 
     def turn_boost_on(self, id, length_minutes):
         """Turn hot water boost on."""

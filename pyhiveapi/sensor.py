@@ -7,6 +7,7 @@ from pyhiveapi.device_attributes import Attributes
 
 class Sensor():
     """Hive Sensor Code."""
+
     def __init__(self):
         """Initialise."""
         self.hive = Hive()
@@ -18,20 +19,20 @@ class Sensor():
         """Get sensor state."""
         self.log.log('sensor', "Getting state of sensor: " +
                      Data.NAME[id])
-        end = self.attr.online_offline(id)
+        state = self.attr.online_offline(id)
+        final = None
 
-        if end != 'offline' and id in Data.products:
-            data = Data.products[id]
-            if data["type"] == "contactsensor":
-                end = data["props"]["status"]
-            elif data["type"] == "motionsensor":
-                end = data["props"]["motion"]["status"]
-            Data.NODES["Sensor_State_" + id] = end
+        if id in Data.products:
+            if state != 'offline':
+                data = Data.products[id]
+                if data["type"] == "contactsensor":
+                    state = data["props"]["status"]
+                elif data["type"] == "motionsensor":
+                    state = data["props"]["motion"]["status"]
+            final = Data.HIVETOHA[self.type].get(state, state)
+            Data.NODES[id]['State'] = final
             self.log.log('sensor', "State for " + Data.NAME[id] +
-                         " is : " + str(end))
-        else:
-            self.log.log('sensor', "Failed to get state for " + Data.NAME[id])
+                         " is : " + str(state))
 
-        return Data.HIVETOHA[self.type].get(end,
-                                            Data.NODES.get(
-                                                "Sensor_State_" + id))
+        return final if final is None else Data.NODES[id]['State']
+
