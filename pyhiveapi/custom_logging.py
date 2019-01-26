@@ -34,17 +34,19 @@ class Logger:
             Data.l_values = {}
 
     @staticmethod
-    def log(log_type, new_message):
+    def log(n_id, l_type, new_message, **kwargs):
         """Output new log entry if logging is turned on."""
+        name = Data.NAME.get(n_id, n_id)
+        data = kwargs.get('info', None)
         f = False
-        if '_' in log_type:
-            x = log_type.split("_")
+        if '_' in l_type:
+            x = l_type.split("_")
             for i in x:
                 if i in Data.l_values or 'all' in Data.l_values:
                     if Data.l_values['enabled']:
                         f = True
                         break
-        elif log_type in Data.l_values or 'all' in Data.l_values:
+        elif l_type in Data.l_values or 'all' in Data.l_values:
             if Data.l_values['enabled']:
                 f = True
 
@@ -52,13 +54,25 @@ class Logger:
             try:
                 l_file = open(Data.l_o_file, "a")
                 l_file.write(datetime.now().strftime("%d-%b-%Y %H:%M:%S") +
-                             " - " + log_type + " : " + new_message + "\n")
+                             " - " + l_type + "-" + name + " : " +
+                             + new_message.format(data) + "\n")
                 l_file.close()
             except FileNotFoundError:
                 pass
         else:
             pass
 
-    @staticmethod
-    def error():
+    def error_check(self, n_id, n_type, error_type, **kwargs):
         """Error has occured."""
+        import re
+        message = None
+        new_data = None
+        if error_type == 'Offline':
+            message = "Offline could not update device."
+        elif error_type == 'Failed:':
+            message = "ERROR - No data found for device."
+        elif error_type == 'Failed_API':
+            code = kwargs.get('resp')
+            new_data = re.search('[0-9][0-9][0-9]', code)
+            message = "ERROR - Received {0} response from API."
+        self.log(n_id, n_type, message, info=new_data)

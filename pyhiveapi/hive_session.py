@@ -18,10 +18,11 @@ class Session:
         self.lock = threading.Lock()
         self.api = Hive()
         self.log = Logger()
+        self.type = self.type
 
     def hive_api_logon(self):
-        """Log in to the Hive API and get the Session IData."""
-        self.log.log('core', "hive_api_logon")
+        """Log in to the Hive API and get the Session Data."""
+        self.log.log('No_ID', self.type, "Attempting to login to Hive.")
 
         login_details_found = True
         try_finished = False
@@ -87,7 +88,7 @@ class Session:
 
     def check_hive_api_logon(self):
         """Check if currently logged in with a valid Session IData."""
-        self.log.log('core', "check_hive_api_logon")
+        self.log.log('No_ID', self.type, "Checking Hive token is valid.")
 
         if Data.s_file is False:
             c_time = datetime.now()
@@ -123,14 +124,14 @@ class Session:
             Data.s_file = True
             Data.t_file = file
 
-        self.log.log('core', "hive_api_get_nodes_nl")
+        self.log.log('No_ID', self.type, "Getting first set of data from Hive")
         self.hive_api_get_nodes("NoID")
 
     def hive_api_get_nodes(self, n_id):
         """Get latest data for Hive nodes."""
         get_nodes_successful = False
         api_resp_d = None
-        self.log.log('core', "hive_api_get_nodes : NodeID = " + n_id)
+        self.log.log(n_id, self.type, "Getting data from Hive.")
 
         self.check_hive_api_logon()
         try:
@@ -143,11 +144,9 @@ class Session:
 
                 api_resp = str(api_resp_d['original'])
                 if api_resp == "<Response [200]>":
-                    self.log.log('core_http', "Devices API call " +
-                                 "successful: " + api_resp)
+                    self.log.log(n_id, 'Core_API', "Got Devices - API response 200")
                 else:
-                    self.log.log('core_http', "Devices API call " +
-                                 "failed : " + api_resp)
+                    self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=api_resp)
 
             api_resp_p = api_resp_d['parsed']
 
@@ -156,21 +155,20 @@ class Session:
                     Data.devices.update({a_device['id']: a_device})
             try_finished_devices = True
         except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
-            self.log.log('core_http', "Api didnt receive any data")
+            self.log.log('No_ID', 'Core_API', "Api didnt receive any data")
             try_finished_devices = False
 
         try:
+            api_resp = None
             resp = None
             if Data.s_file:
                 resp = Data.t_file['products']
             elif Data.sess_id is not None:
                 resp = self.api.get_products(Data.sess_id)
-                if resp['original'] == "<Response [200]>":
-                    self.log.log('core_http', "Products API " +
-                                 "successful: " + resp['original'])
+                if api_resp == "<Response [200]>":
+                    self.log.log(n_id, 'Core_API', "Got Products - API response 200")
                 else:
-                    self.log.log('core_http', "Products API " +
-                                 "failed : " + resp['original'])
+                    self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=api_resp)
 
             for a_product in resp['parsed']:
                 if 'id' in a_product:
@@ -180,17 +178,16 @@ class Session:
             try_finished_products = False
 
         try:
+            api_resp = None
             resp = None
             if Data.s_file:
                 resp = Data.t_file['actions']
             elif Data.sess_id is not None:
                 resp = self.api.get_actions(Data.sess_id)
-                if resp['original'] == "<Response [200]>":
-                    self.log.log('core_http', "Actions API " +
-                                 "successful: " + resp['original'])
+                if api_resp == "<Response [200]>":
+                    self.log.log(n_id, 'Core_API', "Got Actions - API response 200")
                 else:
-                    self.log.log('core_http', "Actions API " +
-                                 "failed : " + resp['original'])
+                    self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=api_resp)
 
             for a_action in resp['parsed']:
                 if 'id' in a_action:
@@ -208,7 +205,7 @@ class Session:
 
     def hive_api_get_weather(self):
         """Get latest weather data from Hive."""
-        self.log.log('core', "hive_api_get_weather")
+        self.log.log('No_ID', self.type, "Getting Hive weather info.")
 
         get_weather_successful = True
         current_time = datetime.now()
@@ -322,8 +319,8 @@ class Session:
         self.log.check_logging(kwargs.get('session', False))
         Data.s_username = username
         Data.s_password = password
-        self.log.log('core', "api initialising")
-        tmp_file = kwargs.get('file', None)
+        self.log.log('No_ID', self.type, "Initialising Hive Component.")
+        tmp_file = kwargs.get('file')
 
         if interval < 30:
             interval = Data.NODE_INTERVAL_DEFAULT
@@ -340,7 +337,7 @@ class Session:
                 self.hive_api_get_weather()
 
         if Data.devices is None or Data.products is None:
-            self.log.log('core', "Failed to get devices and products")
+            self.log.log('No_ID', self.type, "Failed to get devices and products")
 
         device_all = {}
         sensor = []
@@ -359,10 +356,10 @@ class Session:
                                    'Hive_NodeName': d["state"]["name"],
                                    "Hive_DeviceType": "Hub"})
                 except KeyError:
-                    self.log.log('core', "Failed to get hive hubs")
+                    self.log.log('No_ID', self.type, "Failed to find hive hub")
 
         for a_product in Data.products:
-            if Data.products[a_product]["type"] in Data.types['hub']:
+            if Data.products[a_product]["type"] == 'sense':
                 d = Data.products[a_product]
                 try:
                     Data.NAME.update({d["id"]: d["state"]["name"]})
@@ -382,7 +379,7 @@ class Session:
                                    " Glass Break Detection",
                                    "Hive_DeviceType": "Hub"})
                 except KeyError:
-                    self.log.log('core', "Failed to get hive hubs")
+                    self.log.log('No_ID', self.type, "Failed to find hive hub sensors")
 
         count = sum(1 for i in Data.products
                     if Data.products[i]['type'] == 'heating')
@@ -429,7 +426,7 @@ class Session:
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                             except KeyError:
-                                self.log.log('core', "Failed to get hive " +
+                                self.log.log('No_ID', self.type, "Failed to find hive " +
                                              "heating")
 
         count = sum(1 for i in Data.products
@@ -459,7 +456,7 @@ class Session:
                                    'Hive_NodeName': node_name,
                                    "Hive_DeviceType": "HotWater"})
                 except KeyError:
-                    self.log.log('core', "Failed to get hive hotwater")
+                    self.log.log('No_ID', self.type, "Failed to find hive hotwater")
 
         count = sum(1 for i in Data.devices
                     if Data.devices[i]['type'] == 'thermostatui')
@@ -482,7 +479,7 @@ class Session:
                                    'Hive_NodeName': node_name,
                                    "Hive_DeviceType": d["type"]})
                 except KeyError:
-                    self.log.log('core', "Failed to get hive sensors")
+                    self.log.log('No_ID', self.type, "Failed to find hive sensors")
 
         for product in Data.products:
             if Data.products[product]['type'] in Data.types['light']:
@@ -505,7 +502,7 @@ class Session:
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
                 except KeyError:
-                    self.log.log('core', "Failed to get hive lights")
+                    self.log.log('No_ID', self.type, "Failed to find hive lights")
 
         for product in Data.products:
             if Data.products[product]['type'] in Data.types['plug']:
@@ -528,7 +525,7 @@ class Session:
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
                 except KeyError:
-                    self.log.log('core', "Failed to get hive plugs")
+                    self.log.log('No_ID', self.type, "Failed to find hive plugs")
 
         for action in Data.actions:
                 a = Data.actions[action]
@@ -540,7 +537,7 @@ class Session:
                                    'Hive_NodeName': a["name"],
                                    "Hive_DeviceType": "Action"})
                 except KeyError:
-                    self.log.log('core', "Failed to get hive plugs")
+                    self.log.log('No_id', self.type, "Failed to find hive plugs")
 
         for product in Data.products:
             if Data.products[product]['type'] in Data.types['sensor']:
@@ -553,7 +550,7 @@ class Session:
                                           'Hive_NodeName': p["state"]["name"],
                                           "Hive_DeviceType": p["type"]})
                 except KeyError:
-                    self.log.log('core', "Failed to get hive sensors")
+                    self.log.log('No_ID', self.type, "Failed to find hive sensors")
 
         if Data.w_nodeid == "HiveWeather":
             sensor.append({'HA_DeviceType': 'Hive_OutsideTemperature',
@@ -567,7 +564,7 @@ class Session:
         device_all['device_list_light'] = light
         device_all['device_list_plug'] = switch
 
-        self.log.log('core', "api initialised")
+        self.log.log('No_ID', self.type, "Hive component has initialised")
 
         return device_all
 

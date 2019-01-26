@@ -71,14 +71,16 @@ class Data:
     # Logging data
     l_o_folder = ''
     l_o_file = ''
-    l_files = {'all': 'logging.all',
-               'action': 'logging.aciton',
-               'core': 'logging.core',
-               'http': 'logging.http',
-               'heating': 'logging.heating',
-               'hotwater':  'logging.hotwater',
-               'light': 'logging.light',
-               'switch': 'logging.switch',
-               'sensor': 'logging.sensor',
-               'attribute': 'logging.attribute'}
+    l_files = {'All': 'log.all',
+               'Action': 'log.aciton',
+               'Attribute': 'log.attribute',
+               'API': 'log.api',
+               'Core': 'log.core',
+               'ERROR': 'log.error',
+               'Heating': 'log.heating',
+               'Hotwater':  'log.hotwater',
+               'Light': 'log.light',
+               'Switch': 'log.switch',
+               'Sensor': 'log.sensor',
+               }
     l_values = {}

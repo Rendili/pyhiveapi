@@ -1,5 +1,6 @@
 """Hive API Module."""
 import requests
+from pyhiveapi.custom_logging import Logger
 
 
 class Hive:
@@ -7,6 +8,7 @@ class Hive:
 
     def __init__(self):
         """Hive API initialisation."""
+        self.log = Logger()
         self.urls = {
             'login': "https://beekeeper.hivehome.com/1.0/global/login",
             'base': "https://beekeeper-uk.hivehome.com/1.0",
@@ -190,5 +192,6 @@ class Hive:
         return self.json_return
 
     def error(self):
-        self.json_return.update({'original': "Error getting JSON data"})
-        self.json_return.update({'parsed': "Error getting JSON data"})
+        self.json_return.update({'original': "Error making API call"})
+        self.json_return.update({'parsed': "Error making API call"})
+        self.log.log('API_ERROR', 'ERROR', "Error attempting API call")

@@ -16,60 +16,55 @@ class Action:
 
     def get_state(self, n_id):
         """Get action state."""
-        self.log.log('action', "Getting state of action: " +
-                     Data.NAME[n_id])
-        end = False
+        self.log.log(n_id, self.type, "Getting state")
+        final = False
 
         if n_id in Data.actions:
             data = Data.actions[n_id]
-            end = data["enabled"]
-            Data.NODES["Action_State_" + n_id] = end
-            self.log.log('action', "State for " + Data.NAME[n_id] +
-                         " is : " + str(end))
+            final = data["enabled"]
+            Data.NODES[n_id]["State"] = final
+            self.log.log(n_id, self.type, "Status is {0}", info=final)
         else:
-            self.log.log('sensor', "Failed to get state for " + Data.NAME[n_id])
+            self.log.error_check(n_id, 'ERROR', 'Failed')
 
-        return end if end is False else Data.NODES.get("Action_State_" + n_id)
+        return final if final is False else Data.NODES[n_id].get("State")
 
     def turn_on(self, n_id):
         """Set action turn on."""
         from pyhiveapi.hive_session import Session
-        self.log.log('action', "Enabling action : " + Data.NAME[n_id])
-        end = False
-        Session.check_hive_api_logon(Session())
-        data = Data.actions[n_id]
+        self.log.log(n_id, self.type, "Enabling action")
+        final = False
 
-        data.update({"enabled": "true"})
-        resp = self.hive.set_action(Data.sess_id, n_id, data)
-        if str(resp['original']) == "<Response [200]>":
-            end = True
-            Session.hive_api_get_nodes(Session(), n_id)
-            self.log.log("action", "Action  " + Data.NAME[n_id] +
-                         " has been successfully enabled")
-        else:
-            self.log.log("action", "Failed to enable on action: " +
-                         Data.NAME[n_id])
+        if n_id in Data.actions:
+            Session.check_hive_api_logon(Session())
+            data = Data.actions[n_id]
+            data.update({"enabled": "true"})
+            resp = self.hive.set_action(Data.sess_id, n_id, data)
+            if str(resp['original']) == "<Response [200]>":
+                final = True
+                Session.hive_api_get_nodes(Session(), n_id)
+                self.log.log(n_id, 'API_Action', "Enabled action - API response 200")
+            else:
+                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
 
-        return end
+        return final
 
     def turn_off(self, n_id):
         """Set action to turn off."""
         from pyhiveapi.hive_session import Session
-        self.log.log('action', "Diabling off action : " + Data.NAME[n_id])
+        self.log.log(n_id, self.type, "Disabling action")
         final = False
 
-        if n_id in Data.products:
+        if n_id in Data.actions:
             Session.check_hive_api_logon(Session())
             data = Data.actions[n_id]
-
             data.update({"enabled": "false"})
             resp = self.hive.set_action(Data.sess_id, n_id, data)
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log("action", "Action  " + Data.NAME[n_id] +
-                             " has been successfully disabiled on")
+                self.log.log(n_id, 'API_Action', "Disabled action - API response 200")
             else:
-                self.log.log("action", "Failed to disable on action: " +
-                             Data.NAME[n_id])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+
         return final

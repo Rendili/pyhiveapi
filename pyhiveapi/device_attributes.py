@@ -12,12 +12,12 @@ class Attributes:
 
     def state_attributes(self, n_id):
         """Get HA State Attributes"""
-        self.log.log("attribute", "Getting state_attributes for: " + n_id)
+        self.log.log(n_id, self.type, "Getting state_attributes")
         state_attributes = {}
 
         state_attributes.update({"availability": (self.online_offline(n_id))})
         if n_id in Data.BATTERY:
-            state_attributes.update({"battery_level": str(self.batt(n_id)) + "%"})
+            state_attributes.update({"battery_level": (self.batt(n_id)) + "%"})
         if n_id in Data.MODE:
             state_attributes.update({"mode": (self.get_mode(n_id))})
 
@@ -25,28 +25,23 @@ class Attributes:
 
     def online_offline(self, n_id):
         """Check if device is online"""
-        self.log.log("attribute", "Checking device availability for : " +
-                     Data.NAME[n_id])
+        self.log.log(n_id, self.type, "Checking device availability")
         final = None
 
         if n_id in Data.devices:
             data = Data.devices[n_id]
             state = data["props"]["online"]
             final = Data.HIVETOHA[self.type].get(state, 'UNKNOWN')
-            Data.NODES[n_id]['Device_Availability'] = final
-            self.log.log("attribute", "Availability of device " +
-                         Data.NAME[n_id] + " is : " +
-                         Data.HIVETOHA[type].get(state))
+            Data.NODES[n_id]['Availability'] = final
+            self.log.log(n_id, self.type, "Device is {0}", info=str(final))
         else:
-            self.log.log("attribute", "Device does not have " +
-                         "availability info : " + Data.NAME[n_id])
+            self.log.error_check(n_id, 'ERROR', 'Failed')
 
-        return final if final is None else Data.NODES[n_id]['Device_Availability']
+        return final if final is None else Data.NODES[n_id]['Availability']
 
     def get_mode(self, n_id):
         """Get sensor mode."""
-        self.log.log("attribute", "Checking device mode for : " +
-                     Data.NAME[n_id])
+        self.log.log(n_id, self.type, "Getting mode of device")
         state = self.online_offline(n_id)
         final = None
 
@@ -54,28 +49,30 @@ class Attributes:
             if state != 'Offline':
                 data = Data.products[n_id]
                 state = data["state"]["mode"]
+                self.log.log(n_id, self.type, "Mode is {0}", info=str(final))
+            self.log.error_check(n_id, self.type, state)
             final = Data.HIVETOHA[self.type].get(state, state)
             Data.NODES[n_id]["Device_Mode"] = final
-            self.log.log("attribute", "Mode for device " +
-                         Data.NAME[n_id] + " is : " + str(final))
         else:
-            self.log.log("attribute", "Device does not have mode info : " +
-                         Data.NAME[n_id])
+            self.log.error_check(n_id, 'ERROR', 'Failed')
+
         return final if final is None else Data.NODES[n_id]['Device_Mode']
 
     def batt(self, n_id):
         """Get device battery level."""
-        self.log.log("attribute", "Checking battery level for : " +
-                     Data.NAME[n_id])
-        state = None
+        self.log.log(n_id, self.type, "Checking battery level")
+        state = self.online_offline(n_id)
+        final = None
 
         if n_id in Data.devices:
-            data = Data.devices[n_id]
-            state = data["props"]["battery"]
-            Data.NODES["BatteryLevel_" + n_id] = state
-            self.log.log("attribute", "Battery level for device " +
-                         Data.NAME[n_id] + " is : " + str(state))
+            if state != 'Offline':
+                data = Data.devices[n_id]
+                state = data["props"]["battery"]
+                self.log.log(n_id, self.type, "Battery level is", info=str(final))
+            self.log.error_check(n_id, self.type, state)
+            final = state
+            Data.NODES[n_id]["BatteryLevel"] = final
         else:
-            self.log.log("attribute", "Could not get battery level for : " +
-                         Data.NAME[n_id])
-        return state
+            self.log.error_check(n_id, 'ERROR', 'Failed')
+
+        return final if final is None else Data.NODES[n_id]['BatteryLevel']
