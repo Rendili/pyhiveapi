@@ -31,5 +31,5 @@ setup(
         'console_scripts': [
             'pyhiveapi=pyhiveapi.pyhiveapi:Pyhiveapi',
         ],
-    }
+    }, install_requires=['requests']
 )
