@@ -19,7 +19,7 @@ class Session:
         self.lock = threading.Lock()
         self.api = Hive()
         self.log = Logger()
-        self.type = self.type
+        self.type = 'Session'
 
     def hive_api_logon(self):
         """Log in to the Hive API and get the Session Data."""
@@ -567,7 +567,7 @@ class Session:
         device_all['device_list_light'] = light
         device_all['device_list_plug'] = switch
 
-        self.log.log('Core', self.type, "Hive component has initialised")
+        self.log.log('Session', self.type, "Hive component has initialised")
 
         return device_all
 

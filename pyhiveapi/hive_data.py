@@ -75,12 +75,12 @@ class Data:
                'Action': 'log.aciton',
                'Attribute': 'log.attribute',
                'API': 'log.api',
-               'Core': 'log.core',
                'ERROR': 'log.error',
                'Heating': 'log.heating',
                'Hotwater': 'log.hotwater',
                'Light': 'log.light',
-               'Switch': 'log.switch',
                'Sensor': 'log.sensor',
+               'Session': 'log.session',
+               'Switch': 'log.switch',
                }
     l_values = {}
