@@ -251,7 +251,7 @@ class Session:
         return converted_time_string
 
     @staticmethod
-    def p_get_schedule_now_next_later(self, hive_api_schedule):
+    def p_get_schedule_nnl(self, hive_api_schedule):
         """Get the schedule now, next and later of a given nodes schedule."""
         schedule_now_and_next = {}
         date_time_now = datetime.now()
@@ -347,7 +347,7 @@ class Session:
         switch = []
 
         for a_device in Data.devices:
-            if Data.devices[a_device]["type"] in Data.types['hub']:
+            if Data.devices[a_device]["type"] in Data.types['Hub']:
                 d = Data.devices[a_device]
                 try:
                     Data.NAME.update({d["id"]: d["state"]["name"]})
@@ -382,12 +382,12 @@ class Session:
                     self.log.log('No_ID', self.type, "Failed to find hive hub sensors")
 
         count = sum(1 for i in Data.products
-                    if Data.products[i]['type'] == 'heating')
+                    if Data.products[i]['type'] in Data.types['Heating'])
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['heating']:
+            if Data.products[product]['type'] in Data.types['Heating']:
                 p = Data.products[product]
                 for device in Data.devices:
-                    if Data.devices[device]['type'] in Data.types['thermo']:
+                    if Data.devices[device]['type'] in Data.types['Thermo']:
                         d = Data.devices[device]
                         if p["parent"] == d["props"]["zone"]:
                             try:
@@ -430,9 +430,9 @@ class Session:
                                              "heating")
 
         count = sum(1 for i in Data.products
-                    if Data.products[i]['type'] == 'hotwater')
+                    if Data.products[i]['type'] in Data.types['Hotwater'])
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['hotwater']:
+            if Data.products[product]['type'] in Data.types['Hotwater']:
                 p = Data.products[product]
                 try:
                     node_name = p["state"]["name"]
@@ -459,9 +459,9 @@ class Session:
                     self.log.log('No_ID', self.type, "Failed to find hive hotwater")
 
         count = sum(1 for i in Data.devices
-                    if Data.devices[i]['type'] == 'thermostatui')
+                    if Data.devices[i]['type'] in Data.types['Thermo'])
         for a_device in Data.devices:
-            if Data.devices[a_device]['type'] in Data.types['thermo'] or \
+            if Data.devices[a_device]['type'] in Data.types['Thermo'] or \
                     Data.devices[a_device]['type'] in Data.types['sensor']:
                 d = Data.devices[a_device]
                 try:
@@ -482,7 +482,7 @@ class Session:
                     self.log.log('No_ID', self.type, "Failed to find hive sensors")
 
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['light']:
+            if Data.products[product]['type'] in Data.types['Light']:
                 p = Data.products[product]
                 Data.MODE.append(p["id"])
                 try:
@@ -505,7 +505,7 @@ class Session:
                     self.log.log('No_ID', self.type, "Failed to find hive lights")
 
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['plug']:
+            if Data.products[product]['type'] in Data.types['Plug']:
                 p = Data.products[product]
                 Data.MODE.append(p["id"])
                 try:
@@ -540,7 +540,7 @@ class Session:
                     self.log.log('No_id', self.type, "Failed to find hive plugs")
 
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['sensor']:
+            if Data.products[product]['type'] in Data.types['Sensor']:
                 p = Data.products[product]
                 try:
                     Data.NAME.update({p["id"]: p["state"]["name"]})

@@ -7,7 +7,7 @@ file = {}
 
 print('Using File')
 devices = (input("Enter path for the devices file : ") or None)
-if devices != None:
+if devices is not None:
     JSON_File = open(devices, 'r')
     devices_t = JSON_File.read()
     JSON_File.close()

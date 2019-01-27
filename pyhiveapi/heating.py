@@ -102,8 +102,8 @@ class Heating:
                     state = data["state"]["target"]
 
                 else:
-                    snan = Session.p_get_schedule_now_next_later(Session(),
-                                                                 data["state"]["schedule"])
+                    snan = Session.p_get_schedule_nnl(Session(),
+                                                      data["state"]["schedule"])
                     if 'now' in snan:
                         state = snan["now"]["value"]["target"]
                     else:
@@ -216,8 +216,8 @@ class Heating:
         if n_id in Data.products:
             if state == 'Offline' and current_mode == "SCHEDULE":
                 data = Data.products
-                state = Session.p_get_schedule_now_next_later(Session(),
-                                                              data["state"]["schedule"])
+                state = Session.p_get_schedule_nnl(Session(),
+                                                   data["state"]["schedule"])
                 self.log.log(n_id, self.type, "Schedule is {0}", info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = state

@@ -23,7 +23,7 @@ class Hub:
         final = None
 
         if n_id in Data.devices:
-            if state != 'offline':
+            if state != 'Offline':
                 data = Data.devices[n_id]
                 state = data["props"]["online"]
                 final = Data.HIVETOHA[self.type]["Status"].get(state, state)
@@ -44,7 +44,7 @@ class Hub:
         final = None
 
         if n_id in Data.products:
-            if state != 'offline':
+            if state != 'Offline':
                 data = Data.products[n_id]
                 state = data["props"]["sensors"]["SMOKE_CO"]["active"]
                 final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
@@ -64,7 +64,7 @@ class Hub:
         final = None
 
         if n_id in Data.products:
-            if state != 'offline':
+            if state != 'Offline':
                 data = Data.products[n_id]
                 state = data["props"]["sensors"]["DOG_BARK"]["active"]
                 final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
@@ -84,7 +84,7 @@ class Hub:
         final = None
 
         if n_id in Data.products:
-            if state != 'offline':
+            if state != 'Offline':
                 data = Data.products[n_id]
                 state = data["props"]["sensors"]["GLASS_BREAK"]["active"]
                 final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)

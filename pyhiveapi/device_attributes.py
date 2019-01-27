@@ -12,14 +12,20 @@ class Attributes:
 
     def state_attributes(self, n_id):
         """Get HA State Attributes"""
+        from pyhiveapi.hive_session import Session
         self.log.log(n_id, self.type, "Getting state_attributes")
         state_attributes = {}
 
         state_attributes.update({"availability": (self.online_offline(n_id))})
         if n_id in Data.BATTERY:
-            state_attributes.update({"battery_level": (self.batt(n_id)) + "%"})
+            state_attributes.update({"battery_level": (self.battery(n_id)) + "%"})
         if n_id in Data.MODE:
             state_attributes.update({"mode": (self.get_mode(n_id))})
+        if n_id in Data.products:
+            data = Data.products[n_id]
+            if data['type'] in Data.types['Sensor']:
+                time = Session.epochtime(data['props']['statusChanged'])
+                state_attributes.update({'state_changed': time})
 
         return state_attributes
 
@@ -58,7 +64,7 @@ class Attributes:
 
         return final if final is None else Data.NODES[n_id]['Device_Mode']
 
-    def batt(self, n_id):
+    def battery(self, n_id):
         """Get device battery level."""
         self.log.log(n_id, self.type, "Checking battery level")
         state = self.online_offline(n_id)

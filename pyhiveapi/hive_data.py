@@ -16,29 +16,29 @@ class Data:
     actions = None
     NODES = {'Header': 'HeaderText'}
     HIVETOHA = {'Attribute': {True: 'Online', False: 'Offline'},
-                'Boost': {None: 'OFF', 'offline': 'OFF'},
-                'Heating': {'offline': 'OFF'},
-                'Hotwater': {'MANUAL': 'ON', None: 'OFF'},
-                'Hub': {'Status': {True: 'Online', False: 'Offline', 'offline': 'Offline'},
+                'Boost': {None: 'OFF', 'Offline': 'OFF'},
+                'Heating': {'Offline': 'OFF'},
+                'Hotwater': {'MANUAL': 'ON', None: 'OFF', 'Offline': 'OFF'},
+                'Hub': {'Status': {True: 'Online', False: 'Offline', 'Offline': 'Offline'},
                         'Smoke': {True: "Smoke Alarm Detected", False:
-                                  "Nothing Detected", 'offline': 'Offline'},
+                                  "Nothing Detected", 'Offline': 'Offline'},
                         'Dog': {True: "Dog Bark Detected", False:
-                                "Nothing Detected", 'offline': 'Offline'},
+                                "Nothing Detected", 'Offline': 'Offline'},
                         'Glass': {True: "Broken Glass Detected", False:
-                                  "Nothing Detected", 'offline': 'Offline'}},
-                'Light': {'ON': True, 'OFF': False, 'offline': False},
-                'Sensor': {'OPEN': True, 'CLOSED': False, 'offline': False},
-                'Switch': {'ON': True, 'OFF': False, 'offline': False}
+                                  "Nothing Detected", 'Offline': 'Offline'}},
+                'Light': {'ON': True, 'OFF': False, 'Offline': False},
+                'Sensor': {'OPEN': True, 'CLOSED': False, 'Offline': False},
+                'Switch': {'ON': True, 'OFF': False, 'Offline': False}
                 }
     NAME = {}
-    types = {'hub': ['hub', 'sense'],
-             'thermo': ['thermostatui'],
-             'heating': ['heating'],
-             'hotwater': ['hotwater'],
-             'plug': ['activeplug'],
-             'light': ['warmwhitelight', 'tuneablelight',
+    types = {'Hub': ['hub', 'sense'],
+             'Thermo': ['thermostatui'],
+             'Heating': ['heating'],
+             'Hotwater': ['hotwater'],
+             'Plug': ['activeplug'],
+             'Light': ['warmwhitelight', 'tuneablelight',
                        'colourtuneablelight'],
-             'sensor': ['motionsensor', 'contactsensor']}
+             'Sensor': ['motionsensor', 'contactsensor']}
 
     # Session Data
     sess_id = ''

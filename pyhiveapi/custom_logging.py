@@ -38,6 +38,8 @@ class Logger:
         """Output new log entry if logging is turned on."""
         name = Data.NAME.get(n_id, n_id)
         data = kwargs.get('info', None)
+        if n_id == 'No_ID':
+            name = 'Hive'
         f = False
         if '_' in l_type:
             x = l_type.split("_")
@@ -63,12 +65,12 @@ class Logger:
             pass
 
     def error_check(self, n_id, n_type, error_type, **kwargs):
-        """Error has occured."""
+        """Error has occurred."""
         import re
         message = None
         new_data = None
         if error_type == 'Offline':
-            message = "Offline could not update device."
+            message = "Offline could not update entity."
         elif error_type == 'Failed:':
             message = "ERROR - No data found for device."
         elif error_type == 'Failed_API':
