@@ -1,6 +1,7 @@
 """Custom Logging Module."""
 import os
 from datetime import datetime
+
 from pyhiveapi.hive_data import Data
 
 

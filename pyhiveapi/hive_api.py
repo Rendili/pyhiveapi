@@ -1,5 +1,6 @@
 """Hive API Module."""
 import requests
+
 from pyhiveapi.custom_logging import Logger
 
 

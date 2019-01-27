@@ -1,8 +1,8 @@
 """Hive Hub Module."""
-from pyhiveapi.hive_api import Hive
-from pyhiveapi.hive_data import Data
 from pyhiveapi.custom_logging import Logger
 from pyhiveapi.device_attributes import Attributes
+from pyhiveapi.hive_api import Hive
+from pyhiveapi.hive_data import Data
 
 
 class Hub:

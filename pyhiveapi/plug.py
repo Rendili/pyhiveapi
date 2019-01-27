@@ -7,6 +7,7 @@ from pyhiveapi.hive_data import Data
 
 class Plug:
     """Hive Switch Code."""
+
     def __init__(self):
         """Initialise."""
         self.hive = Hive()

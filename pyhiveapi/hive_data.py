@@ -21,11 +21,11 @@ class Data:
                 'Hotwater': {'MANUAL': 'ON', None: 'OFF', 'Offline': 'OFF'},
                 'Hub': {'Status': {True: 'Online', False: 'Offline', 'Offline': 'Offline'},
                         'Smoke': {True: "Smoke Alarm Detected", False:
-                                  "Nothing Detected", 'Offline': 'Offline'},
+                            "Nothing Detected", 'Offline': 'Offline'},
                         'Dog': {True: "Dog Bark Detected", False:
-                                "Nothing Detected", 'Offline': 'Offline'},
+                            "Nothing Detected", 'Offline': 'Offline'},
                         'Glass': {True: "Broken Glass Detected", False:
-                                  "Nothing Detected", 'Offline': 'Offline'}},
+                            "Nothing Detected", 'Offline': 'Offline'}},
                 'Light': {'ON': True, 'OFF': False, 'Offline': False},
                 'Sensor': {'OPEN': True, 'CLOSED': False, 'Offline': False},
                 'Switch': {'ON': True, 'OFF': False, 'Offline': False}
@@ -78,7 +78,7 @@ class Data:
                'Core': 'log.core',
                'ERROR': 'log.error',
                'Heating': 'log.heating',
-               'Hotwater':  'log.hotwater',
+               'Hotwater': 'log.hotwater',
                'Light': 'log.light',
                'Switch': 'log.switch',
                'Sensor': 'log.sensor',

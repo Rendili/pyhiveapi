@@ -182,7 +182,7 @@ class Heating:
 
     def get_boost_time(self, n_id):
         """Get heating boost time remaining."""
-        if self. get_boost(n_id) == 'ON':
+        if self.get_boost(n_id) == 'ON':
             self.log.log(n_id, self.type, "Getting boost time")
             state = self.attr.online_offline(n_id)
             final = None
