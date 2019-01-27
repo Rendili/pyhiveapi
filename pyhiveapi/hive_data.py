@@ -19,7 +19,7 @@ class Data:
                 'Boost': {None: 'OFF', 'Offline': 'OFF'},
                 'Heating': {'Offline': 'OFF'},
                 'Hotwater': {'MANUAL': 'ON', None: 'OFF', 'Offline': 'OFF'},
-                'Hub': {'Status': {True: 'Online', False: 'Offline', 'Offline': 'Offline'},
+                'Hub': {'Status': {True: 'Online', False: 'Offline'},
                         'Smoke': {True: "Smoke Alarm Detected", False:
                             "Nothing Detected", 'Offline': 'Offline'},
                         'Dog': {True: "Dog Bark Detected", False:

@@ -44,7 +44,8 @@ class Plug:
             if state != 'Offline':
                 data = Data.products[n_id]
                 state = data["props"]["powerConsumption"]
-                self.log.log(n_id, self.type, "Power consumption is {0}", info=state)
+                self.log.log(n_id, self.type, "Power consumption is {0}",
+                             info=state)
             self.log.error_check(n_id, self.type, state)
             final = state
             Data.NODES[n_id]["Power"] = final
@@ -62,13 +63,15 @@ class Plug:
         if n_id in Data.products:
             Session.check_hive_api_logon(Session())
             data = Data.products[n_id]
-            resp = self.hive.set_state(Data.sess_id, data['type'], n_id, status='ON')
+            resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
+                                       status='ON')
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Switch', "Switched turned on - API response 200")
+                self.log.log(n_id, 'API', "Switched on - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -81,12 +84,14 @@ class Plug:
         if n_id in Data.products:
             Session.check_hive_api_logon(Session())
             data = Data.products[n_id]
-            resp = self.hive.set_state(Data.sess_id, data['type'], n_id, status='OFF')
+            resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
+                                       status='OFF')
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Switch', "Switch turned off - API response 200")
+                self.log.log(n_id, 'API', "Switch off - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final

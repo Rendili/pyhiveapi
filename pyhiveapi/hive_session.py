@@ -145,9 +145,10 @@ class Session:
 
                 api_resp = str(api_resp_d['original'])
                 if api_resp == "<Response [200]>":
-                    self.log.log(n_id, 'Core_API', "Got Devices - API response 200")
+                    self.log.log(n_id, 'API', "Devices - API response 200")
                 else:
-                    self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=api_resp)
+                    self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                         resp=api_resp)
 
             api_resp_p = api_resp_d['parsed']
 
@@ -167,9 +168,10 @@ class Session:
             elif Data.sess_id is not None:
                 resp = self.api.get_products(Data.sess_id)
                 if api_resp == "<Response [200]>":
-                    self.log.log(n_id, 'Core_API', "Got Products - API response 200")
+                    self.log.log(n_id, 'API', "Products - API response 200")
                 else:
-                    self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=api_resp)
+                    self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                         resp=api_resp)
 
             for a_product in resp['parsed']:
                 if 'id' in a_product:
@@ -186,9 +188,10 @@ class Session:
             elif Data.sess_id is not None:
                 resp = self.api.get_actions(Data.sess_id)
                 if api_resp == "<Response [200]>":
-                    self.log.log(n_id, 'Core_API', "Got Actions - API response 200")
+                    self.log.log(n_id, 'API', "Actions - API response 200")
                 else:
-                    self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=api_resp)
+                    self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                         resp=api_resp)
 
             for a_action in resp['parsed']:
                 if 'id' in a_action:
@@ -338,7 +341,7 @@ class Session:
                 self.hive_api_get_weather()
 
         if Data.devices is None or Data.products is None:
-            self.log.log('No_ID', self.type, "Failed to get devices and products")
+            self.log.log('No_ID', self.type, "Failed to get data")
 
         device_all = {}
         sensor = []
@@ -357,7 +360,7 @@ class Session:
                                    'Hive_NodeName': d["state"]["name"],
                                    "Hive_DeviceType": "Hub"})
                 except KeyError:
-                    self.log.log('No_ID', self.type, "Failed to find hive hub")
+                    self.log.log('Hub', self.type, "No data found.")
 
         for a_product in Data.products:
             if Data.products[a_product]["type"] == 'sense':
@@ -380,7 +383,7 @@ class Session:
                                                     " Glass Break Detection",
                                    "Hive_DeviceType": "Hub"})
                 except KeyError:
-                    self.log.log('No_ID', self.type, "Failed to find hive hub sensors")
+                    self.log.log('Hub 360', self.type, "No data found")
 
         count = sum(1 for i in Data.products
                     if Data.products[i]['type'] in Data.types['Heating'])
@@ -427,8 +430,7 @@ class Session:
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                             except KeyError:
-                                self.log.log('No_ID', self.type, "Failed to find hive " +
-                                             "heating")
+                                self.log.log('Hot', self.type, "No data found")
 
         count = sum(1 for i in Data.products
                     if Data.products[i]['type'] in Data.types['Hotwater'])
@@ -457,7 +459,7 @@ class Session:
                                    'Hive_NodeName': node_name,
                                    "Hive_DeviceType": "HotWater"})
                 except KeyError:
-                    self.log.log('No_ID', self.type, "Failed to find hive hotwater")
+                    self.log.log('Hotwater', self.type, "No data found.")
 
         count = sum(1 for i in Data.devices
                     if Data.devices[i]['type'] in Data.types['Thermo'])
@@ -480,7 +482,7 @@ class Session:
                                    'Hive_NodeName': node_name,
                                    "Hive_DeviceType": d["type"]})
                 except KeyError:
-                    self.log.log('No_ID', self.type, "Failed to find hive sensors")
+                    self.log.log('Thermostat', self.type, "No data found")
 
         for product in Data.products:
             if Data.products[product]['type'] in Data.types['Light']:
@@ -503,7 +505,7 @@ class Session:
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
                 except KeyError:
-                    self.log.log('No_ID', self.type, "Failed to find hive lights")
+                    self.log.log('Light', self.type, "No data found")
 
         for product in Data.products:
             if Data.products[product]['type'] in Data.types['Plug']:
@@ -526,7 +528,7 @@ class Session:
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
                 except KeyError:
-                    self.log.log('No_ID', self.type, "Failed to find hive plugs")
+                    self.log.log('Plug', self.type, "No data found")
 
         for action in Data.actions:
             a = Data.actions[action]
@@ -538,7 +540,7 @@ class Session:
                                'Hive_NodeName': a["name"],
                                "Hive_DeviceType": "Action"})
             except KeyError:
-                self.log.log('No_id', self.type, "Failed to find hive plugs")
+                self.log.log('Actions', self.type, "No data found")
 
         for product in Data.products:
             if Data.products[product]['type'] in Data.types['Sensor']:
@@ -551,7 +553,7 @@ class Session:
                                           'Hive_NodeName': p["state"]["name"],
                                           "Hive_DeviceType": p["type"]})
                 except KeyError:
-                    self.log.log('No_ID', self.type, "Failed to find hive sensors")
+                    self.log.log('Sensor', self.type, "No data found")
 
         if Data.w_nodeid == "HiveWeather":
             sensor.append({'HA_DeviceType': 'Hive_OutsideTemperature',
@@ -565,7 +567,7 @@ class Session:
         device_all['device_list_light'] = light
         device_all['device_list_plug'] = switch
 
-        self.log.log('No_ID', self.type, "Hive component has initialised")
+        self.log.log('Core', self.type, "Hive component has initialised")
 
         return device_all
 

@@ -18,7 +18,8 @@ class Attributes:
 
         state_attributes.update({"availability": (self.online_offline(n_id))})
         if n_id in Data.BATTERY:
-            state_attributes.update({"battery_level": (self.battery(n_id)) + "%"})
+            state_attributes.update({"battery_level": (self.battery(n_id)) +
+                                                      '%'})
         if n_id in Data.MODE:
             state_attributes.update({"mode": (self.get_mode(n_id))})
         if n_id in Data.products:
@@ -74,7 +75,7 @@ class Attributes:
             if state != 'Offline':
                 data = Data.devices[n_id]
                 state = data["props"]["battery"]
-                self.log.log(n_id, self.type, "Battery level is", info=str(final))
+                self.log.log(n_id, self.type, "Battery level is", info=final)
             self.log.error_check(n_id, self.type, state)
             final = state
             Data.NODES[n_id]["BatteryLevel"] = final

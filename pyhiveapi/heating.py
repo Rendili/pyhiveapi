@@ -38,7 +38,8 @@ class Heating:
                 state = data["props"]["temperature"]
 
                 if n_id in Data.p_minmax:
-                    if Data.p_minmax[n_id]['TodayDate'] != datetime.date(datetime.now()):
+                    if Data.p_minmax[n_id]['TodayDate'] != datetime.date(
+                            datetime.now()):
                         Data.p_minmax[n_id]['TodayMin'] = 1000
                         Data.p_minmax[n_id]['TodayMax'] = -1000
                         Data.p_minmax[n_id]['TodayDate'] = datetime.date(
@@ -56,10 +57,12 @@ class Heating:
                     if state > Data.p_minmax[n_id]['RestartMax']:
                         Data.p_minmax[n_id]['RestartMax'] = state
                 else:
-                    data = {'TodayMin': state, 'TodayMax': state, 'TodayDate': datetime.date(
-                        datetime.now()), 'RestartMin': state, 'RestartMax': state}
+                    data = {'TodayMin': state, 'TodayMax': state,
+                            'TodayDate': datetime.date(datetime.now()),
+                            'RestartMin': state, 'RestartMax': state}
                     Data.p_minmax[n_id] = data
-                self.log.log(n_id, self.type, "Current Temp is {0}", info=str(state))
+                self.log.log(n_id, self.type, "Current Temp is {0}",
+                             info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = state
             Data.NODES[n_id]['CurrentTemp'] = final
@@ -103,12 +106,14 @@ class Heating:
 
                 else:
                     snan = Session.p_get_schedule_nnl(Session(),
-                                                      data["state"]["schedule"])
+                                                      data["state"]
+                                                      ["schedule"])
                     if 'now' in snan:
                         state = snan["now"]["value"]["target"]
                     else:
                         state = data["state"]["target"]
-                self.log.log(n_id, self.type, "Target temp is {0}", info=str(state))
+                self.log.log(n_id, self.type, "Target temp is {0}",
+                             info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = state
             Data.NODES[n_id]['TargetTemp'] = final
@@ -170,8 +175,10 @@ class Heating:
         if n_id in Data.products:
             if state != 'Offline':
                 data = Data.products[n_id]
-                state = Data.HIVETOHA['Boost'].get(data["state"]["boost"], 'ON')
-                self.log.log(n_id, self.type, "Boost state is {0}", info=str(state))
+                state = Data.HIVETOHA['Boost'].get(data["state"]["boost"],
+                                                   'ON')
+                self.log.log(n_id, self.type, "Boost state is {0}",
+                             info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = state
             Data.NODES[n_id]['Boost'] = final
@@ -191,7 +198,8 @@ class Heating:
                 if state != 'Offline':
                     data = Data.products[n_id]
                     state = data["state"]["boost"]
-                    self.log.log(n_id, self.type, "Time left on boost is {0}", info=str(state))
+                    self.log.log(n_id, self.type, "Time left on boost is {0}",
+                                 info=str(state))
                 self.log.error_check(n_id, self.type, state)
                 final = state
                 Data.NODES[n_id]['Boost_Time'] = final
@@ -218,7 +226,8 @@ class Heating:
                 data = Data.products
                 state = Session.p_get_schedule_nnl(Session(),
                                                    data["state"]["schedule"])
-                self.log.log(n_id, self.type, "Schedule is {0}", info=str(state))
+                self.log.log(n_id, self.type, "Schedule is {0}",
+                             info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = state
             Data.NODES[n_id]['snnl'] = final
@@ -241,9 +250,10 @@ class Heating:
             if str(resp['original']) == "<Response [200]>":
                 Session.hive_api_get_nodes(Session(), n_id)
                 final = True
-                self.log.log(n_id, 'API_Heating', "Temperature set - API response 200")
+                self.log.log(n_id, 'API', "Temperature set - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -261,9 +271,10 @@ class Heating:
             if str(resp['original']) == "<Response [200]>":
                 Session.hive_api_get_nodes(Session(), n_id)
                 final = True
-                self.log.log(n_id, 'API_Heating', "Mode updated - API response 200")
+                self.log.log(n_id, 'API', "Mode updated - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -279,14 +290,17 @@ class Heating:
                 if n_id in Data.products:
                     data = Data.products[n_id]
                     resp = self.hive.set_state(Data.sess_id, data[type], n_id,
-                                               mode='BOOST', boost=mins, target=temp)
+                                               mode='BOOST', boost=mins,
+                                               target=temp)
 
                     if str(resp['original']) == "<Response [200]>":
                         Session.hive_api_get_nodes(Session(), n_id)
                         final = True
-                        self.log.log(n_id, 'API_Heating', "Boost enabled - API response 200")
+                        self.log.log(n_id, 'API', "Boost enabled - " +
+                                     "API response 200")
                     else:
-                        self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                        self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                             resp=resp['original'])
 
                 return final
 
@@ -303,17 +317,19 @@ class Heating:
             if self.get_boost(n_id) == "ON":
                 prev_mode = data["props"]["previous"]["mode"]
                 if prev_mode == "MANUAL":
-                    prev_temp = data["props"]["previous"]["target"]
+                    pre_temp = data["props"]["previous"]["target"]
                     resp = self.hive.set_state(Data.sess_id, data[type], n_id,
-                                               mode=prev_mode, target=prev_temp)
+                                               mode=prev_mode, target=pre_temp)
                 else:
                     resp = self.hive.set_state(Data.sess_id, data[type], n_id,
                                                mode=prev_mode)
                 if str(resp['original']) == "<Response [200]>":
                     Session.hive_api_get_nodes(Session(), n_id)
                     final = True
-                    self.log.log(n_id, 'API_Heating', "Boost disabled - API response 200")
+                    self.log.log(n_id, 'API', "Boost disabled - " +
+                                 "API response 200")
                 else:
-                    self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                    self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                         resp=resp['original'])
 
         return final

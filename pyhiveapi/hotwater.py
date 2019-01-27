@@ -73,7 +73,8 @@ class Hotwater:
                 if state != 'Offline':
                     data = Data.products[n_id]
                     state = data["state"]["boost"]
-                    self.log.log(n_id, self.type, "Boost time is {0}", info=state)
+                    self.log.log(n_id, self.type, "Boost time is {0}",
+                                 info=state)
                 self.log.error_check(n_id, self.type, state)
                 final = state
                 Data.NODES[n_id]['Boost_Time'] = final
@@ -99,7 +100,8 @@ class Hotwater:
                         state = 'ON'
                     else:
                         snan = Session.p_get_schedule_nnl(Session(),
-                                                          data["state"]["schedule"])
+                                                          data["state"]
+                                                          ["schedule"])
                         state = snan["now"]["value"]["status"]
             self.log.error_check(n_id, self.type, state)
             final = Data.HIVETOHA[self.type].get(state, state)
@@ -141,13 +143,16 @@ class Hotwater:
         if n_id in Data.products:
             Session.check_hive_api_logon(Session())
             data = Data.products[n_id]
-            resp = self.hive.set_state(Data.sess_id, data[type], n_id, mode=new_mode)
+            resp = self.hive.set_state(Data.sess_id, data[type], n_id,
+                                       mode=new_mode)
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Hotwater', "Mode set to {0} - API response 200", info=new_mode)
+                self.log.log(n_id, 'API', "Mode set to {0} - API response 200",
+                             info=new_mode)
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
             return final
 
@@ -165,9 +170,10 @@ class Hotwater:
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Hotwater', "Boost turned on - API response 200")
+                self.log.log(n_id, 'API', "Boost on - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -186,8 +192,9 @@ class Hotwater:
             if str(resp['original']) == "<Response [200]>":
                 Session.hive_api_get_nodes(Session(), n_id)
                 final = True
-                self.log.log(n_id, 'API_Hotwater', "Boost turned off - API response 200")
+                self.log.log(n_id, 'API', "Boost off - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final

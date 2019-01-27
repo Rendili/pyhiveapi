@@ -67,7 +67,8 @@ class Light:
                 state = data["props"]["colourTemperature"]["max"]
                 final = round((1 / state) * 1000000)
                 Data.NODES[n_id]["Min_CT"] = final
-                self.log.log(n_id, self.type, "Min colour temp is {0}", info=final)
+                self.log.log(n_id, self.type, "Min colour temp is {0}",
+                             info=final)
             self.log.error_check(n_id, self.type, state)
         else:
             self.log.error_check(n_id, 'ERROR', 'Failed')
@@ -86,7 +87,8 @@ class Light:
                 state = data["props"]["colourTemperature"]["min"]
                 final = round((1 / state) * 1000000)
                 Data.NODES[n_id]["Max_CT"] = final
-                self.log.log(n_id, self.type, "Max colour temp is {0}", info=final)
+                self.log.log(n_id, self.type, "Max colour temp is {0}",
+                             info=final)
             self.log.error_check(n_id, self.type, state)
         else:
             self.log.error_check(n_id, 'ERROR', 'Failed')
@@ -105,7 +107,8 @@ class Light:
                 state = data["state"]["colourTemperature"]
                 final = round((1 / state) * 1000000)
                 Data.NODES[n_id]["CT"] = final
-                self.log.log(n_id, self.type, "Colour temp is {0}", info=final)
+                self.log.log(n_id, self.type, "Colour temp is {0}",
+                             info=final)
             self.log.error_check(n_id, self.type, state)
         else:
             self.log.error_check(n_id, 'ERROR', 'Failed')
@@ -144,13 +147,15 @@ class Light:
         if n_id in Data.products:
             Session.check_hive_api_logon(Session())
             data = Data.products[n_id]
-            resp = self.hive.set_state(Data.sess_id, data['type'], n_id, status='OFF')
+            resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
+                                       status='OFF')
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Light', "Light turned off - API response 200")
+                self.log.log(n_id, 'API', "Light off - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -171,13 +176,15 @@ class Light:
             if color is not None:
                 self.set_color(n_id, color)
 
-            resp = self.hive.set_state(Data.sess_id, data['type'], n_id, status='ON')
+            resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
+                                       status='ON')
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Light', "Light turned on - API response 200")
+                self.log.log(n_id, 'API', "Light on - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -195,9 +202,10 @@ class Light:
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Light', "Brightness set - API response 200")
+                self.log.log(n_id, 'API', "Brightness set - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -225,9 +233,10 @@ class Light:
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Light', "Colour temp set - API response 200")
+                self.log.log(n_id, 'API', "Colour temp set - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -242,13 +251,16 @@ class Light:
             data = Data.products[n_id]
 
             resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
-                                       colourMode='COLOUR', hue=str(new_color[0]),
-                                       saturation=str(new_color[1]), value=str(new_color[2]))
+                                       colourMode='COLOUR',
+                                       hue=str(new_color[0]),
+                                       saturation=str(new_color[1]),
+                                       value=str(new_color[2]))
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Light', "Colour set - API response 200")
+                self.log.log(n_id, 'API', "Colour set - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final

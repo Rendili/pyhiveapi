@@ -44,9 +44,10 @@ class Action:
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Action', "Enabled action - API response 200")
+                self.log.log(n_id, 'API', "Enabled action - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
 
@@ -64,8 +65,9 @@ class Action:
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
-                self.log.log(n_id, 'API_Action', "Disabled action - API response 200")
+                self.log.log(n_id, 'API', "Disabled action - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API', resp=resp['original'])
+                self.log.error_check(n_id, 'ERROR', 'Failed_API',
+                                     resp=resp['original'])
 
         return final
