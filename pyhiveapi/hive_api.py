@@ -1,6 +1,5 @@
 """Hive API Module."""
 import requests
-
 from pyhiveapi.custom_logging import Logger
 
 
@@ -116,9 +115,13 @@ class Hive:
 
     def set_state(self, session_id, n_type, n_id, **kwargs):
         self.headers.update({'authorization': session_id})
-        jsc = '{{' + ','.join(('"' + i + '": ' '"' + t +
-                               '" ' for i, t in kwargs.items())) + '}}'
+        jsc = '{' + ','.join(('"' + str(i) + '": ' '"' + str(t) +
+                               '" ' for i, t in kwargs.items())) + '}'
+
         url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
+
+        self.log.log(n_id, 'api_core', "Headers >\n{0}\nURL >\n{1}\n" +
+                     "Payload\n{2}\n".format(self.headers, url, jsc))
         try:
             response = requests.post(url=url, headers=self.headers,
                                      data=jsc, timeout=self.timeout)
@@ -133,9 +136,10 @@ class Hive:
         self.headers.update({'authorization': session_id})
         jsc = data
         url = self.urls['base'] + self.urls['actions'] + "/" + n_id
-
+        self.log.log(n_id, 'api_core', "Headers >\n{0}\nURL >\n{1}\n" +
+                     "Payload\n{2}\n".format(self.headers, url, jsc))
         try:
-            response = requests.post(url=url, headers=self.headers,
+            response = requests.put(url=url, headers=self.headers,
                                      data=jsc, timeout=self.timeout)
             self.json_return.update({'original': str(response)})
             self.json_return.update({'parsed': response.json()})

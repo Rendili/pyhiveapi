@@ -124,7 +124,8 @@ class Hotwater:
             if state != 'Offline' and mode_current == 'SCHEDULE':
                 data = Data.products[n_id]
                 state = Session.p_get_schedule_nnl(Session(),
-                                                   data["state"]["schedule"])
+                                                   data["state"]
+                                                   ["schedule"])
                 final = state
                 Data.NODES[n_id]['snnl'] = final
                 self.log.log(n_id, self.type, "Schedule is {0}", info=final)

@@ -149,6 +149,7 @@ class Light:
             data = Data.products[n_id]
             resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
                                        status='OFF')
+            print(resp)
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)

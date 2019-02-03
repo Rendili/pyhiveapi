@@ -33,14 +33,16 @@ class Action:
     def turn_on(self, n_id):
         """Set action turn on."""
         from pyhiveapi.hive_session import Session
+        import json
         self.log.log(n_id, self.type, "Enabling action")
         final = False
 
         if n_id in Data.actions:
             Session.check_hive_api_logon(Session())
             data = Data.actions[n_id]
-            data.update({"enabled": "true"})
-            resp = self.hive.set_action(Data.sess_id, n_id, data)
+            data.update({"enabled": True})
+            send = json.dumps(data)
+            resp = self.hive.set_action(Data.sess_id, n_id, send)
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)
@@ -54,14 +56,17 @@ class Action:
     def turn_off(self, n_id):
         """Set action to turn off."""
         from pyhiveapi.hive_session import Session
+        import json
         self.log.log(n_id, self.type, "Disabling action")
         final = False
 
         if n_id in Data.actions:
             Session.check_hive_api_logon(Session())
             data = Data.actions[n_id]
-            data.update({"enabled": "false"})
-            resp = self.hive.set_action(Data.sess_id, n_id, data)
+            data.update({"enabled": False})
+            send = json.dumps(data)
+            resp = self.hive.set_action(Data.sess_id, n_id, send)
+            print(resp)
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)

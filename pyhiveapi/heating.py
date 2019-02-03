@@ -225,7 +225,8 @@ class Heating:
             if state == 'Offline' and current_mode == "SCHEDULE":
                 data = Data.products
                 state = Session.p_get_schedule_nnl(Session(),
-                                                   data["state"]["schedule"])
+                                                   data["state"]
+                                                   ["schedule"])
                 self.log.log(n_id, self.type, "Schedule is {0}",
                              info=str(state))
             self.log.error_check(n_id, self.type, state)

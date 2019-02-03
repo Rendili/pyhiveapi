@@ -14,21 +14,23 @@ class Attributes:
         """Get HA State Attributes"""
         from pyhiveapi.hive_session import Session
         self.log.log(n_id, self.type, "Getting state_attributes")
-        state_attributes = {}
+        attr = {}
 
-        state_attributes.update({"availability": (self.online_offline(n_id))})
-        if n_id in Data.BATTERY:
-            state_attributes.update({"battery_level": (self.battery(n_id)) +
-                                                      '%'})
-        if n_id in Data.MODE:
-            state_attributes.update({"mode": (self.get_mode(n_id))})
         if n_id in Data.products:
+            attr.update({"availability": (self.online_offline(n_id))})
+            if n_id in Data.BATTERY:
+                attr.update({"battery_level": str(self.battery(n_id)) + '%'})
+            if n_id in Data.MODE:
+                attr.update({"mode": (self.get_mode(n_id))})
+
             data = Data.products[n_id]
             if data['type'] in Data.types['Sensor']:
-                time = Session.epochtime(data['props']['statusChanged'])
-                state_attributes.update({'state_changed': time})
+                s = str(data['props']['statusChanged'])
+                t = '{:10.10}'.format(s)
+                time = Session.epochtime(t, '%d-%m-%Y %H:%M:%S','from_epoch')
+                attr.update({'state_changed': time})
 
-        return state_attributes
+        return attr
 
     def online_offline(self, n_id):
         """Check if device is online"""
@@ -75,10 +77,10 @@ class Attributes:
             if state != 'Offline':
                 data = Data.devices[n_id]
                 state = data["props"]["battery"]
+                final = state
+                Data.NODES[n_id]["BatteryLevel"] = final
                 self.log.log(n_id, self.type, "Battery level is", info=final)
             self.log.error_check(n_id, self.type, state)
-            final = state
-            Data.NODES[n_id]["BatteryLevel"] = final
         else:
             self.log.error_check(n_id, 'ERROR', 'Failed')
 

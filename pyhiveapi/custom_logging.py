@@ -76,6 +76,6 @@ class Logger:
             message = "ERROR - No data found for device."
         elif error_type == 'Failed_API':
             code = kwargs.get('resp')
-            new_data = re.search('[0-9][0-9][0-9]', code)
+            new_data = re.search('[0-9][0-9][0-9]', str(code))
             message = "ERROR - Received {0} response from API."
         self.log(n_id, n_type, message, info=new_data)

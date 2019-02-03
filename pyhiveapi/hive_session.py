@@ -7,6 +7,9 @@ from datetime import datetime, timedelta
 from pyhiveapi.custom_logging import Logger
 from pyhiveapi.hive_api import Hive
 from pyhiveapi.hive_data import Data
+from pyhiveapi.weather import Weather
+from pyhiveapi.hub import Hub
+from pyhiveapi.device_attributes import Attributes
 
 MINUTES_BETWEEN_LOGONS = 15
 
@@ -139,8 +142,6 @@ class Session:
             if Data.s_file:
                 api_resp_d = Data.t_file['devices']
             elif Data.sess_id is not None:
-                Data.devices = {}
-                Data.products = {}
                 api_resp_d = self.api.get_devices(Data.sess_id)
 
                 api_resp = str(api_resp_d['original'])
@@ -155,6 +156,7 @@ class Session:
             for a_device in api_resp_p:
                 if 'id' in a_device:
                     Data.devices.update({a_device['id']: a_device})
+                    Data.NODES.update({a_device['id']: {'': ''}})
             try_finished_devices = True
         except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
             self.log.log('No_ID', 'Core_API', "Api didnt receive any data")
@@ -176,6 +178,7 @@ class Session:
             for a_product in resp['parsed']:
                 if 'id' in a_product:
                     Data.products.update({a_product['id']: a_product})
+                    Data.NODES.update({a_product['id']: {'': ''}})
             try_finished_products = True
         except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
             try_finished_products = False
@@ -196,6 +199,7 @@ class Session:
             for a_action in resp['parsed']:
                 if 'id' in a_action:
                     Data.actions.update({a_action['id']: a_action})
+                    Data.NODES.update({a_action['id']: {'': ''}})
             try_finished_actions = True
         except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
             try_finished_actions = False
@@ -465,7 +469,7 @@ class Session:
                     if Data.devices[i]['type'] in Data.types['Thermo'])
         for a_device in Data.devices:
             if Data.devices[a_device]['type'] in Data.types['Thermo'] or \
-                    Data.devices[a_device]['type'] in Data.types['sensor']:
+                    Data.devices[a_device]['type'] in Data.types['Sensor']:
                 d = Data.devices[a_device]
                 try:
                     node_name = d["state"]["name"]
@@ -572,8 +576,26 @@ class Session:
         return device_all
 
     @staticmethod
-    def epochtime(date_time):
+    def epochtime(date_time, pattern, action):
         """ date/time conversion to epoch"""
-        pattern = '%d.%m.%Y %H:%M:%S'
-        epochtime = int(time.mktime(time.strptime(date_time, pattern)))
-        return epochtime
+        if action == 'to_epoch':
+            pattern = '%d.%m.%Y %H:%M:%S'
+            epochtime = int(time.mktime(time.strptime(str(date_time), pattern)))
+            return epochtime
+        elif action == 'from_epoch':
+            date = datetime.fromtimestamp(int(date_time)).strftime(pattern)
+            return date
+
+    @staticmethod
+    def device_type(n_id, n_type):
+        """Decide which sensor to call."""
+        if n_type == 'Hub_OnlineStatus':
+            return Attributes.online_offline(Attributes(), n_id)
+        elif n_type == 'Hive_OutsideTemperature':
+            return Weather.temperature(Weather())
+        elif n_type == 'Hub_SMOKE_CO':
+            return Hub.hub_smoke(Hub(), n_id)
+        elif n_type == 'Hub_DOG_BARK':
+            return Hub.hub_dog_bark(Hub(), n_id)
+        elif n_type == 'Hub_GLASS_BREAK':
+            return Hub.hub_glass(Hub(), n_id)
