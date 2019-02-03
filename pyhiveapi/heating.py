@@ -267,7 +267,7 @@ class Heating:
 
         if n_id in Data.products:
             data = Data.products[n_id]
-            resp = self.hive.set_state(Data.sess_id, data[type], n_id,
+            resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
                                        mode=new_mode)
 
             if str(resp['original']) == "<Response [200]>":
@@ -291,8 +291,8 @@ class Heating:
 
                 if n_id in Data.products:
                     data = Data.products[n_id]
-                    resp = self.hive.set_state(Data.sess_id, data[type], n_id,
-                                               mode='BOOST', boost=mins,
+                    resp = self.hive.set_state(Data.sess_id, data['type'],
+                                               n_id, mode='BOOST', boost=mins,
                                                target=temp)
 
                     if str(resp['original']) == "<Response [200]>":

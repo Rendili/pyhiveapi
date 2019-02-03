@@ -171,11 +171,11 @@ class Light:
             data = Data.products[n_id]
 
             if brightness is not None:
-                self.set_brightness(n_id, brightness)
+                return self.set_brightness(n_id, brightness)
             if color_temp is not None:
-                self.set_color_temp(n_id, color_temp)
+                return self.set_color_temp(n_id, color_temp)
             if color is not None:
-                self.set_color(n_id, color)
+                return self.set_color(n_id, color)
 
             resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
                                        status='ON')

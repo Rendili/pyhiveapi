@@ -19,7 +19,9 @@ class Attributes:
         if n_id in Data.products:
             attr.update({"availability": (self.online_offline(n_id))})
             if n_id in Data.BATTERY:
-                attr.update({"battery_level": str(self.battery(n_id)) + '%'})
+                battery = self.battery(n_id)
+                if battery is not None:
+                    attr.update({"battery": str(battery) + '%'})
             if n_id in Data.MODE:
                 attr.update({"mode": (self.get_mode(n_id))})
 
