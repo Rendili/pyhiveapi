@@ -374,17 +374,17 @@ class Session:
                     sensor.append({'HA_DeviceType': 'Hub_SMOKE_CO',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                   " Smoke Detection",
+                                   "Smoke Detection",
                                    "Hive_DeviceType": "Hub"})
                     sensor.append({'HA_DeviceType': 'Hub_DOG_BARK',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                   " Dog Bark Detection",
+                                   "Dog Bark Detection",
                                    "Hive_DeviceType": "Hub"})
                     sensor.append({'HA_DeviceType': 'Hub_GLASS_BREAK',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                   " Glass Break Detection",
+                                   "Glass Break Detection",
                                    "Hive_DeviceType": "Hub"})
                 except KeyError:
                     self.log.log('Hub 360', self.type, "No data found")
