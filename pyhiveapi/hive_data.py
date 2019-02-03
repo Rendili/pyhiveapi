@@ -43,7 +43,7 @@ class Data:
 
     # Session Data
     sess_id = ''
-    s_platform_name = '',
+    s_platform_name = ''
     s_logon_datetime = datetime(2017, 1, 1, 12, 0, 0)
     s_username = ''
     s_password = ''

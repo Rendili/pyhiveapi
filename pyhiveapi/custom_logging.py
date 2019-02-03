@@ -22,12 +22,12 @@ class Logger:
                 os.remove(Data.l_o_file)
 
             if os.path.isdir(Data.l_o_folder):
-                for a in Data.l_files:
-                    t = Data.l_o_folder + "/" + Data.l_files[a]
-                    if os.path.isfile(t):
-                        Data.l_values.update({a: True})
+                for name in Data.l_files:
+                    loc = Data.l_o_folder + "/" + Data.l_files[name]
+                    if os.path.isfile(loc):
+                        Data.l_values.update({name: True})
                         Data.l_values.update({'enabled': True})
-                    elif os.path.isfile(t) is False:
+                    elif os.path.isfile(loc) is False:
                         count += 1
                         if count == len(Data.l_files):
                             Data.l_values = {}
@@ -41,19 +41,19 @@ class Logger:
         data = kwargs.get('info', None)
         if n_id == 'No_ID':
             name = 'Hive'
-        f = False
+        final = False
         if '_' in l_type:
-            x = l_type.split("_")
-            for i in x:
+            nxt = l_type.split("_")
+            for i in nxt:
                 if i in Data.l_values or 'all' in Data.l_values:
                     if Data.l_values['enabled']:
-                        f = True
+                        final = True
                         break
         elif l_type in Data.l_values or 'all' in Data.l_values:
             if Data.l_values['enabled']:
-                f = True
+                final = True
 
-        if f:
+        if final:
             try:
                 l_file = open(Data.l_o_file, "a")
                 l_file.write(datetime.now().strftime("%d-%b-%Y %H:%M:%S") +

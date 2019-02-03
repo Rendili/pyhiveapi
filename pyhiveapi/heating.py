@@ -207,6 +207,7 @@ class Heating:
                 self.log.error_check(n_id, 'ERROR', 'Failed')
 
             return final if final is None else Data.NODES[n_id]['Boost_Time']
+        return None
 
     @staticmethod
     def get_operation_modes():
@@ -304,6 +305,7 @@ class Heating:
                                              resp=resp['original'])
 
                 return final
+        return None
 
     def turn_boost_off(self, n_id):
         """Turn heating boost off."""
