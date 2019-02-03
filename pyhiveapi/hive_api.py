@@ -116,7 +116,7 @@ class Hive:
     def set_state(self, session_id, n_type, n_id, **kwargs):
         self.headers.update({'authorization': session_id})
         jsc = '{' + ','.join(('"' + str(i) + '": ' '"' + str(t) +
-                               '" ' for i, t in kwargs.items())) + '}'
+                              '" ' for i, t in kwargs.items())) + '}'
 
         url = self.urls['base'] + self.urls['nodes'].format(n_type, n_id)
 
@@ -140,7 +140,7 @@ class Hive:
                      "Payload\n{2}\n".format(self.headers, url, jsc))
         try:
             response = requests.put(url=url, headers=self.headers,
-                                     data=jsc, timeout=self.timeout)
+                                    data=jsc, timeout=self.timeout)
             self.json_return.update({'original': str(response)})
             self.json_return.update({'parsed': response.json()})
         except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):

@@ -22,11 +22,11 @@ class Data:
                 'Hotwater': {'MANUAL': 'ON', None: 'OFF', 'Offline': 'OFF'},
                 'Hub': {'Status': {True: 'Online', False: 'Offline'},
                         'Smoke': {True: "Alarm Detected", False:
-                            "Clear", 'Offline': 'Offline'},
+                                  'Clear', 'Offline': 'Offline'},
                         'Dog': {True: "Barking Detected", False:
-                            "Clear", 'Offline': 'Offline'},
+                                'Clear', 'Offline': 'Offline'},
                         'Glass': {True: "Noise Detected", False:
-                            "Clear", 'Offline': 'Offline'}},
+                                  'Clear', 'Offline': 'Offline'}},
                 'Light': {'ON': True, 'OFF': False, 'Offline': False},
                 'Sensor': {'OPEN': True, 'CLOSED': False, 'Offline': False},
                 'Switch': {'ON': True, 'OFF': False, 'Offline': False}

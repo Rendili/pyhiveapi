@@ -27,7 +27,7 @@ class Attributes:
             if data['type'] in Data.types['Sensor']:
                 s = str(data['props']['statusChanged'])
                 t = '{:10.10}'.format(s)
-                time = Session.epochtime(t, '%d-%m-%Y %H:%M:%S','from_epoch')
+                time = Session.epochtime(t, '%d-%m-%Y %H:%M:%S', 'from_epoch')
                 attr.update({'state_changed': time})
 
         return attr

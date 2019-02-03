@@ -290,7 +290,7 @@ class Session:
 
                 slot_date = datetime.now() + timedelta(days=day_index)
                 slot_time = self.p_minutes_to_time(current_slot_custom[
-                                                       "start"])
+                    "start"])
                 slot_time_date_s = (slot_date.strftime("%d-%m-%Y") +
                                     " " + slot_time)
                 slot_time_date_dt = datetime.strptime(slot_time_date_s,
@@ -374,17 +374,17 @@ class Session:
                     sensor.append({'HA_DeviceType': 'Hub_SMOKE_CO',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                                    " Smoke Detection",
+                                   " Smoke Detection",
                                    "Hive_DeviceType": "Hub"})
                     sensor.append({'HA_DeviceType': 'Hub_DOG_BARK',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                                    " Dog Bark Detection",
+                                   " Dog Bark Detection",
                                    "Hive_DeviceType": "Hub"})
                     sensor.append({'HA_DeviceType': 'Hub_GLASS_BREAK',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                                    " Glass Break Detection",
+                                   " Glass Break Detection",
                                    "Hive_DeviceType": "Hub"})
                 except KeyError:
                     self.log.log('Hub 360', self.type, "No data found")
@@ -410,17 +410,17 @@ class Session:
                                                 'Hive_DeviceType': "Heating",
                                                 'Thermostat_NodeID': d["id"]})
                                 sensor.append({'HA_DeviceType':
-                                                   'Heating_CurrentTemperature',
+                                               'Heating_CurrentTemperature',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                                 sensor.append({'HA_DeviceType':
-                                                   'Heating_TargetTemperature',
+                                               'Heating_TargetTemperature',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                                 sensor.append({'HA_DeviceType':
-                                                   'Heating_State',
+                                               'Heating_State',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
@@ -429,7 +429,7 @@ class Session:
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
                                 sensor.append({'HA_DeviceType':
-                                                   'Heating_Boost',
+                                               'Heating_Boost',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name,
                                                "Hive_DeviceType": "Heating"})
@@ -504,7 +504,7 @@ class Session:
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
                     sensor.append({'HA_DeviceType':
-                                       'Hive_Device_Light_Availability',
+                                   'Hive_Device_Light_Availability',
                                    'Hive_NodeID': p["id"],
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
@@ -527,7 +527,7 @@ class Session:
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
                     sensor.append({'HA_DeviceType':
-                                       'Hive_Device_Plug_Availability',
+                                   'Hive_Device_Plug_Availability',
                                    'Hive_NodeID': p["id"],
                                    'Hive_NodeName': p["state"]["name"],
                                    "Hive_DeviceType": p["type"]})
@@ -552,7 +552,7 @@ class Session:
                 try:
                     Data.NAME.update({p["id"]: p["state"]["name"]})
                     binary_sensor.append({'HA_DeviceType':
-                                              'Hive_Device_Binary_Sensor',
+                                          'Hive_Device_Binary_Sensor',
                                           'Hive_NodeID': p["id"],
                                           'Hive_NodeName': p["state"]["name"],
                                           "Hive_DeviceType": p["type"]})
@@ -580,7 +580,8 @@ class Session:
         """ date/time conversion to epoch"""
         if action == 'to_epoch':
             pattern = '%d.%m.%Y %H:%M:%S'
-            epochtime = int(time.mktime(time.strptime(str(date_time), pattern)))
+            epochtime = int(time.mktime(
+                time.strptime(str(date_time), pattern)))
             return epochtime
         elif action == 'from_epoch':
             date = datetime.fromtimestamp(int(date_time)).strftime(pattern)
