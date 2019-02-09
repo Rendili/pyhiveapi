@@ -35,7 +35,7 @@ class Heating:
         if n_id in Data.products:
             if state != 'Offline':
                 data = Data.products[n_id]
-                state = data["props"]["temperature"]
+                state = round(float(data["props"]["temperature"]), 1)
 
                 if n_id in Data.p_minmax:
                     if Data.p_minmax[n_id]['TodayDate'] != datetime.date(
@@ -61,10 +61,11 @@ class Heating:
                             'TodayDate': datetime.date(datetime.now()),
                             'RestartMin': state, 'RestartMax': state}
                     Data.p_minmax[n_id] = data
+                f_state = round(float(state), 1)
                 self.log.log(n_id, self.type, "Current Temp is {0}",
                              info=str(state))
             self.log.error_check(n_id, self.type, state)
-            final = state
+            final = f_state
             Data.NODES[n_id]['CurrentTemp'] = final
         else:
             self.log.error_check(n_id, 'ERROR', 'Failed')
@@ -102,16 +103,16 @@ class Heating:
                 mode_current = self.get_mode(n_id)
                 boost_current = self.get_boost(n_id)
                 if boost_current == "ON" or mode_current == "SCHEDULE":
-                    state = data["state"]["target"]
+                    state = round(float(data["state"]["target"]), 1)
 
                 else:
                     snan = Session.p_get_schedule_nnl(Session(),
                                                       data["state"]
                                                       ["schedule"])
                     if 'now' in snan:
-                        state = snan["now"]["value"]["target"]
+                        state = round(float(snan["now"]["value"]["target"]), 1)
                     else:
-                        state = data["state"]["target"]
+                        state = round(float(data["state"]["target"]), 1)
                 self.log.log(n_id, self.type, "Target temp is {0}",
                              info=str(state))
             self.log.error_check(n_id, self.type, state)
