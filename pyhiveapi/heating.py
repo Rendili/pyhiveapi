@@ -35,7 +35,7 @@ class Heating:
         if n_id in Data.products:
             if state != 'Offline':
                 data = Data.products[n_id]
-                state = round(float(data["props"]["temperature"]), 1)
+                state = data["props"]["temperature"]
 
                 if n_id in Data.p_minmax:
                     if Data.p_minmax[n_id]['TodayDate'] != datetime.date(
