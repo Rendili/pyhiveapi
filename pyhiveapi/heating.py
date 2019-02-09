@@ -92,7 +92,6 @@ class Heating:
 
     def get_target_temperature(self, n_id):
         """Get heating target temperature."""
-        from pyhiveapi.hive_session import Session
         self.log.log(n_id, self.type, "Getting target temp")
         state = self.attr.online_offline(n_id)
         final = None
@@ -100,19 +99,7 @@ class Heating:
         if n_id in Data.products:
             if state != 'Offline':
                 data = Data.products[n_id]
-                mode_current = self.get_mode(n_id)
-                boost_current = self.get_boost(n_id)
-                if boost_current == "ON" or mode_current == "SCHEDULE":
-                    state = round(float(data["state"]["target"]), 1)
-
-                else:
-                    snan = Session.p_get_schedule_nnl(Session(),
-                                                      data["state"]
-                                                      ["schedule"])
-                    if 'now' in snan:
-                        state = round(float(snan["now"]["value"]["target"]), 1)
-                    else:
-                        state = round(float(data["state"]["target"]), 1)
+                state = round(float(data["state"]["target"]), 1)
                 self.log.log(n_id, self.type, "Target temp is {0}",
                              info=str(state))
             self.log.error_check(n_id, self.type, state)
