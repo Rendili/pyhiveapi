@@ -402,8 +402,6 @@ class Session:
                                 node_name = p["state"]["name"]
                                 Data.NAME.update({p["id"]: node_name})
                                 Data.MODE.append(p["id"])
-                                if count == 1:
-                                    node_name = None
                                 climate.append({'HA_DeviceType': 'Heating',
                                                 'Hive_NodeID': p["id"],
                                                 'Hive_NodeName': node_name,
