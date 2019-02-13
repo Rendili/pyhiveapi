@@ -45,11 +45,11 @@ class Logger:
         if '_' in l_type:
             nxt = l_type.split("_")
             for i in nxt:
-                if i in Data.l_values or 'all' in Data.l_values:
+                if i in Data.l_values or 'All' in Data.l_values:
                     if Data.l_values['enabled']:
                         final = True
                         break
-        elif l_type in Data.l_values or 'all' in Data.l_values:
+        elif l_type in Data.l_values or 'All' in Data.l_values:
             if Data.l_values['enabled']:
                 final = True
 
@@ -57,8 +57,8 @@ class Logger:
             try:
                 l_file = open(Data.l_o_file, "a")
                 l_file.write(datetime.now().strftime("%d-%b-%Y %H:%M:%S") +
-                             " - " + l_type + "-" + name + " : " +
-                             + new_message.format(data) + "\n")
+                             " - " + l_type + " - " + name + " : " +
+                             new_message.format(data) + "\n")
                 l_file.close()
             except FileNotFoundError:
                 pass
@@ -71,11 +71,12 @@ class Logger:
         message = None
         new_data = None
         if error_type == 'Offline':
-            message = "Offline could not update entity."
+            message = "Device offline could not update entity."
         elif error_type == 'Failed:':
             message = "ERROR - No data found for device."
         elif error_type == 'Failed_API':
             code = kwargs.get('resp')
-            new_data = re.search('[0-9][0-9][0-9]', str(code))
+            new_data = (re.search('[0-9][0-9][0-9]', str(code)))
+            print(new_data)
             message = "ERROR - Received {0} response from API."
         self.log(n_id, n_type, message, info=new_data)

@@ -15,7 +15,7 @@ class Light:
         self.hive = Hive()
         self.log = Logger()
         self.attr = Attributes()
-        self.type = "Light"
+        self.type = 'Light'
 
     def get_state(self, n_id):
         """Get light current state."""
