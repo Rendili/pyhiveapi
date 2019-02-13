@@ -33,7 +33,7 @@ class Custom_logging_Tests(unittest.TestCase):
             os.remove(writefile)
         Data.l_values = {}
 
-    def test_checking_if_logging_enabled(self):
+    def test_checking_logging_enabled(self):
         Logger.check_logging(new_session=True)
         print(Data.l_values)
         self.assertTrue(Data.l_values)
@@ -43,7 +43,7 @@ class Custom_logging_Tests(unittest.TestCase):
         Data.l_values.update({'enabled': True})
         file = os.path.expanduser(
             '~') + "/.homeassistant/pyhiveapi/pyhiveapi.log"
-        message = "This is a test message"
+        message = "This is a unit test message"
         Logger.log('No_ID', 'All', message)
         f = open(file, 'r')
         file_contents = f.read()
@@ -84,7 +84,7 @@ class Custom_logging_Tests(unittest.TestCase):
             '~') + "/.homeassistant/pyhiveapi/pyhiveapi.log"
         message = "ERROR - Received"
         Logger.error_check(Logger(), 'No_ID', 'All',
-                           'Failed_API', resp="response <200>")
+                           'Failed_API', resp="response <400>")
         f = open(file, 'r')
         file_contents = f.read()
         print(file_contents)
