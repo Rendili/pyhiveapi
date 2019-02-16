@@ -4,7 +4,7 @@ import unittest
 import os
 
 
-class Custom_logging_Tests(unittest.TestCase):
+class Custom_Logging_Tests(unittest.TestCase):
     """Unit tests for the Logger Class."""
 
     def setUp(self):

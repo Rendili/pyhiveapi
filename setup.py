@@ -15,21 +15,21 @@ setup(
     classifiers=[
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
-#        'Topic :: Software Development :: API',
+        #        'Topic :: Software Development :: API',
         'License :: OSI Approved :: MIT License',
-#        'Programming Language :: Python :: 3.4',
+        #        'Programming Language :: Python :: 3.4',
         'Programming Language :: Python :: 3.5',
         'Programming Language :: Python :: 3.6',
     ],
     python_requires='>=3.5.*',
     keywords='Hive API Library',
     packages=find_packages(exclude=['contrib', 'docs', 'tests']),
-#    packages=["pyhiveapi"],
-#    install_requires=[],
+    #    packages=["pyhiveapi"],
+    #    install_requires=[],
 
     entry_points={
         'console_scripts': [
             'pyhiveapi=pyhiveapi.pyhiveapi:Pyhiveapi',
         ],
-    }, install_requires=['requests']
+    }, install_requires=['requests', 'mock', 'unittest']
 )

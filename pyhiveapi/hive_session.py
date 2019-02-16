@@ -28,67 +28,41 @@ class Session:
         """Log in to the Hive API and get the Session Data."""
         self.log.log('No_ID', self.type, "Attempting to login to Hive.")
 
-        login_details_found = True
+        login_details_found = False
         try_finished = False
 
-        try:
-            resp_p = self.api.login(Data.s_username, Data.s_password)[
-                'parsed']
+        resp_p = self.api.login(Data.s_username, Data.s_password)
 
-            if ('token' in resp_p and 'user' in resp_p and
-                    'platform' in resp_p):
-                Data.sess_id = resp_p['token']
+        if resp_p['original'] == "<Response [200]>":
+            info = resp_p['parsed']
+            if ('token' in info and 'user' in info and
+                'platform' in info):
+                Data.sess_id = info['token']
                 Data.s_logon_datetime = datetime.now()
+                login_details_found = True
 
-                if 'endpoint' in resp_p['platform']:
-                    self.api.urls.update({'base': resp_p['platform'][
+                if 'endpoint' in info['platform']:
+                    self.api.urls.update({'base': info['platform'][
                         'endpoint']})
-                else:
-                    login_details_found = False
 
-                if 'name' in resp_p['platform']:
-                    Data.s_platform_name = resp_p['platform']['name']
-                else:
-                    login_details_found = False
+                if 'name' in info['platform']:
+                    Data.s_platform_name = info['platform']['name']
 
-                if 'locale' in resp_p['user']:
-                    Data.s_locale = resp_p['user']['locale']
-                else:
-                    login_details_found = False
+                if 'locale' in info['user']:
+                    Data.s_locale = info['user']['locale']
 
-                if 'countryCode' in resp_p['user']:
-                    Data.s_countrycode = resp_p['user']['countryCode']
-                else:
-                    login_details_found = False
+                if 'countryCode' in info['user']:
+                    Data.s_countrycode = info['user']['countryCode']
 
-                if 'timezone' in resp_p['user']:
-                    Data.s_timezone = resp_p['user']['timezone']
-                else:
-                    login_details_found = False
+                if 'timezone' in info['user']:
+                    Data.s_timezone = info['user']['timezone']
 
-                if 'postcode' in resp_p['user']:
-                    Data.s_postcode = resp_p['user']['postcode']
-                else:
-                    login_details_found = False
+                if 'postcode' in info['user']:
+                    Data.s_postcode = info['user']['postcode']
 
-                if 'temperatureUnit' in resp_p['user']:
-                    Data.s_temperature_unit = resp_p['user'][
+                if 'temperatureUnit' in info['user']:
+                    Data.s_temperature_unit = info['user'][
                         'temperatureUnit']
-                else:
-                    login_details_found = False
-            else:
-                login_details_found = False
-
-            try_finished = True
-
-        except (IOError, RuntimeError, ZeroDivisionError):
-            try_finished = False
-        finally:
-            if not try_finished:
-                login_details_found = False
-
-        if not login_details_found:
-            Data.sess_id = ""
 
     def check_hive_api_logon(self):
         """Check if currently logged in with a valid Session IData."""
@@ -229,7 +203,7 @@ class Session:
                     if "icon" in resp['parsed']["weather"]:
                         Data.w_icon = resp['parsed']["weather"]["icon"]
                     if "description" in resp['parsed']["weather"]:
-                        Data.w_description = resp['parsed']["weather"]["icon"]
+                        Data.w_description = resp['parsed']["weather"]["description"]
                     if "temperature" in resp['parsed']["weather"]:
                         if "unit" in resp['parsed']["weather"]["temperature"]:
                             Data.t_unit = resp['parsed']["weather"][

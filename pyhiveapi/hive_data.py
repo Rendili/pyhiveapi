@@ -1,5 +1,5 @@
 """Hive Data Module."""
-from datetime import datetime
+import datetime
 
 
 class Data:
@@ -42,9 +42,9 @@ class Data:
              'Sensor': ['motionsensor', 'contactsensor']}
 
     # Session Data
-    sess_id = ''
+    sess_id = None
     s_platform_name = ''
-    s_logon_datetime = datetime(2017, 1, 1, 12, 0, 0)
+    s_logon_datetime = datetime.datetime.now()
     s_username = ''
     s_password = ''
     s_postcode = ''
@@ -53,12 +53,12 @@ class Data:
     s_locale = ''
     s_temperature_unit = ''
     s_interval_seconds = NODE_INTERVAL_DEFAULT
-    s_last_update = datetime(2017, 1, 1, 12, 0, 0)
+    s_last_update = datetime.datetime(2017, 1, 1, 12, 0, 0)
     s_file = False
     t_file = None
 
     # Weather data
-    w_last_update = datetime(2017, 1, 1, 12, 0, 0)
+    w_last_update = datetime.datetime(2017, 1, 1, 12, 0, 0)
     w_nodeid = ''
     w_icon = ''
     w_description = ''
