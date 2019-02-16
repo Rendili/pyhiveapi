@@ -11,6 +11,5 @@ __pycache__/
 # due to using tox and pytest
 .tox
 .cache
-.vscode/settings.json
+.vscode/*
 .idea
-.vscode/launch.json
