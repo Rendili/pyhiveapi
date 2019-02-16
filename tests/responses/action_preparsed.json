@@ -1,6 +1,6 @@
 [
     {
-        "id": "action1-0000-0000-0000-000000000001",
+        "id": "action-0000-0000-0000-000000000001",
         "created": 1498848808604,
         "name": "Action 1",
         "enabled": true,
@@ -9,7 +9,7 @@
         "template": "contact-sensor-canvas.1",
         "events": [
             {
-                "id": "contact-sensor-0000-0000-000000000001",
+                "id": "sensor-0000-0000-0000-000000000001",
                 "group": "when",
                 "type": "contact-sensor",
                 "settings": {
@@ -134,7 +134,7 @@
         ]
     },
     {
-        "id": "action2-0000-0000-0000-000000000002",
+        "id": "action-0000-0000-0000-000000000002",
         "created": 1534796888391,
         "name": "Action 2",
         "enabled": false,
@@ -143,7 +143,7 @@
         "template": "motion-sensor-light-dark-light-on-duration.1",
         "events": [
             {
-                "id": "motion-sensor-0000-0000-000000000001",
+                "id": "motion-0000-0000-0000-000000000001",
                 "group": "when",
                 "type": "motion-sensor"
             },
@@ -169,8 +169,8 @@
         ]
     },
     {
-        "id": "action3-0000-0000-0000-000000000003",
-        "created": 1543763163317,
+        "id": "action-0000-0000-0000-000000000003",
+        "created": 1543781304658,
         "name": "Action 3",
         "enabled": true,
         "entitlements": [],
@@ -178,62 +178,7 @@
         "template": "contact-sensor-canvas.1",
         "events": [
             {
-                "id": "contact-sensor-0000-0000-000000000002",
-                "group": "when",
-                "type": "contact-sensor",
-                "settings": {
-                    "event": "OPEN"
-                }
-            },
-            {
-                "id": "light-0000-0000-0000-000000000002",
-                "group": "then",
-                "type": "light",
-                "settings": {
-                    "status": "ON",
-                    "brightness": 100
-                }
-            }
-        ]
-    },
-    {
-        "id": "action4-0000-0000-0000-000000000004",
-        "created": 1543763220373,
-        "name": "Action 4",
-        "enabled": true,
-        "entitlements": [],
-        "entitled": true,
-        "template": "contact-sensor-canvas.1",
-        "events": [
-            {
-                "id": "contact-sensor-0000-0000-000000000002",
-                "group": "when",
-                "type": "contact-sensor",
-                "settings": {
-                    "event": "CLOSED"
-                }
-            },
-            {
-                "id": "light-0000-0000-0000-000000000002",
-                "group": "then",
-                "type": "light",
-                "settings": {
-                    "status": "OFF"
-                }
-            }
-        ]
-    },
-    {
-        "id": "action5-0000-0000-0000-000000000005",
-        "created": 1543781304658,
-        "name": "Action 5",
-        "enabled": true,
-        "entitlements": [],
-        "entitled": true,
-        "template": "contact-sensor-canvas.1",
-        "events": [
-            {
-                "id": "contact-sensor-0000-0000-000000000002",
+                "id": "sensor-0000-0000-0000-000000000002",
                 "group": "when",
                 "type": "contact-sensor",
                 "settings": {

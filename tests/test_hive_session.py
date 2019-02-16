@@ -102,7 +102,3 @@ class Hive_Session_Tests(unittest.TestCase):
         ime = Session.epochtime(trim, '%d-%m-%Y %H:%M:%S', 'from_epoch')
         print(ime)
         self.assertIsNotNone(ime)
-
-
-if __name__ == '__main__':
-    unittest.main()
