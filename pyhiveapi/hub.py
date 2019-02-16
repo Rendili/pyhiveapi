@@ -67,10 +67,10 @@ class Hub:
             if state != 'Offline':
                 data = Data.products[n_id]
                 state = data["props"]["sensors"]["DOG_BARK"]["active"]
-                final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
+                final = Data.HIVETOHA[self.type]["Dog"].get(state, state)
                 self.log.log(n_id, self.log_type, "Status is {0}", info=final)
             self.log.error_check(n_id, self.type, state)
-            final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
+            final = Data.HIVETOHA[self.type]["Dog"].get(state, state)
             Data.NODES[n_id]['Dog'] = final
         else:
             self.log.error_check(n_id, 'ERROR', 'Failed')
@@ -87,10 +87,10 @@ class Hub:
             if state != 'Offline':
                 data = Data.products[n_id]
                 state = data["props"]["sensors"]["GLASS_BREAK"]["active"]
-                final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
+                final = Data.HIVETOHA[self.type]["Glass"].get(state, state)
                 self.log.log(n_id, self.log_type, "Status is {0}", info=final)
             self.log.error_check(n_id, self.type, state)
-            final = Data.HIVETOHA[self.type]["Smoke"].get(state, state)
+            final = Data.HIVETOHA[self.type]["Glass"].get(state, state)
             Data.NODES[n_id]['Glass'] = final
         else:
             self.log.error_check(n_id, 'ERROR', 'Failed')

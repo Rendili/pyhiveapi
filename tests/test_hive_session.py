@@ -4,6 +4,7 @@ from unittest.mock import Mock, patch
 import unittest
 import datetime
 import json
+import time
 import os
 
 
@@ -97,7 +98,8 @@ class Hive_Session_Tests(unittest.TestCase):
 
     def test_epochtime_from_epoch(self):
         ime = None
-        epoch = 1550272738652
+        epoch = str(time.time())
+        print(epoch)
         trim = '{:10.10}'.format(str(epoch))
         ime = Session.epochtime(trim, '%d-%m-%Y %H:%M:%S', 'from_epoch')
         print(ime)
