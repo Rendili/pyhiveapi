@@ -16,7 +16,7 @@ class Plug:
         self.type = "Switch"
 
     def get_state(self, n_id):
-        """Get light current state."""
+        """Get plug current state."""
         self.log.log(n_id, self.type, "Getting state of switch")
         state = self.attr.online_offline(n_id)
         final = None

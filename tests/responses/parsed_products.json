@@ -632,7 +632,7 @@
             "model": "SLP2b",
             "version": "01045700",
             "manufacturer": "Computime",
-            "powerConsumption": 0,
+            "powerConsumption": 35,
             "onSince": 1550266428863,
             "inUse": false,
             "deviceClass": "UNKNOWN",
@@ -644,7 +644,7 @@
         },
         "state": {
             "name": "Plug 1",
-            "status": "OFF",
+            "status": "ON",
             "mode": "MANUAL",
             "schedule": {
                 "monday": [
@@ -2227,7 +2227,7 @@
             "model": "DWS003",
             "version": "05042603",
             "manufacturer": "HiveHome.com",
-            "status": "CLOSED",
+            "status": "OPEN",
             "statusChanged": 1550310866196,
             "deviceClass": "UNKNOWN",
             "capabilities": [

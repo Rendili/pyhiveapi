@@ -206,10 +206,10 @@ class Session:
                         Data.w_description = resp['parsed']["weather"]["description"]
                     if "temperature" in resp['parsed']["weather"]:
                         if "unit" in resp['parsed']["weather"]["temperature"]:
-                            Data.t_unit = resp['parsed']["weather"][
+                            Data.w_temperature_unit = resp['parsed']["weather"][
                                 "temperature"]["unit"]
                         if "unit" in resp['parsed']["weather"]["temperature"]:
-                            Data.t_value = resp['parsed']["weather"][
+                            Data.w_temperature_value = resp['parsed']["weather"][
                                 "temperature"]["value"]
                     Data.w_nodeid = "HiveWeather"
                 else:
