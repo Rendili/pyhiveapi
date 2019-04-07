@@ -1,6 +1,7 @@
 """"Hive Heating Module. """
 from pyhiveapi.custom_logging import Logger
 from pyhiveapi.device_attributes import Attributes
+from datetime import datetime
 from pyhiveapi.hive_api import Hive
 from pyhiveapi.hive_data import Data
 
@@ -58,7 +59,7 @@ class Heating:
                         Data.p_minmax[n_id]['RestartMax'] = state
                 else:
                     data = {'TodayMin': state, 'TodayMax': state,
-                            'TodayDate': datetime.date(datetime.now()),
+                            'TodayDate': str(datetime.date(datetime.now())),
                             'RestartMin': state, 'RestartMax': state}
                     Data.p_minmax[n_id] = data
                 f_state = round(float(state), 1)
