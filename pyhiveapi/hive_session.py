@@ -439,6 +439,27 @@ class Session:
                     self.log.log('Plug', self.type, "No data found")
 
         for product in Data.products:
+            if Data.products[product]['type'] in Data.HIVE_TYPES['Light']:
+                p = Data.products[product]
+                Data.MODE.append(p["id"])
+                try:
+                    Data.NAME.update({p["id"]: p["state"]["name"]})
+                    light.append({'HA_DeviceType': 'light',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': p["state"]["name"],
+                                   "Hive_DeviceType": p["type"]})
+                    sensor.append({'HA_DeviceType': 'sensor',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': p["state"]["name"] + " Mode",
+                                   "Hive_DeviceType": p["type"] + "_Mode"})
+                    sensor.append({'HA_DeviceType': 'sensor',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': p["state"]["name"] + "Availability",
+                                   "Hive_DeviceType": p["type"] + "_Availability"})
+                except KeyError:
+                    self.log.log('Light', self.type, "No data found")
+
+        for product in Data.products:
             if Data.products[product]['type'] in Data.HIVE_TYPES['Sensor']:
                 p = Data.products[product]
                 try:
