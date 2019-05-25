@@ -32,14 +32,24 @@ class Data:
                 'Switch': {'ON': True, 'OFF': False, 'Offline': False}
                 }
     NAME = {}
-    types = {'Hub': ['hub', 'sense'],
-             'Thermo': ['thermostatui'],
-             'Heating': ['heating'],
-             'Hotwater': ['hotwater'],
-             'Plug': ['activeplug'],
-             'Light': ['warmwhitelight', 'tuneablelight',
-                       'colourtuneablelight'],
-             'Sensor': ['motionsensor', 'contactsensor']}
+    HIVE_TYPES = {
+        'Hub': ['hub', 'sense'],
+        'Thermo': ['thermostatui'],
+        'Heating': ['heating'],
+        'Hotwater': ['hotwater'],
+        'Plug': ['activeplug'],
+        'Light': ['warmwhitelight', 'tuneablelight',
+                  'colourtuneablelight'],
+        'Sensor': ['motionsensor', 'contactsensor']
+    }
+    HA_TYPES = {
+        'Climate': ['heating'],
+        'Water_Heater': ['hotwater'],
+        'Switch': ['activeplug', 'action'],
+        'Light': ['warmwhitelight', 'tuneablelight', 'colourtuneablelight'],
+        'Sensor': ['hub', 'sense', 'thermostatui'],
+        'Binary_Sensor': ['motionsensor', 'contactsensor']
+    }
 
     # Session Data
     sess_id = None

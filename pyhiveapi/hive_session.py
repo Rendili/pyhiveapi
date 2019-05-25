@@ -329,7 +329,7 @@ class Session:
         switch = []
 
         for a_device in Data.devices:
-            if Data.devices[a_device]["type"] in Data.types['Hub']:
+            if Data.devices[a_device]["type"] in Data.HIVE_TYPES['Hub']:
                 d = Data.devices[a_device]
                 try:
                     Data.NAME.update({d["id"]: d["state"]["name"]})
@@ -348,28 +348,28 @@ class Session:
                     sensor.append({'HA_DeviceType': 'Hub_SMOKE_CO',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                   "Smoke Detection",
+                                   " - Smoke Detection",
                                    "Hive_DeviceType": "Hub"})
                     sensor.append({'HA_DeviceType': 'Hub_DOG_BARK',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                   "Dog Bark Detection",
+                                   " - Dog Bark Detection",
                                    "Hive_DeviceType": "Hub"})
                     sensor.append({'HA_DeviceType': 'Hub_GLASS_BREAK',
                                    'Hive_NodeID': d["id"],
                                    'Hive_NodeName': d["state"]["name"] +
-                                   "Glass Break Detection",
+                                   " - Glass Break Detection",
                                    "Hive_DeviceType": "Hub"})
                 except KeyError:
                     self.log.log('Hub 360', self.type, "No data found")
 
         count = sum(1 for i in Data.products
-                    if Data.products[i]['type'] in Data.types['Heating'])
+                    if Data.products[i]['type'] in Data.HIVE_TYPES['Heating'])
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['Heating']:
+            if Data.products[product]['type'] in Data.HIVE_TYPES['Heating']:
                 p = Data.products[product]
                 for device in Data.devices:
-                    if Data.devices[device]['type'] in Data.types['Thermo']:
+                    if Data.devices[device]['type'] in Data.HIVE_TYPES['Thermo']:
                         d = Data.devices[device]
                         if p["parent"] == d["props"]["zone"]:
                             try:
@@ -409,9 +409,9 @@ class Session:
                                 self.log.log('Hot', self.type, "No data found")
 
         count = sum(1 for i in Data.products
-                    if Data.products[i]['type'] in Data.types['Hotwater'])
+                    if Data.products[i]['type'] in Data.HIVE_TYPES['Hotwater'])
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['Hotwater']:
+            if Data.products[product]['type'] in Data.HIVE_TYPES['Hotwater']:
                 p = Data.products[product]
                 try:
                     node_name = p["state"]["name"]
@@ -438,10 +438,10 @@ class Session:
                     self.log.log('Hotwater', self.type, "No data found.")
 
         count = sum(1 for i in Data.devices
-                    if Data.devices[i]['type'] in Data.types['Thermo'])
+                    if Data.devices[i]['type'] in Data.HIVE_TYPES['Thermo'])
         for a_device in Data.devices:
-            if Data.devices[a_device]['type'] in Data.types['Thermo'] or \
-                    Data.devices[a_device]['type'] in Data.types['Sensor']:
+            if Data.devices[a_device]['type'] in Data.HIVE_TYPES['Thermo'] or \
+                    Data.devices[a_device]['type'] in Data.HIVE_TYPES['Sensor']:
                 d = Data.devices[a_device]
                 try:
                     node_name = d["state"]["name"]
@@ -461,7 +461,7 @@ class Session:
                     self.log.log('Thermostat', self.type, "No data found")
 
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['Light']:
+            if Data.products[product]['type'] in Data.HIVE_TYPES['Light']:
                 p = Data.products[product]
                 Data.MODE.append(p["id"])
                 try:
@@ -484,7 +484,7 @@ class Session:
                     self.log.log('Light', self.type, "No data found")
 
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['Plug']:
+            if Data.products[product]['type'] in Data.HIVE_TYPES['Plug']:
                 p = Data.products[product]
                 Data.MODE.append(p["id"])
                 try:
@@ -519,7 +519,7 @@ class Session:
                 self.log.log('Actions', self.type, "No data found")
 
         for product in Data.products:
-            if Data.products[product]['type'] in Data.types['Sensor']:
+            if Data.products[product]['type'] in Data.HIVE_TYPES['Sensor']:
                 p = Data.products[product]
                 try:
                     Data.NAME.update({p["id"]: p["state"]["name"]})
