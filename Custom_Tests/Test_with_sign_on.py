@@ -1,5 +1,5 @@
 
-from .hive_session import Session
+from pyhiveapi.hive_session import Session
 
 p = Session()
 
