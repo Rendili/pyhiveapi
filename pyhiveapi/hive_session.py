@@ -36,7 +36,7 @@ class Session:
         if resp_p['original'] == "<Response [200]>":
             info = resp_p['parsed']
             if ('token' in info and 'user' in info and
-                'platform' in info):
+                    'platform' in info):
                 Data.sess_id = info['token']
                 Data.s_logon_datetime = datetime.now()
                 login_details_found = True
@@ -322,49 +322,33 @@ class Session:
             self.log.log('No_ID', self.type, "Failed to get data")
 
         device_all = {}
-        sensor = []
-        binary_sensor = []
         climate = []
+        water_heater = []
         light = []
         switch = []
-
-        for a_device in Data.devices:
-            if Data.devices[a_device]["type"] in Data.HIVE_TYPES['Hub']:
-                d = Data.devices[a_device]
-                try:
-                    Data.NAME.update({d["id"]: d["state"]["name"]})
-                    sensor.append({'HA_DeviceType': 'Hub_OnlineStatus',
-                                   'Hive_NodeID': d["id"],
-                                   'Hive_NodeName': d["state"]["name"],
-                                   "Hive_DeviceType": "Hub"})
-                except KeyError:
-                    self.log.log('Hub', self.type, "No data found.")
+        sensor = []
+        binary_sensor = []
 
         for a_product in Data.products:
             if Data.products[a_product]["type"] == 'sense':
-                d = Data.products[a_product]
+                p = Data.products[a_product]
                 try:
-                    Data.NAME.update({d["id"]: d["state"]["name"]})
-                    sensor.append({'HA_DeviceType': 'Hub_SMOKE_CO',
-                                   'Hive_NodeID': d["id"],
-                                   'Hive_NodeName': d["state"]["name"] +
-                                   " - Smoke Detection",
-                                   "Hive_DeviceType": "Hub"})
-                    sensor.append({'HA_DeviceType': 'Hub_DOG_BARK',
-                                   'Hive_NodeID': d["id"],
-                                   'Hive_NodeName': d["state"]["name"] +
-                                   " - Dog Bark Detection",
-                                   "Hive_DeviceType": "Hub"})
-                    sensor.append({'HA_DeviceType': 'Hub_GLASS_BREAK',
-                                   'Hive_NodeID': d["id"],
-                                   'Hive_NodeName': d["state"]["name"] +
-                                   " - Glass Break Detection",
-                                   "Hive_DeviceType": "Hub"})
+                    Data.NAME.update({p["id"]: p["state"]["name"]})
+                    sensor.append({'HA_DeviceType': 'sensor',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': "Glass Break Detection",
+                                   "Hive_DeviceType": p["type"] + "_GLASS_BREAK"})
+                    sensor.append({'HA_DeviceType': 'sensor',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': "Smoke Detection",
+                                   "Hive_DeviceType": p["type"] + "_SMOKE_CO"})
+                    sensor.append({'HA_DeviceType': 'sensor',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': "Dog Bark Detection",
+                                   "Hive_DeviceType": p["type"] + "_DOG_BARK"})
                 except KeyError:
                     self.log.log('Hub 360', self.type, "No data found")
 
-        count = sum(1 for i in Data.products
-                    if Data.products[i]['type'] in Data.HIVE_TYPES['Heating'])
         for product in Data.products:
             if Data.products[product]['type'] in Data.HIVE_TYPES['Heating']:
                 p = Data.products[product]
@@ -376,69 +360,96 @@ class Session:
                                 node_name = p["state"]["name"]
                                 Data.NAME.update({p["id"]: node_name})
                                 Data.MODE.append(p["id"])
-                                climate.append({'HA_DeviceType': 'Heating',
+                                climate.append({'HA_DeviceType': 'climate',
                                                 'Hive_NodeID': p["id"],
                                                 'Hive_NodeName': node_name,
-                                                'Hive_DeviceType': "Heating",
+                                                'Hive_DeviceType': p["type"],
                                                 'Thermostat_NodeID': d["id"]})
-                                sensor.append({'HA_DeviceType':
-                                               'Heating_CurrentTemperature',
+                                sensor.append({'HA_DeviceType': 'sensor',
                                                'Hive_NodeID': p["id"],
-                                               'Hive_NodeName': node_name,
-                                               "Hive_DeviceType": "Heating"})
-                                sensor.append({'HA_DeviceType':
-                                               'Heating_TargetTemperature',
+                                               'Hive_NodeName': node_name +
+                                               " CurrentTemperature",
+                                               "Hive_DeviceType": p["type"] +
+                                               "_CurrentTemperature"})
+                                sensor.append({'HA_DeviceType': 'sensor',
                                                'Hive_NodeID': p["id"],
-                                               'Hive_NodeName': node_name,
-                                               "Hive_DeviceType": "Heating"})
-                                sensor.append({'HA_DeviceType':
-                                               'Heating_State',
+                                               'Hive_NodeName': node_name +
+                                               " TargetTemperature",
+                                               "Hive_DeviceType":  p["type"] +
+                                               "_TargetTemperature"})
+                                sensor.append({'HA_DeviceType': 'sensor',
                                                'Hive_NodeID': p["id"],
-                                               'Hive_NodeName': node_name,
-                                               "Hive_DeviceType": "Heating"})
-                                sensor.append({'HA_DeviceType': 'Heating_Mode',
+                                               'Hive_NodeName': node_name + " State",
+                                               "Hive_DeviceType": p["type"] + "_State"})
+                                sensor.append({'HA_DeviceType': 'sensor',
                                                'Hive_NodeID': p["id"],
-                                               'Hive_NodeName': node_name,
-                                               "Hive_DeviceType": "Heating"})
-                                sensor.append({'HA_DeviceType':
-                                               'Heating_Boost',
+                                               'Hive_NodeName': node_name + " Mode",
+                                               "Hive_DeviceType": p["type"] + "_Mode"})
+                                sensor.append({'HA_DeviceType': 'sensor',
                                                'Hive_NodeID': p["id"],
-                                               'Hive_NodeName': node_name,
-                                               "Hive_DeviceType": "Heating"})
+                                               'Hive_NodeName': node_name + "Boost",
+                                               "Hive_DeviceType": p["type"] + "_Boost"})
                             except KeyError:
                                 self.log.log('Hot', self.type, "No data found")
 
-        count = sum(1 for i in Data.products
-                    if Data.products[i]['type'] in Data.HIVE_TYPES['Hotwater'])
         for product in Data.products:
             if Data.products[product]['type'] in Data.HIVE_TYPES['Hotwater']:
                 p = Data.products[product]
                 try:
-                    node_name = p["state"]["name"]
+                    node_name = "Hotwater"
                     Data.NAME.update({p["id"]: node_name})
-                    if count == 1:
-                        node_name = None
-                    climate.append({'HA_DeviceType': 'HotWater',
-                                    'Hive_NodeID': p["id"],
-                                    'Hive_NodeName': node_name,
-                                    "Hive_DeviceType": "HotWater"})
-                    sensor.append({'HA_DeviceType': 'HotWater_State',
+                    water_heater.append({'HA_DeviceType': 'water_heater',
+                                         'Hive_NodeID': p["id"],
+                                         'Hive_NodeName': node_name,
+                                         "Hive_DeviceType": p["type"]})
+                    sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': node_name,
-                                   "Hive_DeviceType": "HotWater"})
-                    sensor.append({'HA_DeviceType': 'HotWater_Mode',
+                                   'Hive_NodeName': node_name + "State",
+                                   "Hive_DeviceType": p["type"] + "_State"})
+                    sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': node_name,
-                                   "Hive_DeviceType": "HotWater"})
-                    sensor.append({'HA_DeviceType': 'HotWater_Boost',
+                                   'Hive_NodeName': node_name + "Mode",
+                                   "Hive_DeviceType": p["type"] + "_Mode"})
+                    sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': node_name,
-                                   "Hive_DeviceType": "HotWater"})
+                                   'Hive_NodeName': node_name + "Boost",
+                                   "Hive_DeviceType": p["type"] + "_Boost"})
                 except KeyError:
                     self.log.log('Hotwater', self.type, "No data found.")
 
-        count = sum(1 for i in Data.devices
-                    if Data.devices[i]['type'] in Data.HIVE_TYPES['Thermo'])
+        for product in Data.products:
+            if Data.products[product]['type'] in Data.HIVE_TYPES['Plug']:
+                p = Data.products[product]
+                Data.MODE.append(p["id"])
+                try:
+                    Data.NAME.update({p["id"]: p["state"]["name"]})
+                    switch.append({'HA_DeviceType': 'switch',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': p["state"]["name"],
+                                   "Hive_DeviceType": p["type"]})
+                    sensor.append({'HA_DeviceType': 'sensor',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': p["state"]["name"] + " Mode",
+                                   "Hive_DeviceType": p["type"] + "_Mode"})
+                    sensor.append({'HA_DeviceType': 'sensor',
+                                   'Hive_NodeID': p["id"],
+                                   'Hive_NodeName': p["state"]["name"] + "Availability",
+                                   "Hive_DeviceType": p["type"] + "_Availability"})
+                except KeyError:
+                    self.log.log('Plug', self.type, "No data found")
+
+        for product in Data.products:
+            if Data.products[product]['type'] in Data.HIVE_TYPES['Sensor']:
+                p = Data.products[product]
+                try:
+                    Data.NAME.update({p["id"]: p["state"]["name"]})
+                    binary_sensor.append({'HA_DeviceType': 'binary_sensor',
+                                          'Hive_NodeID': p["id"],
+                                          'Hive_NodeName': p["state"]["name"],
+                                          "Hive_DeviceType": p["type"]})
+                except KeyError:
+                    self.log.log('Sensor', self.type, "No data found")
+
         for a_device in Data.devices:
             if Data.devices[a_device]['type'] in Data.HIVE_TYPES['Thermo'] or \
                     Data.devices[a_device]['type'] in Data.HIVE_TYPES['Sensor']:
@@ -447,101 +458,52 @@ class Session:
                     node_name = d["state"]["name"]
                     Data.NAME.update({d["id"]: node_name})
                     Data.BATTERY.append(d["id"])
-                    if count == 1:
-                        node_name = None
-                    sensor.append({'HA_DeviceType': 'Hive_Device_BatteryLevel',
+                    sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': d["id"],
-                                   'Hive_NodeName': node_name,
-                                   "Hive_DeviceType": d["type"]})
-                    sensor.append({'HA_DeviceType': 'Hive_Device_Availability',
+                                   'Hive_NodeName': node_name + " BatteryLevel",
+                                   "Hive_DeviceType": d["type"] + "_BatteryLevel"})
+                    sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': d["id"],
-                                   'Hive_NodeName': node_name,
-                                   "Hive_DeviceType": d["type"]})
+                                   'Hive_NodeName': node_name + " Availability",
+                                   "Hive_DeviceType": d["type"] + "_Availability"})
                 except KeyError:
                     self.log.log('Thermostat', self.type, "No data found")
 
-        for product in Data.products:
-            if Data.products[product]['type'] in Data.HIVE_TYPES['Light']:
-                p = Data.products[product]
-                Data.MODE.append(p["id"])
+        for a_device in Data.devices:
+            if Data.devices[a_device]["type"] in Data.HIVE_TYPES['Hub']:
+                d = Data.devices[a_device]
                 try:
-                    Data.NAME.update({p["id"]: p["state"]["name"]})
-                    light.append({'HA_DeviceType': 'Hive_Device_Light',
-                                  'Hive_Light_DeviceType': p["type"],
-                                  'Hive_NodeID': p["id"],
-                                  'Hive_NodeName': p["state"]["name"],
-                                  "Hive_DeviceType": "Light"})
-                    sensor.append({'HA_DeviceType': 'Hive_Device_Light_Mode',
-                                   'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': p["state"]["name"],
-                                   "Hive_DeviceType": p["type"]})
-                    sensor.append({'HA_DeviceType':
-                                   'Hive_Device_Light_Availability',
-                                   'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': p["state"]["name"],
-                                   "Hive_DeviceType": p["type"]})
+                    Data.NAME.update({d["id"]: d["state"]["name"]})
+                    sensor.append({'HA_DeviceType': 'sensor',
+                                   'Hive_NodeID': d["id"],
+                                   'Hive_NodeName': d["state"]["name"] + " Online Status",
+                                   "Hive_DeviceType": d["type"] + "_OnlineStatus"})
                 except KeyError:
-                    self.log.log('Light', self.type, "No data found")
-
-        for product in Data.products:
-            if Data.products[product]['type'] in Data.HIVE_TYPES['Plug']:
-                p = Data.products[product]
-                Data.MODE.append(p["id"])
-                try:
-                    Data.NAME.update({p["id"]: p["state"]["name"]})
-                    switch.append({'HA_DeviceType': 'Hive_Device_Plug',
-                                   'Hive_Switch_DeviceType': p["type"],
-                                   'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': p["state"]["name"],
-                                   "Hive_DeviceType": "Switch"})
-                    sensor.append({'HA_DeviceType': 'Hive_Device_Plug_Mode',
-                                   'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': p["state"]["name"],
-                                   "Hive_DeviceType": p["type"]})
-                    sensor.append({'HA_DeviceType':
-                                   'Hive_Device_Plug_Availability',
-                                   'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': p["state"]["name"],
-                                   "Hive_DeviceType": p["type"]})
-                except KeyError:
-                    self.log.log('Plug', self.type, "No data found")
+                    self.log.log('Hub', self.type, "No data found.")
 
         for action in Data.actions:
             a = Data.actions[action]
             try:
                 Data.NAME.update({a["id"]: a["name"]})
-                switch.append({'HA_DeviceType': 'Hive_Action',
-                               'Hive_Switch_DeviceType': "Action",
+                switch.append({'HA_DeviceType': 'switch',
                                'Hive_NodeID': a["id"],
                                'Hive_NodeName': a["name"],
                                "Hive_DeviceType": "Action"})
             except KeyError:
                 self.log.log('Actions', self.type, "No data found")
 
-        for product in Data.products:
-            if Data.products[product]['type'] in Data.HIVE_TYPES['Sensor']:
-                p = Data.products[product]
-                try:
-                    Data.NAME.update({p["id"]: p["state"]["name"]})
-                    binary_sensor.append({'HA_DeviceType':
-                                          'Hive_Device_Binary_Sensor',
-                                          'Hive_NodeID': p["id"],
-                                          'Hive_NodeName': p["state"]["name"],
-                                          "Hive_DeviceType": p["type"]})
-                except KeyError:
-                    self.log.log('Sensor', self.type, "No data found")
-
         if Data.w_nodeid == "HiveWeather":
-            sensor.append({'HA_DeviceType': 'Hive_OutsideTemperature',
+            sensor.append({'HA_DeviceType': 'sensor',
                            'Hive_NodeID': Data.w_nodeid,
                            'Hive_NodeName': "Hive Weather",
-                           "Hive_DeviceType": "Weather"})
+                           "Hive_DeviceType": "Weather_OutsideTemperature"})
 
-        device_all['device_list_sensor'] = sensor
-        device_all['device_list_binary_sensor'] = binary_sensor
-        device_all['device_list_climate'] = climate
-        device_all['device_list_light'] = light
-        device_all['device_list_plug'] = switch
+        device_all['climate'] = climate
+        device_all['water_heater'] = water_heater
+        device_all['light'] = light
+        device_all['switch'] = switch
+        device_all['sensor'] = sensor
+        device_all['binary_sensor'] = binary_sensor
 
         self.log.log('Session', self.type, "Hive component has initialised")
 
