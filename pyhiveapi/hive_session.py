@@ -368,13 +368,13 @@ class Session:
                                 sensor.append({'HA_DeviceType': 'sensor',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name +
-                                               " CurrentTemperature",
+                                               " Current Temperature",
                                                "Hive_DeviceType": p["type"] +
                                                "_CurrentTemperature"})
                                 sensor.append({'HA_DeviceType': 'sensor',
                                                'Hive_NodeID': p["id"],
                                                'Hive_NodeName': node_name +
-                                               " TargetTemperature",
+                                               " Target Temperature",
                                                "Hive_DeviceType":  p["type"] +
                                                "_TargetTemperature"})
                                 sensor.append({'HA_DeviceType': 'sensor',
@@ -387,7 +387,7 @@ class Session:
                                                "Hive_DeviceType": p["type"] + "_Mode"})
                                 sensor.append({'HA_DeviceType': 'sensor',
                                                'Hive_NodeID': p["id"],
-                                               'Hive_NodeName': node_name + "Boost",
+                                               'Hive_NodeName': node_name + " Boost",
                                                "Hive_DeviceType": p["type"] + "_Boost"})
                             except KeyError:
                                 self.log.log('Hot', self.type, "No data found")
@@ -404,15 +404,15 @@ class Session:
                                          "Hive_DeviceType": p["type"]})
                     sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': node_name + "State",
+                                   'Hive_NodeName': node_name + " State",
                                    "Hive_DeviceType": p["type"] + "_State"})
                     sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': node_name + "Mode",
+                                   'Hive_NodeName': node_name + " Mode",
                                    "Hive_DeviceType": p["type"] + "_Mode"})
                     sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': node_name + "Boost",
+                                   'Hive_NodeName': node_name + " Boost",
                                    "Hive_DeviceType": p["type"] + "_Boost"})
                 except KeyError:
                     self.log.log('Hotwater', self.type, "No data found.")
@@ -433,7 +433,7 @@ class Session:
                                    "Hive_DeviceType": p["type"] + "_Mode"})
                     sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': p["state"]["name"] + "Availability",
+                                   'Hive_NodeName': p["state"]["name"] + " Availability",
                                    "Hive_DeviceType": p["type"] + "_Availability"})
                 except KeyError:
                     self.log.log('Plug', self.type, "No data found")
@@ -454,7 +454,7 @@ class Session:
                                    "Hive_DeviceType": p["type"] + "_Mode"})
                     sensor.append({'HA_DeviceType': 'sensor',
                                    'Hive_NodeID': p["id"],
-                                   'Hive_NodeName': p["state"]["name"] + "Availability",
+                                   'Hive_NodeName': p["state"]["name"] + " Availability",
                                    "Hive_DeviceType": p["type"] + "_Availability"})
                 except KeyError:
                     self.log.log('Light', self.type, "No data found")
