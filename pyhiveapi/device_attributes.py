@@ -26,7 +26,7 @@ class Attributes:
                 attr.update({"mode": (self.get_mode(n_id))})
 
             data = Data.products[n_id]
-            if data['type'] in Data.types['Sensor']:
+            if data['type'] in Data.HIVE_TYPES['Sensor']:
                 rec = str(data['props']['statusChanged'])
                 trim = '{:10.10}'.format(rec)
                 time = Session.epochtime(trim, '%d-%m-%Y %H:%M:%S',
