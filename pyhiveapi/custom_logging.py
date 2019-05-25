@@ -39,6 +39,7 @@ class Logger:
         """Output new log entry if logging is turned on."""
         name = Data.NAME.get(n_id, n_id)
         data = kwargs.get('info', None)
+        values = Data.l_values
         if n_id == 'No_ID':
             name = 'Hive'
         final = False
@@ -49,7 +50,7 @@ class Logger:
                     if Data.l_values['enabled']:
                         final = True
                         break
-        elif l_type in Data.l_values or 'All' in Data.l_values:
+        elif l_type in values or 'All' in values:
             if Data.l_values['enabled']:
                 final = True
 

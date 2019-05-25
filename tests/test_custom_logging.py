@@ -38,6 +38,16 @@ class Custom_Logging_Tests(unittest.TestCase):
         print(Data.l_values)
         self.assertTrue(Data.l_values)
 
+    def test_checking_logging_disabled(self):
+        expected = {}
+        Data.l_values = {'All': True, 'enabled': True}
+        path = os.path.expanduser('~') + "/.homeassistant/pyhiveapi"
+        logfile = os.path.join(path, 'log.all')
+        os.remove(logfile)
+        Logger.check_logging(new_session=True)
+        print(Data.l_values)
+        self.assertEqual(Data.l_values, expected)
+
     def test_writing_a_log_message(self):
         Data.l_values.update({'All': True})
         Data.l_values.update({'enabled': True})
