@@ -18,7 +18,7 @@ class Action:
     def get_state(self, n_id):
         """Get action state."""
         self.log.log(n_id, self.type, "Getting state")
-        final = False
+        final = None
 
         if n_id in Data.actions:
             data = Data.actions[n_id]
@@ -28,7 +28,7 @@ class Action:
         else:
             self.log.error_check(n_id, 'ERROR', 'Failed')
 
-        return final if final is False else Data.NODES[n_id].get("State")
+        return final if final is None else Data.NODES[n_id].get("State")
 
     def turn_on(self, n_id):
         """Set action turn on."""
@@ -66,7 +66,6 @@ class Action:
             data.update({"enabled": False})
             send = json.dumps(data)
             resp = self.hive.set_action(Data.sess_id, n_id, send)
-            print(resp)
             if str(resp['original']) == "<Response [200]>":
                 final = True
                 Session.hive_api_get_nodes(Session(), n_id)

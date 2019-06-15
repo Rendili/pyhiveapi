@@ -44,8 +44,7 @@ class Hive_Session_Tests(unittest.TestCase):
         print('Session ID is {0}'.format(Data.sess_id))
         self.assertNotEqual(previous, Data.s_logon_datetime)
 
-    @patch('pyhiveapi.hive_session.Hive.login', return_value=open_file('login_sucessful.json'))
-    def test_token_refresh_not_required(self, Session_login_function):
+    def test_token_refresh_not_required(self):
         previous_token = 'Test_Token'
         Data.sess_id = previous_token
         print('Last logon time - {0}'.format(Data.s_logon_datetime))
