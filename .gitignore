@@ -7,6 +7,10 @@ dist/
 __pycache__/
 *.so
 *~
+.vscode/*
+build
+dist
+pyhiveapi.egg-info
 
 # due to using tox and pytest
 .tox
