@@ -734,6 +734,7 @@ class Pyhiveapi:
         device_list_sensor = []
         device_list_binary_sensor = []
         device_list_climate = []
+        device_list_water_heater = []
         device_list_light = []
         device_list_plug = []
 
