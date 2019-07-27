@@ -734,6 +734,7 @@ class Pyhiveapi:
         device_list_sensor = []
         device_list_binary_sensor = []
         device_list_climate = []
+        device_list_water_heater = []
         device_list_light = []
         device_list_plug = []
 
@@ -763,7 +764,7 @@ class Pyhiveapi:
                     node_name = product["state"]["name"]
                     if len(HSC.products.hotwater) == 1:
                         node_name = None
-                    device_list_climate.append({'HA_DeviceType': 'HotWater', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "HotWater"})
+                    device_list_water_heater.append({'HA_DeviceType': 'HotWater', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "HotWater"})
                     device_list_sensor.append({'HA_DeviceType': 'HotWater_State', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "HotWater"})
                     device_list_sensor.append({'HA_DeviceType': 'HotWater_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "HotWater"})
                     device_list_sensor.append({'HA_DeviceType': 'HotWater_Boost', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "HotWater"})
@@ -814,6 +815,7 @@ class Pyhiveapi:
         device_list_all['device_list_sensor'] = device_list_sensor
         device_list_all['device_list_binary_sensor'] = device_list_binary_sensor
         device_list_all['device_list_climate'] = device_list_climate
+        device_list_all['device_list_water_heater'] = device_list_water_heater
         device_list_all['device_list_light'] = device_list_light
         device_list_all['device_list_plug'] = device_list_plug
 
