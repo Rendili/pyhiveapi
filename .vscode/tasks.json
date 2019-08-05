@@ -1,8 +1,101 @@
 {
-    // See https://go.microsoft.com/fwlink/?LinkId=733558
-    // for the documentation about the tasks.json format
     "version": "2.0.0",
     "tasks": [
+        {
+            "label": "Preview",
+            "type": "shell",
+            "command": "hass -c ./config",
+            "group": {
+                "kind": "test",
+                "isDefault": true,
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Pytest",
+            "type": "shell",
+            "command": "pytest tests",
+            "group": {
+                "kind": "test",
+                "isDefault": true,
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Flake8",
+            "type": "shell",
+            "command": "flake8 homeassistant tests",
+            "group": {
+                "kind": "test",
+                "isDefault": true,
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Pylint",
+            "type": "shell",
+            "command": "pylint homeassistant",
+            "dependsOn": [
+                "Install all Requirements"
+            ],
+            "group": {
+                "kind": "test",
+                "isDefault": true,
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Generate Requirements",
+            "type": "shell",
+            "command": "./script/gen_requirements_all.py",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Install all Requirements",
+            "type": "shell",
+            "command": "pip3 install -r requirements_all.txt -c homeassistant/package_constraints.txt",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "install_develop",
+            "type": "shell",
+            "command": "sudo script/setup",
+            "options": {
+                "cwd": "/Users/kholejones/Git/home-assistant/"
+            }
+        },
         {
             "label": "Build Package",
             "type": "shell",
@@ -16,6 +109,6 @@
             "label": "Upload Package",
             "type": "shell",
             "command": "upload-package"
-        }
+        },
     ]
 }

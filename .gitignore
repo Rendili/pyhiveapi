@@ -1,7 +1,7 @@
 # general things to ignore
 build/
 dist/
-.vscode/
+*.vscode/
 *.egg-info/
 *.egg
 *.py[cod]
@@ -12,6 +12,4 @@ __pycache__/
 # due to using tox and pytest
 .tox
 .cache
-.vscode/settings.json
 .idea
-.vscode/launch.json

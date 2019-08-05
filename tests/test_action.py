@@ -1,15 +1,15 @@
-from pyhiveapi.action import Action
-from pyhiveapi.hive_data import Data
-from unittest.mock import Mock, patch
-import unittest
-import datetime
-import json
-import time
 import os
+import time
+import json
+import datetime
+import unittest
+from unittest.mock import Mock, patch
+from pyhiveapi.hive_data import Data
+from pyhiveapi.action import Action
 
 
 def open_file(file):
-    path = os.getcwd() + '/tests/responses/' + file
+    path = os.getcwd() + '/responses/' + file
     json_data = open(path).read()
 
     return json.loads(json_data)

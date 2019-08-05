@@ -6,7 +6,7 @@ import os
 
 
 def open_file(file):
-    path = os.getcwd() + '/tests/responses/' + file
+    path = os.getcwd() + '/responses/' + file
     json_data = open(path).read()
 
     return json.loads(json_data)
