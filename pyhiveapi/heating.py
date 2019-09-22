@@ -304,11 +304,11 @@ class Heating:
 
         if n_id in Data.products:
             Session.check_hive_api_logon(Session())
-            data = Data.products
+            data = Data.products[n_id]
             Session.hive_api_get_nodes(Session(), n_id)
             if self.get_boost(n_id) == "ON":
                 prev_mode = data["props"]["previous"]["mode"]
-                if prev_mode == "MANUAL":
+                if prev_mode == 'MANUAL' or prev_mode == 'OFF':
                     pre_temp = data["props"]["previous"].get('target', 7)
                     resp = self.hive.set_state(Data.sess_id, data[type], n_id,
                                                mode=prev_mode, target=pre_temp)
