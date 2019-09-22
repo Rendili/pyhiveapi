@@ -309,7 +309,7 @@ class Heating:
             if self.get_boost(n_id) == "ON":
                 prev_mode = data["props"]["previous"]["mode"]
                 if prev_mode == "MANUAL":
-                    pre_temp = data["props"]["previous"]["target"]
+                    pre_temp = data["props"]["previous"].get('target', 7)
                     resp = self.hive.set_state(Data.sess_id, data[type], n_id,
                                                mode=prev_mode, target=pre_temp)
                 else:
