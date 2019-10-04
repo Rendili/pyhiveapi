@@ -35,8 +35,7 @@ class Hive:
     def login(self, username, password):
         """Login to the Hive API."""
         try:
-            j = '{{"username": "{0}", "password": "{1}"}}'.format(
-                username, password)
+            j = '{{"username": "{0}", "password": "{1}"}}'.format(username, password)
             response = requests.post(
                 url=self.urls["login"],
                 headers=self.headers,
@@ -184,8 +183,7 @@ class Hive:
         jsc = (
             "{"
             + ",".join(
-                ('"' + str(i) + '": ' '"' + str(t) +
-                 '" ' for i, t in kwargs.items())
+                ('"' + str(i) + '": ' '"' + str(t) + '" ' for i, t in kwargs.items())
             )
             + "}"
         )
