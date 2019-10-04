@@ -124,7 +124,7 @@ class Session:
             for hive_type in api_resp_p:
                 if hive_type == "products":
                     for a_product in api_resp_p[hive_type]:
-                        Data.devices.update({a_product["id"]: a_product})
+                        Data.products.update({a_product["id"]: a_product})
                         Data.NODES.update({a_product["id"]: {"": ""}})
                 if hive_type == "devices":
                     for a_device in api_resp_p[hive_type]:
@@ -132,7 +132,7 @@ class Session:
                         Data.NODES.update({a_device["id"]: {"": ""}})
                 if hive_type == "actions":
                     for a_action in api_resp_p[hive_type]:
-                        Data.devices.update({a_action["id"]: a_action})
+                        Data.actions.update({a_action["id"]: a_action})
                         Data.NODES.update({a_action["id"]: {"": ""}})
 
             try_finished = True
