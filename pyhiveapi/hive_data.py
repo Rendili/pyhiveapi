@@ -64,7 +64,6 @@ class Data:
     s_interval_seconds = NODE_INTERVAL_DEFAULT
     s_last_update = datetime.datetime(2017, 1, 1, 12, 0, 0)
     s_file = False
-    t_file = None
 
     # Weather data
     w_last_update = datetime.datetime(2017, 1, 1, 12, 0, 0)

@@ -1,7 +1,9 @@
 """ Hive Session Module."""
 import operator
 import threading
+import os
 import time
+import json
 from datetime import datetime, timedelta
 
 from pyhiveapi.custom_logging import Logger
@@ -23,6 +25,12 @@ class Session:
         self.api = Hive()
         self.log = Logger()
         self.type = "Session"
+
+    def open_file(file):
+        path = os.getcwd() + file
+        json_data = open(path).read()
+
+    return json.loads(json_data)
 
     def hive_api_logon(self):
         """Log in to the Hive API and get the Session Data."""
@@ -92,16 +100,6 @@ class Session:
 
         return updated
 
-    def hive_api_get_nodes_nl(self, **kwargs):
-        """Get latest data for Hive nodes - not rate limiting."""
-        file = kwargs.get("file", False)
-        if file:
-            Data.s_file = True
-            Data.t_file = file
-
-        self.log.log("No_ID", self.type, "Getting first set of data from Hive")
-        self.hive_api_get_nodes("NoID")
-
     def hive_api_get_nodes(self, n_id):
         """Get latest data for Hive nodes."""
         get_nodes_successful = False
@@ -111,10 +109,10 @@ class Session:
         self.check_hive_api_logon()
         try:
             if Data.s_file:
-                api_resp_d = Data.t_file["devices"]
+                api_resp_d = self.open_file("preparsed_all.json")
+                self.log.log(n_id, "API", "Using file")
             elif Data.sess_id is not None:
-                api_resp_d = self.api.get_devices(Data.sess_id)
-
+                api_resp_d = self.api.get_all(Data.sess_id)
                 api_resp = str(api_resp_d["original"])
                 if api_resp == "<Response [200]>":
                     self.log.log(n_id, "API", "Devices - API response 200")
@@ -123,56 +121,26 @@ class Session:
 
             api_resp_p = api_resp_d["parsed"]
 
-            for a_device in api_resp_p:
-                if "id" in a_device:
-                    Data.devices.update({a_device["id"]: a_device})
-                    Data.NODES.update({a_device["id"]: {"": ""}})
-            try_finished_devices = True
+            for hive_type in api_resp_p:
+                if hive_type == "products":
+                    for a_product in api_resp_p[hive_type]:
+                        Data.devices.update({a_product["id"]: a_product})
+                        Data.NODES.update({a_product["id"]: {"": ""}})
+                if hive_type == "devices":
+                    for a_device in api_resp_p[hive_type]:
+                        Data.devices.update({a_device["id"]: a_device})
+                        Data.NODES.update({a_device["id"]: {"": ""}})
+                if hive_type == "actions":
+                    for a_action in api_resp_p[hive_type]:
+                        Data.devices.update({a_action["id"]: a_action})
+                        Data.NODES.update({a_action["id"]: {"": ""}})
+
+            try_finished = True
         except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
-            self.log.log("No_ID", "Core_API", "Api didnt receive any data")
+            self.log.log("No_ID", "Core_API", "Api didn't receive any data")
             try_finished_devices = False
 
-        try:
-            api_resp = None
-            resp = None
-            if Data.s_file:
-                resp = Data.t_file["products"]
-            elif Data.sess_id is not None:
-                resp = self.api.get_products(Data.sess_id)
-                if api_resp == "<Response [200]>":
-                    self.log.log(n_id, "API", "Products - API response 200")
-                else:
-                    self.log.error_check(n_id, "ERROR", "Failed_API", resp=api_resp)
-
-            for a_product in resp["parsed"]:
-                if "id" in a_product:
-                    Data.products.update({a_product["id"]: a_product})
-                    Data.NODES.update({a_product["id"]: {"": ""}})
-            try_finished_products = True
-        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
-            try_finished_products = False
-
-        try:
-            api_resp = None
-            resp = None
-            if Data.s_file:
-                resp = Data.t_file["actions"]
-            elif Data.sess_id is not None:
-                resp = self.api.get_actions(Data.sess_id)
-                if api_resp == "<Response [200]>":
-                    self.log.log(n_id, "API", "Actions - API response 200")
-                else:
-                    self.log.error_check(n_id, "ERROR", "Failed_API", resp=api_resp)
-
-            for a_action in resp["parsed"]:
-                if "id" in a_action:
-                    Data.actions.update({a_action["id"]: a_action})
-                    Data.NODES.update({a_action["id"]: {"": ""}})
-            try_finished_actions = True
-        except (IOError, RuntimeError, ZeroDivisionError, ConnectionError):
-            try_finished_actions = False
-
-        if try_finished_devices and try_finished_products and try_finished_actions:
+        if try_finished:
             get_nodes_successful = True
             Data.s_last_update = datetime.now()
 
@@ -297,20 +265,23 @@ class Session:
         Data.s_username = username
         Data.s_password = password
         self.log.log("No_ID", self.type, "Initialising Hive Component.")
-        tmp_file = kwargs.get("file")
+        loc == os.path.expanduser("~") + "/.homeassistant/pyhiveapi/use_file"
+        if os.path.isfile(loc):
+            Data.s_file = True
 
         if interval < 30:
             interval = Data.NODE_INTERVAL_DEFAULT
 
-        if tmp_file is not None:
-            self.hive_api_get_nodes_nl(file=tmp_file)
+        if Data.s_file:
+            self.log.log("No_ID", self.type, "Getting first set of data from Hive")
+            self.hive_api_get_nodes("NoID")
         elif Data.s_username is None or Data.s_password is None:
             return None
         else:
             self.hive_api_logon()
             if Data.sess_id is not None:
                 Data.s_interval_seconds = interval
-                self.hive_api_get_nodes_nl()
+                self.hive_api_get_nodes("NoID")
                 self.hive_api_get_weather()
 
         if Data.devices is None or Data.products is None:

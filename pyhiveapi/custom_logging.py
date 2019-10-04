@@ -9,7 +9,7 @@ class Logger:
     """Custom Logging Code."""
 
     def __init__(self):
-        """Logger Initialisation"""
+        """Logger Initialization"""
 
     @staticmethod
     def check_logging(new_session):
