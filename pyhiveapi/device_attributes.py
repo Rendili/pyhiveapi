@@ -13,6 +13,7 @@ class Attributes:
     def state_attributes(self, n_id):
         """Get HA State Attributes"""
         from pyhiveapi.hive_session import Session
+
         self.log.log(n_id, self.type, "Getting state_attributes")
         attr = {}
 
@@ -21,17 +22,16 @@ class Attributes:
             if n_id in Data.BATTERY:
                 battery = self.battery(n_id)
                 if battery is not None:
-                    attr.update({"battery": str(battery) + '%'})
+                    attr.update({"battery": str(battery) + "%"})
             if n_id in Data.MODE:
                 attr.update({"mode": (self.get_mode(n_id))})
 
             data = Data.products[n_id]
-            if data['type'] in Data.HIVE_TYPES['Sensor']:
-                rec = str(data['props']['statusChanged'])
-                trim = '{:10.10}'.format(rec)
-                time = Session.epochtime(trim, '%d-%m-%Y %H:%M:%S',
-                                         'from_epoch')
-                attr.update({'state_changed': time})
+            if data["type"] in Data.HIVE_TYPES["Sensor"]:
+                rec = str(data["props"]["statusChanged"])
+                trim = "{:10.10}".format(rec)
+                time = Session.epochtime(trim, "%d-%m-%Y %H:%M:%S", "from_epoch")
+                attr.update({"state_changed": time})
 
         return attr
 
@@ -43,13 +43,13 @@ class Attributes:
         if n_id in Data.devices:
             data = Data.devices[n_id]
             state = data["props"]["online"]
-            final = Data.HIVETOHA[self.type].get(state, 'UNKNOWN')
-            Data.NODES[n_id]['Availability'] = final
+            final = Data.HIVETOHA[self.type].get(state, "UNKNOWN")
+            Data.NODES[n_id]["Availability"] = final
             self.log.log(n_id, self.type, "Device is {0}", info=str(final))
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['Availability']
+        return final if final is None else Data.NODES[n_id]["Availability"]
 
     def get_mode(self, n_id):
         """Get sensor mode."""
@@ -58,7 +58,7 @@ class Attributes:
         final = None
 
         if n_id in Data.products:
-            if state != 'Offline':
+            if state != "Offline":
                 data = Data.products[n_id]
                 state = data["state"]["mode"]
                 self.log.log(n_id, self.type, "Mode is {0}", info=str(final))
@@ -66,9 +66,9 @@ class Attributes:
             final = Data.HIVETOHA[self.type].get(state, state)
             Data.NODES[n_id]["Device_Mode"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['Device_Mode']
+        return final if final is None else Data.NODES[n_id]["Device_Mode"]
 
     def battery(self, n_id):
         """Get device battery level."""
@@ -77,7 +77,7 @@ class Attributes:
         final = None
 
         if n_id in Data.devices:
-            if state != 'Offline':
+            if state != "Offline":
                 data = Data.devices[n_id]
                 state = data["props"]["battery"]
                 final = state
@@ -85,6 +85,6 @@ class Attributes:
                 self.log.log(n_id, self.type, "Battery level is", info=final)
             self.log.error_check(n_id, self.type, state)
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['BatteryLevel']
+        return final if final is None else Data.NODES[n_id]["BatteryLevel"]

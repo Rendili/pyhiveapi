@@ -22,7 +22,7 @@ class Sensor:
         final = None
 
         if n_id in Data.products:
-            if state != 'Offline':
+            if state != "Offline":
                 data = Data.products[n_id]
                 if data["type"] == "contactsensor":
                     state = data["props"]["status"]
@@ -32,8 +32,8 @@ class Sensor:
                 self.log.log(n_id, self.type, "Status is {0}", info=final)
             self.log.error_check(n_id, self.type, state)
             final = Data.HIVETOHA[self.type].get(state, state)
-            Data.NODES[n_id]['State'] = final
+            Data.NODES[n_id]["State"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['State']
+        return final if final is None else Data.NODES[n_id]["State"]

@@ -9,7 +9,7 @@ import os
 
 
 def open_file(file):
-    path = os.getcwd() + '/responses/' + file
+    path = os.getcwd() + "/responses/" + file
     json_data = open(path).read()
 
     return json.loads(json_data)
@@ -19,9 +19,9 @@ class Plug_Tests(unittest.TestCase):
     """Unit tests for the Logger Class."""
 
     def setUp(self):
-        products = open_file('parsed_products.json')
-        devices = open_file('parsed_devices.json')
-        nodes = open_file('NODES.json')
+        products = open_file("parsed_products.json")
+        devices = open_file("parsed_devices.json")
+        nodes = open_file("NODES.json")
         Data.products = products
         Data.devices = devices
         Data.NODES = nodes
@@ -42,9 +42,12 @@ class Plug_Tests(unittest.TestCase):
         print(end)
         self.assertIsNotNone(end)
 
-    @patch('pyhiveapi.hive_session.Session.check_hive_api_logon', return_value=None)
-    @patch('pyhiveapi.hive_session.Session.hive_api_get_nodes', return_value=None)
-    @patch('pyhiveapi.hive_api.Hive.set_state', return_value=open_file('set_state_sucessful.json'))
+    @patch("pyhiveapi.hive_session.Session.check_hive_api_logon", return_value=None)
+    @patch("pyhiveapi.hive_session.Session.hive_api_get_nodes", return_value=None)
+    @patch(
+        "pyhiveapi.hive_api.Hive.set_state",
+        return_value=open_file("set_state_sucessful.json"),
+    )
     def test_turn_on_sucessful(self, Check_login, Get_nodes, Set_state):
         end = None
         id_n = "plug-0000-0000-0000-000000000001"
@@ -52,9 +55,12 @@ class Plug_Tests(unittest.TestCase):
         print(end)
         self.assertTrue(end)
 
-    @patch('pyhiveapi.hive_session.Session.check_hive_api_logon', return_value=None)
-    @patch('pyhiveapi.hive_session.Session.hive_api_get_nodes', return_value=None)
-    @patch('pyhiveapi.hive_api.Hive.set_state', return_value=open_file('set_state_failed.json'))
+    @patch("pyhiveapi.hive_session.Session.check_hive_api_logon", return_value=None)
+    @patch("pyhiveapi.hive_session.Session.hive_api_get_nodes", return_value=None)
+    @patch(
+        "pyhiveapi.hive_api.Hive.set_state",
+        return_value=open_file("set_state_failed.json"),
+    )
     def test_turn_on_failed(self, Check_login, Get_nodes, Set_state):
         end = None
         id_n = "plug-0000-0000-0000-000000000001"
@@ -62,9 +68,12 @@ class Plug_Tests(unittest.TestCase):
         print(end)
         self.assertFalse(end)
 
-    @patch('pyhiveapi.hive_session.Session.check_hive_api_logon', return_value=None)
-    @patch('pyhiveapi.hive_session.Session.hive_api_get_nodes', return_value=None)
-    @patch('pyhiveapi.hive_api.Hive.set_state', return_value=open_file('set_state_sucessful.json'))
+    @patch("pyhiveapi.hive_session.Session.check_hive_api_logon", return_value=None)
+    @patch("pyhiveapi.hive_session.Session.hive_api_get_nodes", return_value=None)
+    @patch(
+        "pyhiveapi.hive_api.Hive.set_state",
+        return_value=open_file("set_state_sucessful.json"),
+    )
     def test_turn_off_sucessful(self, Check_login, Get_nodes, Set_state):
         end = None
         id_n = "plug-0000-0000-0000-000000000001"
@@ -72,9 +81,12 @@ class Plug_Tests(unittest.TestCase):
         print(end)
         self.assertTrue(end)
 
-    @patch('pyhiveapi.hive_session.Session.check_hive_api_logon', return_value=None)
-    @patch('pyhiveapi.hive_session.Session.hive_api_get_nodes', return_value=None)
-    @patch('pyhiveapi.hive_api.Hive.set_state', return_value=open_file('set_state_failed.json'))
+    @patch("pyhiveapi.hive_session.Session.check_hive_api_logon", return_value=None)
+    @patch("pyhiveapi.hive_session.Session.hive_api_get_nodes", return_value=None)
+    @patch(
+        "pyhiveapi.hive_api.Hive.set_state",
+        return_value=open_file("set_state_failed.json"),
+    )
     def test_turn_off_failed(self, Check_login, Get_nodes, Set_state):
         end = None
         id_n = "plug-0000-0000-0000-000000000001"
@@ -83,5 +95,5 @@ class Plug_Tests(unittest.TestCase):
         self.assertFalse(end)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

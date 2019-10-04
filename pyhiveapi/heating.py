@@ -29,49 +29,53 @@ class Heating:
     def current_temperature(self, n_id):
         """Get heating current temperature."""
         from datetime import datetime
+
         self.log.log(n_id, self.type, "Getting current temp")
         state = self.attr.online_offline(n_id)
         final = None
 
         if n_id in Data.products:
-            if state != 'Offline':
+            if state != "Offline":
                 data = Data.products[n_id]
                 state = data["props"]["temperature"]
 
                 if n_id in Data.p_minmax:
-                    if Data.p_minmax[n_id]['TodayDate'] != datetime.date(
-                            datetime.now()):
-                        Data.p_minmax[n_id]['TodayMin'] = 1000
-                        Data.p_minmax[n_id]['TodayMax'] = -1000
-                        Data.p_minmax[n_id]['TodayDate'] = datetime.date(
-                            datetime.now())
+                    if Data.p_minmax[n_id]["TodayDate"] != datetime.date(
+                        datetime.now()
+                    ):
+                        Data.p_minmax[n_id]["TodayMin"] = 1000
+                        Data.p_minmax[n_id]["TodayMax"] = -1000
+                        Data.p_minmax[n_id]["TodayDate"] = datetime.date(datetime.now())
 
-                    if state < Data.p_minmax[n_id]['TodayMin']:
-                        Data.p_minmax[n_id]['TodayMin'] = state
+                    if state < Data.p_minmax[n_id]["TodayMin"]:
+                        Data.p_minmax[n_id]["TodayMin"] = state
 
-                    if state > Data.p_minmax[n_id]['TodayMax']:
-                        Data.p_minmax[n_id]['TodayMax'] = state
+                    if state > Data.p_minmax[n_id]["TodayMax"]:
+                        Data.p_minmax[n_id]["TodayMax"] = state
 
-                    if state < Data.p_minmax[n_id]['RestartMin']:
-                        Data.p_minmax[n_id]['RestartMin'] = state
+                    if state < Data.p_minmax[n_id]["RestartMin"]:
+                        Data.p_minmax[n_id]["RestartMin"] = state
 
-                    if state > Data.p_minmax[n_id]['RestartMax']:
-                        Data.p_minmax[n_id]['RestartMax'] = state
+                    if state > Data.p_minmax[n_id]["RestartMax"]:
+                        Data.p_minmax[n_id]["RestartMax"] = state
                 else:
-                    data = {'TodayMin': state, 'TodayMax': state,
-                            'TodayDate': str(datetime.date(datetime.now())),
-                            'RestartMin': state, 'RestartMax': state}
+                    data = {
+                        "TodayMin": state,
+                        "TodayMax": state,
+                        "TodayDate": str(datetime.date(datetime.now())),
+                        "RestartMin": state,
+                        "RestartMax": state,
+                    }
                     Data.p_minmax[n_id] = data
                 f_state = round(float(state), 1)
-                self.log.log(n_id, self.type, "Current Temp is {0}",
-                             info=str(state))
+                self.log.log(n_id, self.type, "Current Temp is {0}", info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = f_state
-            Data.NODES[n_id]['CurrentTemp'] = final
+            Data.NODES[n_id]["CurrentTemp"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['CurrentTemp']
+        return final if final is None else Data.NODES[n_id]["CurrentTemp"]
 
     def minmax_temperatures(self, n_id):
         """Min/Max Temp"""
@@ -80,16 +84,16 @@ class Heating:
         final = None
 
         if n_id in Data.p_minmax:
-            if state != 'Offline':
+            if state != "Offline":
                 state = Data.p_minmax[n_id]
                 self.log.log(n_id, self.type, "Min/Max is {0}", info=state)
             self.log.error_check(n_id, self.type, state)
             final = state
-            Data.NODES[n_id]['minmax'] = final
+            Data.NODES[n_id]["minmax"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['minmax']
+        return final if final is None else Data.NODES[n_id]["minmax"]
 
     def get_target_temperature(self, n_id):
         """Get heating target temperature."""
@@ -98,18 +102,17 @@ class Heating:
         final = None
 
         if n_id in Data.products:
-            if state != 'Offline':
+            if state != "Offline":
                 data = Data.products[n_id]
                 state = round(float(data["state"]["target"]), 1)
-                self.log.log(n_id, self.type, "Target temp is {0}",
-                             info=str(state))
+                self.log.log(n_id, self.type, "Target temp is {0}", info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = state
-            Data.NODES[n_id]['TargetTemp'] = final
+            Data.NODES[n_id]["TargetTemp"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['TargetTemp']
+        return final if final is None else Data.NODES[n_id]["TargetTemp"]
 
     def get_mode(self, n_id):
         """Get heating current mode."""
@@ -118,7 +121,7 @@ class Heating:
         final = None
 
         if n_id in Data.products:
-            if state != 'Offline':
+            if state != "Offline":
                 data = Data.products[n_id]
                 state = data["state"]["mode"]
                 if state == "BOOST":
@@ -126,11 +129,11 @@ class Heating:
                 self.log.log(n_id, self.type, "Mode is {0}", info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = Data.HIVETOHA[self.type].get(state, state)
-            Data.NODES[n_id]['Mode'] = final
+            Data.NODES[n_id]["Mode"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['Mode']
+        return final if final is None else Data.NODES[n_id]["Mode"]
 
     def get_state(self, n_id):
         """Get heating current state."""
@@ -139,7 +142,7 @@ class Heating:
         final = None
 
         if n_id in Data.products:
-            if state != 'Offline':
+            if state != "Offline":
                 current_temp = self.current_temperature(n_id)
                 target_temp = self.get_target_temperature(n_id)
                 if current_temp < target_temp:
@@ -149,11 +152,11 @@ class Heating:
                 self.log.log(n_id, self.type, "State is {0}", info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = Data.HIVETOHA[self.type].get(state, state)
-            Data.NODES[n_id]['State'] = final
+            Data.NODES[n_id]["State"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['State']
+        return final if final is None else Data.NODES[n_id]["State"]
 
     def get_boost(self, n_id):
         """Get heating boost current status."""
@@ -162,40 +165,39 @@ class Heating:
         final = None
 
         if n_id in Data.products:
-            if state != 'Offline':
+            if state != "Offline":
                 data = Data.products[n_id]
-                state = Data.HIVETOHA['Boost'].get(data["state"]["boost"],
-                                                   'ON')
-                self.log.log(n_id, self.type, "Boost state is {0}",
-                             info=str(state))
+                state = Data.HIVETOHA["Boost"].get(data["state"]["boost"], "ON")
+                self.log.log(n_id, self.type, "Boost state is {0}", info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = state
-            Data.NODES[n_id]['Boost'] = final
+            Data.NODES[n_id]["Boost"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['Boost']
+        return final if final is None else Data.NODES[n_id]["Boost"]
 
     def get_boost_time(self, n_id):
         """Get heating boost time remaining."""
-        if self.get_boost(n_id) == 'ON':
+        if self.get_boost(n_id) == "ON":
             self.log.log(n_id, self.type, "Getting boost time")
             state = self.attr.online_offline(n_id)
             final = None
 
             if n_id in Data.products:
-                if state != 'Offline':
+                if state != "Offline":
                     data = Data.products[n_id]
                     state = data["state"]["boost"]
-                    self.log.log(n_id, self.type, "Time left on boost is {0}",
-                                 info=str(state))
+                    self.log.log(
+                        n_id, self.type, "Time left on boost is {0}", info=str(state)
+                    )
                 self.log.error_check(n_id, self.type, state)
                 final = state
-                Data.NODES[n_id]['Boost_Time'] = final
+                Data.NODES[n_id]["Boost_Time"] = final
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed')
+                self.log.error_check(n_id, "ERROR", "Failed")
 
-            return final if final is None else Data.NODES[n_id]['Boost_Time']
+            return final if final is None else Data.NODES[n_id]["Boost_Time"]
         return None
 
     @staticmethod
@@ -206,66 +208,66 @@ class Heating:
     def get_schedule_now_next_later(self, n_id):
         """Hive get heating schedule now, next and later."""
         from pyhiveapi.hive_session import Session
+
         self.log.log(n_id, self.type, "Getting schedule")
         state = self.attr.online_offline(n_id)
         current_mode = self.get_mode(n_id)
         final = None
 
         if n_id in Data.products:
-            if state != 'Offline' and current_mode == "SCHEDULE":
+            if state != "Offline" and current_mode == "SCHEDULE":
                 data = Data.products[n_id]
-                state = Session.p_get_schedule_nnl(Session(),
-                                                   (data["state"]
-                                                    ["schedule"]))
-                self.log.log(n_id, self.type, "Schedule is {0}",
-                             info=str(state))
+                state = Session.p_get_schedule_nnl(
+                    Session(), (data["state"]["schedule"])
+                )
+                self.log.log(n_id, self.type, "Schedule is {0}", info=str(state))
             self.log.error_check(n_id, self.type, state)
             final = state
-            Data.NODES[n_id]['snnl'] = final
+            Data.NODES[n_id]["snnl"] = final
         else:
-            self.log.error_check(n_id, 'ERROR', 'Failed')
+            self.log.error_check(n_id, "ERROR", "Failed")
 
-        return final if final is None else Data.NODES[n_id]['snnl']
+        return final if final is None else Data.NODES[n_id]["snnl"]
 
     def set_target_temperature(self, n_id, new_temp):
         """Set heating target temperature."""
         from pyhiveapi.hive_session import Session
+
         final = False
 
         if n_id in Data.products:
             Session.check_hive_api_logon(Session())
             data = Data.products[n_id]
-            resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
-                                       target=new_temp)
+            resp = self.hive.set_state(
+                Data.sess_id, data["type"], n_id, target=new_temp
+            )
 
-            if str(resp['original']) == "<Response [200]>":
+            if str(resp["original"]) == "<Response [200]>":
                 Session.hive_api_get_nodes(Session(), n_id)
                 final = True
-                self.log.log(n_id, 'API', "Temperature set - API response 200")
+                self.log.log(n_id, "API", "Temperature set - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API',
-                                     resp=resp['original'])
+                self.log.error_check(n_id, "ERROR", "Failed_API", resp=resp["original"])
 
         return final
 
     def set_mode(self, n_id, new_mode):
         """Set heating mode."""
         from pyhiveapi.hive_session import Session
+
         Session.check_hive_api_logon(Session())
         final = False
 
         if n_id in Data.products:
             data = Data.products[n_id]
-            resp = self.hive.set_state(Data.sess_id, data['type'], n_id,
-                                       mode=new_mode)
+            resp = self.hive.set_state(Data.sess_id, data["type"], n_id, mode=new_mode)
 
-            if str(resp['original']) == "<Response [200]>":
+            if str(resp["original"]) == "<Response [200]>":
                 Session.hive_api_get_nodes(Session(), n_id)
                 final = True
-                self.log.log(n_id, 'API', "Mode updated - API response 200")
+                self.log.log(n_id, "API", "Mode updated - API response 200")
             else:
-                self.log.error_check(n_id, 'ERROR', 'Failed_API',
-                                     resp=resp['original'])
+                self.log.error_check(n_id, "ERROR", "Failed_API", resp=resp["original"])
 
         return final
 
@@ -275,23 +277,31 @@ class Heating:
             if temp <= self.max_temperature():
                 self.log.log(self.type, "Enabling boost for {0}", n_id)
                 from pyhiveapi.hive_session import Session
+
                 Session.check_hive_api_logon(Session())
                 final = False
 
                 if n_id in Data.products:
                     data = Data.products[n_id]
-                    resp = self.hive.set_state(Data.sess_id, data['type'],
-                                               n_id, mode='BOOST', boost=mins,
-                                               target=temp)
+                    resp = self.hive.set_state(
+                        Data.sess_id,
+                        data["type"],
+                        n_id,
+                        mode="BOOST",
+                        boost=mins,
+                        target=temp,
+                    )
 
-                    if str(resp['original']) == "<Response [200]>":
+                    if str(resp["original"]) == "<Response [200]>":
                         Session.hive_api_get_nodes(Session(), n_id)
                         final = True
-                        self.log.log(n_id, 'API', "Boost enabled - " +
-                                     "API response 200")
+                        self.log.log(
+                            n_id, "API", "Boost enabled - " + "API response 200"
+                        )
                     else:
-                        self.log.error_check(n_id, 'ERROR', 'Failed_API',
-                                             resp=resp['original'])
+                        self.log.error_check(
+                            n_id, "ERROR", "Failed_API", resp=resp["original"]
+                        )
 
                 return final
         return None
@@ -299,6 +309,7 @@ class Heating:
     def turn_boost_off(self, n_id):
         """Turn heating boost off."""
         from pyhiveapi.hive_session import Session
+
         self.log.log(self.type, "Disabling boost for {0}", n_id)
         final = False
 
@@ -308,20 +319,22 @@ class Heating:
             Session.hive_api_get_nodes(Session(), n_id)
             if self.get_boost(n_id) == "ON":
                 prev_mode = data["props"]["previous"]["mode"]
-                if prev_mode == 'MANUAL' or prev_mode == 'OFF':
-                    pre_temp = data["props"]["previous"].get('target', 7)
-                    resp = self.hive.set_state(Data.sess_id, data[type], n_id,
-                                               mode=prev_mode, target=pre_temp)
+                if prev_mode == "MANUAL" or prev_mode == "OFF":
+                    pre_temp = data["props"]["previous"].get("target", 7)
+                    resp = self.hive.set_state(
+                        Data.sess_id, data[type], n_id, mode=prev_mode, target=pre_temp
+                    )
                 else:
-                    resp = self.hive.set_state(Data.sess_id, data[type], n_id,
-                                               mode=prev_mode)
-                if str(resp['original']) == "<Response [200]>":
+                    resp = self.hive.set_state(
+                        Data.sess_id, data[type], n_id, mode=prev_mode
+                    )
+                if str(resp["original"]) == "<Response [200]>":
                     Session.hive_api_get_nodes(Session(), n_id)
                     final = True
-                    self.log.log(n_id, 'API', "Boost disabled - " +
-                                 "API response 200")
+                    self.log.log(n_id, "API", "Boost disabled - " + "API response 200")
                 else:
-                    self.log.error_check(n_id, 'ERROR', 'Failed_API',
-                                         resp=resp['original'])
+                    self.log.error_check(
+                        n_id, "ERROR", "Failed_API", resp=resp["original"]
+                    )
 
         return final

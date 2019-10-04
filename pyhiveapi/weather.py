@@ -11,5 +11,5 @@ class Weather:
 
     def temperature(self):
         """Get Hive Weather temperature."""
-        self.log.log('Weather', 'Temp', "Gettin outside temp.")
+        self.log.log("Weather", "Temp", "Gettin outside temp.")
         return Data.w_temperature_value

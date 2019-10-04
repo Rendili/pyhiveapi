@@ -6,7 +6,7 @@ import os
 
 
 def open_file(file):
-    path = os.getcwd() + '/responses/' + file
+    path = os.getcwd() + "/responses/" + file
     json_data = open(path).read()
 
     return json.loads(json_data)
@@ -16,11 +16,11 @@ class Device_Attribute_Tests(unittest.TestCase):
     """Unit tests for the Logger Class."""
 
     def setUp(self):
-        products = open_file('parsed_products.json')
-        devices = open_file('parsed_devices.json')
-        nodes = open_file('NODES.json')
-        mode = open_file('MODE.json')
-        battery = open_file('BATTERY.json')
+        products = open_file("parsed_products.json")
+        devices = open_file("parsed_devices.json")
+        nodes = open_file("NODES.json")
+        mode = open_file("MODE.json")
+        battery = open_file("BATTERY.json")
         Data.products = products
         Data.devices = devices
         Data.NODES = nodes
@@ -30,7 +30,7 @@ class Device_Attribute_Tests(unittest.TestCase):
     def tearDown(self):
         Data.products = {}
         Data.devices = {}
-        Data.NODES = {'Preheader': {'Header': 'HeaderText'}}
+        Data.NODES = {"Preheader": {"Header": "HeaderText"}}
         Data.MODE = []
         Data.BATTERY = []
 
@@ -38,13 +38,13 @@ class Device_Attribute_Tests(unittest.TestCase):
         id_n = "contact-sensor-0000-0000-000000000003"
         end = Attributes.online_offline(Attributes(), id_n)
         print(end)
-        self.assertEqual(end, 'Offline')
+        self.assertEqual(end, "Offline")
 
     def test_device_online(self):
         id_n = "contact-sensor-0000-0000-000000000001"
         end = Attributes.online_offline(Attributes(), id_n)
         print(end)
-        self.assertEqual(end, 'Online')
+        self.assertEqual(end, "Online")
 
     def test_device_get_mode(self):
         end = None
@@ -68,5 +68,5 @@ class Device_Attribute_Tests(unittest.TestCase):
         self.assertIsNotNone(end)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

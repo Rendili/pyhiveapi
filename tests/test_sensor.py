@@ -6,7 +6,7 @@ import os
 
 
 def open_file(file):
-    path = os.getcwd() + '/responses/' + file
+    path = os.getcwd() + "/responses/" + file
     json_data = open(path).read()
 
     return json.loads(json_data)
@@ -16,9 +16,9 @@ class Sensor_Tests(unittest.TestCase):
     """Unit tests for the Logger Class."""
 
     def setUp(self):
-        products = open_file('parsed_products.json')
-        devices = open_file('parsed_devices.json')
-        nodes = open_file('NODES.json')
+        products = open_file("parsed_products.json")
+        devices = open_file("parsed_devices.json")
+        nodes = open_file("NODES.json")
         Data.products = products
         Data.devices = devices
         Data.NODES = nodes
@@ -53,5 +53,5 @@ class Sensor_Tests(unittest.TestCase):
         self.assertEqual(end, True)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

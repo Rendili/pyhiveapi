@@ -9,7 +9,7 @@ import os
 
 
 def open_file(file):
-    path = os.getcwd() + '/responses/' + file
+    path = os.getcwd() + "/responses/" + file
     json_data = open(path).read()
 
     return json.loads(json_data)
@@ -19,9 +19,9 @@ class Heating_Tests(unittest.TestCase):
     """Unit tests for the Logger Class."""
 
     def setUp(self):
-        products = open_file('parsed_products.json')
-        devices = open_file('parsed_devices.json')
-        nodes = open_file('NODES.json')
+        products = open_file("parsed_products.json")
+        devices = open_file("parsed_devices.json")
+        nodes = open_file("NODES.json")
         Data.products = products
         Data.devices = devices
         Data.NODES = nodes
@@ -54,17 +54,20 @@ class Heating_Tests(unittest.TestCase):
     def test_get_minmax_temp(self):
         end = None
         id_n = "heating-0000-0000-0000-000000000001"
-        Data.p_minmax = {'heating-0000-0000-0000-000000000001': {'TodayMin': 19.79,
-                                                                 'TodayMax': 19.79,
-                                                                 'TodayDate': '2019-04-07',
-                                                                 'RestartMin': 10.01,
-                                                                 'RestartMax': 25.05}}
+        Data.p_minmax = {
+            "heating-0000-0000-0000-000000000001": {
+                "TodayMin": 19.79,
+                "TodayMax": 19.79,
+                "TodayDate": "2019-04-07",
+                "RestartMin": 10.01,
+                "RestartMax": 25.05,
+            }
+        }
         end = Heating.minmax_temperatures(Heating(), id_n)
         print(end)
         self.assertIsNotNone(end)
 
-
-#    def test_get_mode(self):
+    #    def test_get_mode(self):
 
     def test_get_state(self):
         end = None
@@ -77,7 +80,7 @@ class Heating_Tests(unittest.TestCase):
         id_n = "heating-0000-0000-0000-000000000001"
         end = Heating.get_boost(Heating(), id_n)
         print(end)
-        self.assertEqual('ON', end)
+        self.assertEqual("ON", end)
 
     def test_get_boost_off(self):
         end = None
@@ -86,7 +89,7 @@ class Heating_Tests(unittest.TestCase):
         data["state"]["boost"] = None
         end = Heating.get_boost(Heating(), id_n)
         print(end)
-        self.assertEqual('OFF', end)
+        self.assertEqual("OFF", end)
 
     def test_get_boost_time(self):
         end = None
@@ -110,9 +113,12 @@ class Heating_Tests(unittest.TestCase):
         print(end)
         self.assertIsNotNone(end)
 
-    @patch('pyhiveapi.hive_session.Session.check_hive_api_logon', return_value=None)
-    @patch('pyhiveapi.hive_session.Session.hive_api_get_nodes', return_value=None)
-    @patch('pyhiveapi.hive_api.Hive.set_state', return_value=open_file('set_state_sucessful.json'))
+    @patch("pyhiveapi.hive_session.Session.check_hive_api_logon", return_value=None)
+    @patch("pyhiveapi.hive_session.Session.hive_api_get_nodes", return_value=None)
+    @patch(
+        "pyhiveapi.hive_api.Hive.set_state",
+        return_value=open_file("set_state_sucessful.json"),
+    )
     def test_set_target_temperature_sucessful(self, Check_login, Get_nodes, Set_state):
         end = None
         id_n = "heating-0000-0000-0000-000000000001"
@@ -120,15 +126,19 @@ class Heating_Tests(unittest.TestCase):
         print(end)
         self.assertTrue(end)
 
-    @patch('pyhiveapi.hive_session.Session.check_hive_api_logon', return_value=None)
-    @patch('pyhiveapi.hive_session.Session.hive_api_get_nodes', return_value=None)
-    @patch('pyhiveapi.hive_api.Hive.set_state', return_value=open_file('set_state_failed.json'))
+    @patch("pyhiveapi.hive_session.Session.check_hive_api_logon", return_value=None)
+    @patch("pyhiveapi.hive_session.Session.hive_api_get_nodes", return_value=None)
+    @patch(
+        "pyhiveapi.hive_api.Hive.set_state",
+        return_value=open_file("set_state_failed.json"),
+    )
     def test_set_target_temperature_failed(self, Check_login, Get_nodes, Set_state):
         end = None
         id_n = "heating-0000-0000-0000-000000000001"
         end = Heating.set_target_temperature(Heating(), id_n, 32)
         print(end)
         self.assertFalse(end)
+
 
 #    def test_set_mode(self):
 
@@ -137,5 +147,5 @@ class Heating_Tests(unittest.TestCase):
 #    def test_turn_boost_off(self):
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
