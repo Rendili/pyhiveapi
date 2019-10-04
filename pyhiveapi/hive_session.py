@@ -26,11 +26,11 @@ class Session:
         self.log = Logger()
         self.type = "Session"
 
-    def open_file(file):
+    def open_file(self, file):
         path = os.getcwd() + file
         json_data = open(path).read()
 
-    return json.loads(json_data)
+        return json.loads(json_data)
 
     def hive_api_logon(self):
         """Log in to the Hive API and get the Session Data."""
@@ -264,8 +264,9 @@ class Session:
         self.log.check_logging(kwargs.get("session", False))
         Data.s_username = username
         Data.s_password = password
+        loc = None
         self.log.log("No_ID", self.type, "Initialising Hive Component.")
-        loc == os.path.expanduser("~") + "/.homeassistant/pyhiveapi/use_file"
+        loc = os.path.expanduser("~") + "/.homeassistant/pyhiveapi/use_file"
         if os.path.isfile(loc):
             Data.s_file = True
 
