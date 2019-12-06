@@ -451,7 +451,8 @@ class Pyhiveapi:
                     if "type" in a_device:
                         if a_device["type"] == "hub":
                             tmp_devices_hub.append(a_device)
-                        if a_device["type"] == "thermostatui":
+                        if (a_device["type"] == "thermostatui" or
+                                a_device["type"] == "nathermostat"):
                             tmp_devices_thermostat.append(a_device)
                         if a_device["type"] == "trv":
                             tmp_devices_trv.append(a_device)
@@ -507,7 +508,8 @@ class Pyhiveapi:
 
                 for a_product in api_resp_p:
                     if "type" in a_product:
-                        if a_product["type"] == "heating":
+                        if (a_product["type"] == "heating" or
+                                a_product["type"] == "nathermostat"):
                             tmp_products_heating.append(a_product)
                         if a_product["type"] == "trvcontrol":
                             tmp_products_trv.append(a_product)
@@ -865,8 +867,12 @@ class Pyhiveapi:
                 thermostat_nodeid = "Thermostat_NodeID"
                 if len(HSC.devices.thermostat) > 0:
                     for device in HSC.devices.thermostat:
-                        if product["parent"] == device["props"]["zone"]:
-                            thermostat_nodeid = device["id"]
+                        if device["type"] == "nathermostat":
+                            if product["id"] == device["id"]:
+                                thermostat_nodeid = device["id"]
+                        else:
+                            if product["parent"] == device["props"]["zone"]:
+                                thermostat_nodeid = device["id"]
                 if "id" in product and "state" in product and "name" in product["state"]:
                     node_name = product["state"]["name"]
                     if len(HSC.products.heating) == 1:
