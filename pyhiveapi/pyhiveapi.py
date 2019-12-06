@@ -804,9 +804,8 @@ class Pyhiveapi:
             for product in HSC.products.trv:
                 if "id" in product and "state" in product:
                     node_name = product["state"]["name"]
-                    device_list_climate.append({'HA_DeviceType': 'TRV', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "TRV"})
+                    device_list_climate.append({'HA_DeviceType': 'TRV', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "TRV", 'Thermostat_NodeID': product["id"]})
                     """device_list_sensor.append({'HA_DeviceType': 'TRV_CurrentTemperature', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "TRV"})"""
-                    
                     """device_list_sensor.append({'HA_DeviceType': 'Heating_TargetTemperature', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "Heating"})
                     device_list_sensor.append({'HA_DeviceType': 'Heating_State', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "Heating"})
                     device_list_sensor.append({'HA_DeviceType': 'Heating_Mode', 'Hive_NodeID': product["id"], 'Hive_NodeName': node_name, "Hive_DeviceType": "Heating"})
@@ -1691,16 +1690,7 @@ class Pyhiveapi:
                             "mode" in HSC.products.hotwater[node_index]["state"]):
                         hotwater_mode_tmp = (HSC.products.hotwater[node_index]
                                              ["state"]["mode"])
-                        if hotwater_mode_tmp == "BOOST":
-                            if ("props" in HSC.products.hotwater[node_index] and
-                                    "previous" in
-                                    HSC.products.hotwater[node_index]["props"] and
-                                    "mode" in
-                                    HSC.products.hotwater[node_index]
-                                    ["props"]["previous"]):
-                                hotwater_mode_tmp = (HSC.products.hotwater[node_index]
-                                                     ["props"]["previous"]["mode"])
-                        elif hotwater_mode_tmp == "MANUAL":
+                        if hotwater_mode_tmp == "BOOST" or hotwater_mode_tmp == "MANUAL":
                             hotwater_mode_tmp = "ON"
                         hotwater_mode_found = True
 
