@@ -7,6 +7,7 @@ import time
 import requests
 import colorsys
 import os
+import json
 
 HIVE_NODE_UPDATE_INTERVAL_DEFAULT = 120
 HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT = 600
@@ -89,6 +90,19 @@ class Logging:
     attribute = False
 
 
+class Testing:
+    """Initiate Testing Class."""
+
+    files_folder = ""
+    file_login = ""
+    file_devices = ""
+    file_products = ""
+    enabled = False
+    login = False
+    devices = False
+    products = False
+
+
 class HiveSession:
     """Initiate Hive Session Class."""
 
@@ -106,6 +120,7 @@ class HiveSession:
     weather = HiveWeather()
     data = HivePlatformData()
     logging = Logging()
+    testing = Testing()
 #    holiday_mode = Hive_HolidayMode()
     update_node_interval_seconds = HIVE_NODE_UPDATE_INTERVAL_DEFAULT
     update_weather_interval_seconds = HIVE_WEATHER_UPDATE_INTERVAL_DEFAULT
@@ -182,6 +197,11 @@ class Pyhiveapi:
         HSC.logging.file_sensor = "pyhiveapi.logging.sensor"
         HSC.logging.file_attribute = "pyhiveapi.logging.attribute"
 
+        HSC.testing.file_login = "pyhiveapi.testing.login.json"
+        HSC.testing.file_devices = "pyhiveapi.testing.devices.json"
+        HSC.testing.file_products = "pyhiveapi.testing.products.json"
+
+
     def hive_api_json_call(self, request_type, request_url, json_string_content, absolute_request_url):
         """Call the JSON Hive API and return any returned data."""
         api_headers = {HIVE_API.headers.content_type_key:
@@ -256,11 +276,22 @@ class Pyhiveapi:
         try:
             api_resp_d = {}
             api_resp_p = None
+            file_login_resp_d = {}
+            file_login_resp_p = None
 
-            json_string_content = '{"username": "' + HSC.username + '","password": "' + HSC.password + '"}'
+            if HSC.testing.enabled:
+                file_login_text = open(HSC.testing.files_folder + "/" + HSC.testing.file_login, "r")
+                file_login_resp_d = file_login_text.read()
+                file_login_text.close()
+                file_login_resp_p = json.loads(file_login_resp_d)
 
-            api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", HIVE_API.urls.global_login, json_string_content, True)
-            api_resp_p = api_resp_d['parsed']
+                api_resp_d = file_login_resp_d
+                api_resp_p = json.loads(file_login_resp_d)
+            else:
+                json_string_content = '{"username": "' + HSC.username + '","password": "' + HSC.password + '"}'
+
+                api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", HIVE_API.urls.global_login, json_string_content, True)
+                api_resp_p = api_resp_d['parsed']
 
             if ('token' in api_resp_p and
                     'user' in api_resp_p and
@@ -385,18 +416,36 @@ class Pyhiveapi:
 
             try_finished = False
             try:
+                if HSC.logging.all or HSC.logging.core or HSC.logging.http:
+                    Pyhiveapi.logger("Get Devices")
+
                 api_resp_d = {}
                 api_resp_p = None
-                api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.devices, "", False)
+                file_login_resp_d = {}
+                file_login_resp_p = None
 
-                if HSC.logging.all or HSC.logging.core or HSC.logging.http:
-                    api_resp = str(api_resp_d['original'])
-                    if api_resp == "<Response [200]>":
-                        Pyhiveapi.logger("Devices API call successful : " + api_resp)
-                    else:
-                        Pyhiveapi.logger("Devices API call failed : " + api_resp)
+                if HSC.testing.enabled:
+                    file_login_text = open(HSC.testing.files_folder + "/" + HSC.testing.file_devices, "r")
+                    file_login_resp_d = file_login_text.read()
+                    file_login_text.close()
+                    file_login_resp_p = json.loads(file_login_resp_d)
 
-                api_resp_p = api_resp_d['parsed']
+                    api_resp_d = file_login_resp_d
+                    api_resp_p = json.loads(file_login_resp_d)
+
+                    if HSC.logging.all or HSC.logging.core or HSC.logging.http:
+                        Pyhiveapi.logger("Devices File read successful")
+                else:
+                    api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.devices, "", False)
+
+                    if HSC.logging.all or HSC.logging.core or HSC.logging.http:
+                        api_resp = str(api_resp_d['original'])
+                        if api_resp == "<Response [200]>":
+                            Pyhiveapi.logger("Devices API call successful : " + api_resp)
+                        else:
+                            Pyhiveapi.logger("Devices API call failed : " + api_resp)
+
+                    api_resp_p = api_resp_d['parsed']
 
                 for a_device in api_resp_p:
                     if "type" in a_device:
@@ -427,18 +476,34 @@ class Pyhiveapi:
 
             try_finished = False
             try:
+                if HSC.logging.all or HSC.logging.core or HSC.logging.http:
+                    Pyhiveapi.logger("Get Products")
+
                 api_resp_d = {}
                 api_resp_p = None
-                api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.products, "", False)
 
-                if HSC.logging.all or HSC.logging.core or HSC.logging.http:
-                    api_resp = str(api_resp_d['original'])
-                    if api_resp == "<Response [200]>":
-                        Pyhiveapi.logger("Products API call successful : " + api_resp)
-                    else:
-                        Pyhiveapi.logger("Products API call failed : " + api_resp)
+                if HSC.testing.enabled:
+                    file_login_text = open(HSC.testing.files_folder + "/" + HSC.testing.file_products, "r")
+                    file_login_resp_d = file_login_text.read()
+                    file_login_text.close()
+                    file_login_resp_p = json.loads(file_login_resp_d)
 
-                api_resp_p = api_resp_d['parsed']
+                    api_resp_d = file_login_resp_d
+                    api_resp_p = json.loads(file_login_resp_d)
+
+                    if HSC.logging.all or HSC.logging.core or HSC.logging.http:
+                        Pyhiveapi.logger("Products File read successful")
+                else:
+                    api_resp_d = Pyhiveapi.hive_api_json_call(self, "GET", HIVE_API.urls.products, "", False)
+
+                    if HSC.logging.all or HSC.logging.core or HSC.logging.http:
+                        api_resp = str(api_resp_d['original'])
+                        if api_resp == "<Response [200]>":
+                            Pyhiveapi.logger("Products API call successful : " + api_resp)
+                        else:
+                            Pyhiveapi.logger("Products API call failed : " + api_resp)
+
+                    api_resp_p = api_resp_d['parsed']
 
                 for a_product in api_resp_p:
                     if "type" in a_product:
@@ -732,12 +797,48 @@ class Pyhiveapi:
         if HSC.logging.all or HSC.logging.core:
             Pyhiveapi.logger("pyhiveapi initialising")
 
+        if HSC.logging.all or HSC.logging.core:
+            Pyhiveapi.logger("Check for test input JSON files")
+
+        HSC.testing.files_folder = os.path.expanduser('~') + "/pyhiveapi"
+        try:
+            if os.path.isdir(HSC.testing.files_folder):
+                if os.path.isfile(HSC.testing.files_folder + "/" + HSC.testing.file_login):
+                    HSC.testing.login = True
+                    HSC.testing.enabled = True
+                    if HSC.logging.all or HSC.logging.core:
+                        Pyhiveapi.logger("Test input JSON file for login found")
+                if os.path.isfile(HSC.testing.files_folder + "/" + HSC.testing.file_devices):
+                    HSC.testing.devices = True
+                    HSC.testing.enabled = True
+                    if HSC.logging.all or HSC.logging.core:
+                        Pyhiveapi.logger("Test input JSON file for devices found")
+                if os.path.isfile(HSC.testing.files_folder + "/" + HSC.testing.file_products):
+                    HSC.testing.products = True
+                    HSC.testing.enabled = True
+                    if HSC.logging.all or HSC.logging.core:
+                        Pyhiveapi.logger("Test input JSON file for products found")
+        except:
+            HSC.testing.enabled = False
+            HSC.testing.login = False
+            HSC.testing.devices = False
+            HSC.testing.products = False
+
+        if HSC.testing.login and HSC.testing.devices and HSC.testing.products:
+            HSC.testing.enabled = True
+            if HSC.logging.all or HSC.logging.core:
+                Pyhiveapi.logger("Test file input enabled - All 3 files found")
+        else:
+            HSC.testing.enabled = False
+            if HSC.logging.all or HSC.logging.core:
+                Pyhiveapi.logger("Test file input disabled - All 3 files not found")
+
         if mins_between_updates <= 0:
             mins_between_updates = 2
 
         hive_node_update_interval = mins_between_updates * 60
 
-        if HSC.username is None or HSC.password is None:
+        if HSC.testing.enabled == False and (HSC.username is None or HSC.password is None):
             return None
         else:
             Pyhiveapi.hive_api_logon(self)
