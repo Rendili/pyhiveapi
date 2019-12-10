@@ -1328,18 +1328,27 @@ class Pyhiveapi:
                 if node_index != -1:
                     heating_mode_current = Pyhiveapi.Heating.get_mode(self, node_id)
                     heating_boost_current = Pyhiveapi.Heating.get_boost(self, node_id)
-
                     if heating_boost_current == "ON":
-                        if "state" in HSC.products.heating[node_index] and "target" in HSC.products.heating[node_index]["state"]:
-                            heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["target"]
-                            heating_target_temp_found = True
+                        if HSC.products.heating[node_index]["type"] != "nathermostat":
+                            if "state" in HSC.products.heating[node_index] and "target" in HSC.products.heating[node_index]["state"]:
+                                heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["target"]
+                                heating_target_temp_found = True
+                        else:
+                            if "state" in HSC.products.heating[node_index] and "heat" in HSC.products.heating[node_index]["state"]:
+                                heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["heat"]
+                                heating_target_temp_found = True
                     else:
                         if heating_mode_current == "SCHEDULE":
                             if 'props' in HSC.products.heating[node_index] and 'scheduleOverride' in HSC.products.heating[node_index]["props"]:
                                 if HSC.products.heating[node_index]["props"]["scheduleOverride"]:
-                                    if "state" in HSC.products.heating[node_index] and "target" in HSC.products.heating[node_index]["state"]:
-                                        heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["target"]
-                                        heating_target_temp_found = True
+                                    if HSC.products.heating[node_index]["type"] != "nathermostat":
+                                        if "state" in HSC.products.heating[node_index] and "target" in HSC.products.heating[node_index]["state"]:
+                                            heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["target"]
+                                            heating_target_temp_found = True
+                                    else:
+                                        if "state" in HSC.products.heating[node_index] and "heat" in HSC.products.heating[node_index]["state"]:
+                                            heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["heat"]
+                                            heating_target_temp_found = True
                                 else:
                                     snan = Pyhiveapi.p_get_schedule_now_next_later(self, HSC.products.heating[node_index]["state"]["schedule"])
                                     if 'now' in snan:
@@ -1347,11 +1356,14 @@ class Pyhiveapi:
                                             heating_target_temp_tmp = snan["now"]["value"]["target"]
                                             heating_target_temp_found = True
                         else:
-                            if ("state" in HSC.products.heating[node_index] and "target"
-                                    in HSC.products.heating[node_index]["state"]):
-                                heating_target_temp_tmp = \
-                                    HSC.products.heating[node_index]["state"]["target"]
-                                heating_target_temp_found = True
+                            if HSC.products.heating[node_index]["type"] != "nathermostat":
+                                if "state" in HSC.products.heating[node_index] and "target" in HSC.products.heating[node_index]["state"]:
+                                    heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["target"]
+                                    heating_target_temp_found = True
+                            else:
+                                if "state" in HSC.products.heating[node_index] and "heat" in HSC.products.heating[node_index]["state"]:
+                                    heating_target_temp_tmp = HSC.products.heating[node_index]["state"]["heat"]
+                                    heating_target_temp_found = True
             if len(HSC.products.trv) > 0 and heating_target_temp_found == False:
                 for current_node_index in range(0,len(HSC.products.trv)):
                     if "id" in HSC.products.trv[current_node_index]:
