@@ -201,10 +201,10 @@ class Pyhiveapi:
         HSC.testing.file_devices = "pyhiveapi.testing.devices.json"
         HSC.testing.file_products = "pyhiveapi.testing.products.json"
 
-        HSC.data.minmax[node_id]['TodayMin'] = 1000
-        HSC.data.minmax[node_id]['TodayMax'] = -1000
-        HSC.data.minmax[node_id]['RestartMin'] = 1000
-        HSC.data.minmax[node_id]['RestartMax'] = -1000
+#        HSC.data.minmax[node_id]['TodayMin'] = 1000
+#        HSC.data.minmax[node_id]['TodayMax'] = -1000
+#        HSC.data.minmax[node_id]['RestartMin'] = 1000
+#        HSC.data.minmax[node_id]['RestartMax'] = -1000
 
 
     def hive_api_json_call(self, request_type, request_url, json_string_content, absolute_request_url):
@@ -1433,6 +1433,15 @@ class Pyhiveapi:
                     if ("state" in HSC.products.trv[node_index] and
                             "mode" in HSC.products.trv[node_index]["state"]):
                         mode_tmp = HSC.products.trv[node_index]["state"]["mode"]
+                        if mode_tmp == "BOOST":
+                            if ("props" in HSC.products.trv[node_index] and
+                                    "previous" in
+                                    HSC.products.trv[node_index]["props"] and
+                                    "mode" in
+                                    HSC.products.trv[node_index]
+                                    ["props"]["previous"]):
+                                mode_tmp = (HSC.products.trv[node_index]
+                                            ["props"]["previous"]["mode"])
                         mode_found = True
             if mode_found:
                 NODE_ATTRIBS[current_node_attribute] = mode_tmp
@@ -1722,6 +1731,14 @@ class Pyhiveapi:
             for a_heating in HSC.products.heating:
                 if "id" in a_heating:
                     if a_heating["id"] == node_id:
+                        node_type = "heating"
+                        heating_node_found = True
+                        break
+
+            for a_trv in HSC.products.trv:
+                if "id" in a_heating:
+                    if a_trv["id"] == node_id:
+                        node_type = "trvcontrol"
                         heating_node_found = True
                         break
 
@@ -1729,7 +1746,7 @@ class Pyhiveapi:
 
             if heating_node_found:
                 json_string_content = '{"mode": "BOOST", "boost": ' + str(length_minutes) + ', "target": ' + str(target_temperature) + '}'
-                hive_api_url = (HIVE_API.urls.nodes + "/heating/" + node_id)
+                hive_api_url = (HIVE_API.urls.nodes + "/" + node_type + "/" + node_id)
                 api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
 
                 api_resp = api_resp_d['original']
@@ -1750,6 +1767,14 @@ class Pyhiveapi:
             for a_heating in HSC.products.heating:
                 if "id" in a_heating:
                     if a_heating["id"] == node_id:
+                        node_type = "heating"
+                        heating_node_found = True
+                        break
+
+            for a_trv in HSC.products.trv:
+                if "id" in a_heating:
+                    if a_trv["id"] == node_id:
+                        node_type = "trvcontrol"
                         heating_node_found = True
                         break
 
@@ -1778,7 +1803,7 @@ class Pyhiveapi:
                             send_previous_temperature = ', "target": ' + str(previous_temperature)
 
                         json_string_content = '{' + send_previous_mode + send_previous_temperature + '}'
-                        hive_api_url = (HIVE_API.urls.nodes + "/heating/" + node_id)
+                        hive_api_url = (HIVE_API.urls.nodes + "/" + node_type + "/" + node_id)
                         api_resp_d = Pyhiveapi.hive_api_json_call(self, "POST", hive_api_url, json_string_content, False)
 
                         api_resp = api_resp_d['original']
