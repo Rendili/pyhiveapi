@@ -1688,7 +1688,8 @@ class Pyhiveapi:
                                 if str(api_resp) == "<Response [200]>":
                                     Pyhiveapi.hive_api_get_nodes(self, node_id)
                                     set_mode_success = True
-                if len(HSC.products.trv) > 0:
+                                    
+                if len(HSC.products.trv) > 0 and set_mode_success == False:
                     for current_node_index in range(0, len(HSC.products.trv)):
                         if "id" in HSC.products.trv[current_node_index]:
                             if HSC.products.trv[current_node_index]["id"] == node_id:
