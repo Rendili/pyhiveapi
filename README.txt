@@ -1,8 +1,5 @@
-A Python library to interface with the Hive API, mainly to support Home Assistant
+This repository originally hosted the source for the pyhiveapi library which is a python api interface to the Hive Home system.
 
-Home Assistant version : pyhiveapi version
-0.59.0 : 0.2.5
-0.61.0 : 0.2.10
-0.62.0 : 0.2.11
-0.86.0 : 0.2.17
-0.96.0 : 0.2.18.1
+The source is not maintained here at the moment but is instead hosted and maintained in a new GitHub repository:
+
+https://github.com/Pyhive/Pyhiveapi
